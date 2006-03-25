@@ -1,0 +1,22 @@
+Version 1.0.1 (released )
+
+	* mapbounds is now supported as an option in the configuration
+	file. 
+
+	* Xplanet now works natively on Aqua, but is a little flaky; it
+	sometimes fails to set the desktop and the default "Aqua Blue"
+	shows up.  Reproducible bug reports are greatly appreciated!
+
+	* The timer would cause an exit after one drawing on non-X11
+	systems. 
+
+	* Markers on the other planets were not drawn properly with the
+	-projection option.
+
+
+Version 1.0.0 (released 11 Mar 2003)
+
+	* First public release.  See the NEWS file for changes from the
+	previous version.
+
+	
