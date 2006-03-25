@@ -45,7 +45,7 @@ drawStars(DisplayBase *display, View *view)
         if (line[0] == '#') continue;
 
         double Vmag, RA, Dec;
-        sscanf(line, "%lf %lf %lf", &Dec, &RA, &Vmag);
+        if (sscanf(line, "%lf %lf %lf", &Dec, &RA, &Vmag) < 3) continue;
 
         RA *= deg_to_rad;
         Dec *= deg_to_rad;
@@ -54,7 +54,7 @@ drawStars(DisplayBase *display, View *view)
         RADecToXYZ(RA, Dec, sX, sY, sZ);
 
         double X, Y, Z;
-        view->XYZToPixel(options->getRotate(), sX, sY, sZ, X, Y, Z);
+        view->XYZToPixel(sX, sY, sZ, X, Y, Z);
         X += options->getCenterX();
         Y += options->getCenterY();
 

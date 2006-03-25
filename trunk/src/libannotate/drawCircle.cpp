@@ -2,7 +2,6 @@
 #include <map>
 using namespace std;
 
-#include "sphericalToPixel.h"
 #include "xpUtil.h"
 
 #include "drawArc.h"

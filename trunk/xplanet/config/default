@@ -18,8 +18,8 @@ cloud_threshold=90
 color={255,255,255}             # fallback color in case an image map
 				# isn't found 
 
-draw_orbit=false                # draw this body's orbit about its
-				# primary 
+draw_orbit=false                # if true, draw this body's orbit
+                                # about its primary
 
 grid=false
 
@@ -129,7 +129,6 @@ min_radius_for_label=0
 [jupiter]
 "Jupiter"
 color={204, 163, 133}
-
 min_radius_for_label=0
 
 [io]
@@ -151,7 +150,6 @@ color={70, 70, 70}
 [saturn]
 "Saturn"
 color={244, 199, 134}
-
 min_radius_for_label=0
 
 [mimas]

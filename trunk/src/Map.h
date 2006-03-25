@@ -14,17 +14,17 @@ class Map
 
     // Use this constructor if there are no image maps
     Map(const int w, const int h, 
-	const double sunLat, const double sunLon, 
-	Planet *t, PlanetProperties *tp, Ring *r, 
-	map<double, Planet *> &planetsFromSunMap);
+        const double sunLat, const double sunLon, 
+        Planet *t, PlanetProperties *tp, Ring *r, 
+        std::map<double, Planet *> &planetsFromSunMap);
 
     Map(const int w, const int h, 
-	const double sunLat, const double sunLon, 
-	const double obsLat, const double obsLon,
-	const unsigned char *day, const unsigned char *night, 
-	const unsigned char *specular, const unsigned char *clouds, 
-	Planet *t, PlanetProperties *tp, Ring *r, 
-	map<double, Planet *> &planetsFromSunMap);
+        const double sunLat, const double sunLon, 
+        const double obsLat, const double obsLon,
+        const unsigned char *day, const unsigned char *night, 
+        const unsigned char *specular, const unsigned char *clouds, 
+        Planet *t, PlanetProperties *tp, Ring *r, 
+        std::map<double, Planet *> &planetsFromSunMap);
 
     ~Map();
 
@@ -66,13 +66,19 @@ class Map
     void SetUpMap();
 
     void AddSpecularReflection(const unsigned char *specular,
-			       const double obsLat, const double obsLon);
+                               const double obsLat, const double obsLon);
     void OverlayClouds(const unsigned char *clouds);
     void AddShadows(std::map<double, Planet *> &planetsFromSunMap);
     void AddShadow(Planet *p, const double sun_size);
     double Overlap(const double elong, const double sun_radius, 
-		   const double p_radius);
+                   const double p_radius);
 
+    double OverlapEllipse(const double elong, const double sunRadius, 
+                          const double planetRadius, 
+                          const double X, const double Y, const double Z,
+                          const double sunX, const double sunY, 
+                          const double sunZ, const double ratio,
+                          Planet *planet);
     void CreateMap();
     void CopyBlock(unsigned char *dest, unsigned char *src, 
                    const int x1, const int y1,

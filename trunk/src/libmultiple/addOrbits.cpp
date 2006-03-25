@@ -36,8 +36,7 @@ addArc(const double startTime, const double stopTime,
 	planet.calcHeliocentricEquatorial(false);
 	planet.getPosition(X, Y, Z);
 	    
-	view->XYZToPixel(options->getRotate(), 
-			 X + Prx, Y + Pry, Z + Prz,
+	view->XYZToPixel(X + Prx, Y + Pry, Z + Prz,
 			 X, Y, Z);
 	X += options->getCenterX();
 	Y += options->getCenterY();

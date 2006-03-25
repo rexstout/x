@@ -171,7 +171,15 @@ AM_CPPFLAGS = @FREETYPE_CFLAGS@ -I@top_srcdir@/src
 @USE_AR_TRUE@libmultiple_a_AR = $(AR) cru
 @USE_AR_FALSE@libmultiple_a_AR = $(CXX) @xplanet_ARFLAGS@
 
-libmultiple_a_SOURCES = libmultiple.h addOrbits.cpp drawRings.cpp drawStars.cpp drawSun.cpp
+libmultiple_a_SOURCES = \
+	libmultiple.h 		\
+	addOrbits.cpp 		\
+	drawSphere.cpp		\
+	drawEllipsoid.cpp	\
+	drawRings.cpp 		\
+	drawStars.cpp 		\
+	drawSun.cpp
+
 subdir = src/libmultiple
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -180,16 +188,18 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 
 libmultiple_a_LIBADD =
-am_libmultiple_a_OBJECTS = addOrbits.$(OBJEXT) drawRings.$(OBJEXT) \
-	drawStars.$(OBJEXT) drawSun.$(OBJEXT)
+am_libmultiple_a_OBJECTS = addOrbits.$(OBJEXT) drawSphere.$(OBJEXT) \
+	drawEllipsoid.$(OBJEXT) drawRings.$(OBJEXT) drawStars.$(OBJEXT) \
+	drawSun.$(OBJEXT)
 libmultiple_a_OBJECTS = $(am_libmultiple_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/addOrbits.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/drawRings.Po ./$(DEPDIR)/drawStars.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/drawSun.Po
+@AMDEP_TRUE@	./$(DEPDIR)/drawEllipsoid.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/drawRings.Po ./$(DEPDIR)/drawSphere.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/drawStars.Po ./$(DEPDIR)/drawSun.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -229,7 +239,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addOrbits.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawEllipsoid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawRings.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawSphere.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawStars.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawSun.Po@am__quote@
 

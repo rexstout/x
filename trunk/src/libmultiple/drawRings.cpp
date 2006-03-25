@@ -98,8 +98,7 @@ drawRings(Planet *p, DisplayBase *display, View *view, Ring *ring,
     {
 	for (int i = i0; i < i1; i++)
 	{
-	    view->PixelToViewCoordinates(options->getRotate(), 
-					 options->getCenterX() - i, 
+	    view->PixelToViewCoordinates(options->getCenterX() - i, 
 					 options->getCenterY() - j, 
 					 pX, pY, pZ);
 
@@ -125,7 +124,7 @@ drawRings(Planet *p, DisplayBase *display, View *view, Ring *ring,
 	    // find lat & lon of ring pixel
 	    double lat, lon = options->Longitude();
 	    double dist;
-	    p->XYZToPlanetocentric(rX, rY, rZ, lat, lon, dist);
+	    p->XYZToPlanetographic(rX, rY, rZ, lat, lon, dist);
 
 	    double dpp = dist_per_pixel * fabs(cos(obs_lon - lon));
 	    dpp *= dist_to_point/dist_to_planet;

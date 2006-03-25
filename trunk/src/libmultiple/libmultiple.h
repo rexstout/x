@@ -5,6 +5,7 @@
 
 class Annotation;
 class DisplayBase;
+class Map;
 class Planet;
 class PlanetProperties;
 class Ring;
@@ -17,10 +18,26 @@ addOrbits(const double jd0, const View *view,
 	  std::multimap<double, Annotation *> &annotationMap);
 
 extern void
+drawEllipsoid(const double pX, const double pY, const double pR, 
+	      const double oX, const double oY, const double oZ, 
+	      const double X, const double Y, const double Z,
+	      DisplayBase *display, 
+	      const View *view, const Map *map, Planet *planet,
+	      const double planetRadius);
+
+extern void
 drawRings(Planet *p, DisplayBase *display, View *view, Ring *ring, 
 	  const double X, const double Y, const double R, 
 	  const double obs_lat, const double obs_lon, 
 	  const bool lit_side, const bool draw_far_side);
+
+extern void
+drawSphere(const double pX, const double pY, const double pR, 
+	   const double oX, const double oY, const double oZ, 
+	   const double X, const double Y, const double Z,
+	   DisplayBase *display, 
+	   const View *view, const Map *map, Planet *planet,
+	   const double planetRadius);
 
 extern void
 drawSun(DisplayBase *display, const double X, const double Y, 

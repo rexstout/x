@@ -46,7 +46,7 @@ xplanet_SOURCES = \
 	satrings.h		\
 	sphericalToPixel.h	\
 	sphericalToPixel.cpp	\
-	xpGetopt.h           	\
+	xpGetopt.h		\
 	xpUtil.cpp		\
 	xpUtil.h		\
 	xplanet.cpp		\

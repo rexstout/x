@@ -8,4 +8,11 @@ else
   libmultiple_a_AR = $(CXX) @xplanet_ARFLAGS@
 endif
 
-libmultiple_a_SOURCES = libmultiple.h addOrbits.cpp drawRings.cpp drawStars.cpp drawSun.cpp
+libmultiple_a_SOURCES = 	\
+	libmultiple.h 		\
+	addOrbits.cpp 		\
+	drawSphere.cpp		\
+	drawEllipsoid.cpp	\
+	drawRings.cpp 		\
+	drawStars.cpp 		\
+	drawSun.cpp

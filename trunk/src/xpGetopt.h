@@ -1,3 +1,12 @@
+#ifndef _GETOPT_H
+#define _GETOPT_H
+
+/*
+  The essential bits and pieces from the GNU getopt.h header file.
+  This has been a headache on all kinds of different systems which
+  define getopt in different ways.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,9 +33,11 @@ extern "C" {
 # define optional_argument      2
 
 extern int getopt_long_only (int __argc, char *const *__argv,
-			     const char *__shortopts,
-		             const struct option *__longopts, int *__longind);
+                             const char *__shortopts,
+                             const struct option *__longopts, int *__longind);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

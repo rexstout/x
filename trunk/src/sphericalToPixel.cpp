@@ -24,12 +24,11 @@ sphericalToPixel(const double lat, const double lon, const double rad,
         }
         else
         {
-            planet->PlanetocentricToXYZ(X, Y, Z, lat, lon, rad);
+            planet->PlanetographicToXYZ(X, Y, Z, lat, lon, rad);
         }           
 
         Options *options = Options::getInstance();
-        view->XYZToPixel(options->getRotate(), 
-                         X, Y, Z, X, Y, Z);
+        view->XYZToPixel(X, Y, Z, X, Y, Z);
         X += options->getCenterX();
         Y += options->getCenterY();
         

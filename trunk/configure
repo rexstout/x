@@ -1570,7 +1570,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=xplanet
- VERSION=1.0.2
+ VERSION=1.0.3
 
 
 cat >>confdefs.h <<_ACEOF

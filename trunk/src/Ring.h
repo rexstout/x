@@ -2,28 +2,23 @@
 #define RING_H
 
 class Planet;
-class View;
 
 class Ring
 {
  public:
     Ring(const double inner_radius, const double outer_radius, 
-	 const double planet_radius, 
-	 const double *ring_brightness, const int num_bright,
-	 const double *ring_transparency, const int num_trans,
-	 const double sunlon, const double sunlat,
-	 const double shade, 
-	 Planet *p, View *view);
+         const double planet_radius, 
+         const double *ring_brightness, const int num_bright,
+         const double *ring_transparency, const int num_trans,
+         const double sunlon, const double sunlat,
+         const double shade, 
+         Planet *p);
 
     ~Ring();
 
-    // Compute the distance of the edge of planet's shadow on the
-    // rings as a function of longitude.
-    void buildShadowRadiusTable();
-
     // get the radius of the ring shadowing the specified location on
     // the planet
-    double getShadowRadius(const double lat, const double lon);
+    double getShadowRadius(double lat, double lon);
 
     // get the brightness on the lit side
     double getBrightness(const double lon, const double r);
@@ -40,9 +35,6 @@ class Ring
     double getOuterRadius() const { return(r_out); };
 
  private:
-    // check if the specified part of the ring is in shadow
-    bool isInShadow(const double lon, const double r);
-
     double r_out;  // outer ring radius, units of planetary radii
     double dr_b;   // resolution of brightness grid
     double dr_t;   // resolution of transparency grid
@@ -57,19 +49,14 @@ class Ring
     double *brightness;
     int window_b;  // each pixel contains this many brightness points
 
-    int num_s;
-    double *shadow_cosangle;
-    double *shadow_radius;
+    Planet *planet_;
 
     double shade_;
     double sun_lat, sun_lon;
-    double sun_x, sun_y, sun_z;
+    double sunX_, sunY_, sunZ_;
 
-    Planet *planet;
-    View *sun_view;  // View coordinate system centered on the sun
-
-    // get the outer radius of the shadow of the planet on the rings
-    double getShadowRadius(const double x);
+    double ellipseCoeffC_; // constant in quadratic to solve for
+                           // ellipsoid intersection
 
     // get a window average of array
     double getValue(const double *array, const int size, const int window,

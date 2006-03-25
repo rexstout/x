@@ -23,8 +23,15 @@ DisplayOutput::DisplayOutput(const int tr) : DisplayBase(tr)
 
     if (!options->CenterSelected())
     {
-	options->setCenterX(width_/2);
-	options->setCenterY(height_/2);
+        if (width_ % 2 == 0)
+            options->setCenterX(width_/2 - 0.5);
+        else
+            options->setCenterX(width_/2);
+
+        if (height_ % 2 == 0)
+            options->setCenterY(height_/2 - 0.5);
+        else
+            options->setCenterY(height_/2);
     }
 
     allocateRGBData();
@@ -45,17 +52,17 @@ DisplayOutput::renderImage(PlanetProperties *planetProperties[])
     i.Quality(quality_);
     if (!i.Write(outputFilename))
     {
-	ostringstream errStr;
-	errStr << "Can't create " << outputFilename << ".\n";
-	xpExit(errStr.str(), __FILE__, __LINE__);
+        ostringstream errStr;
+        errStr << "Can't create " << outputFilename << ".\n";
+        xpExit(errStr.str(), __FILE__, __LINE__);
     }
 
     Options *options = Options::getInstance();
     if (options->Verbosity() > 1)
     {
-	ostringstream msg;
-	msg << "Created image file " << outputFilename << "\n";
-	xpMsg(msg.str(), __FILE__, __LINE__);
+        ostringstream msg;
+        msg << "Created image file " << outputFilename << "\n";
+        xpMsg(msg.str(), __FILE__, __LINE__);
     }
 }
 
@@ -67,10 +74,10 @@ DisplayOutput::constructOutputFilename()
     string output_filename = options->getOutputBase();
     if (options->NumTimes() > 1)
     {
-	const int digits = (int) (log10((double) options->NumTimes()) + 1);
-	char buffer[64];
-	snprintf(buffer, 64, "%.*d", digits, times_run);
-	output_filename += buffer;
+        const int digits = (int) (log10((double) options->NumTimes()) + 1);
+        char buffer[64];
+        snprintf(buffer, 64, "%.*d", digits, times_run);
+        output_filename += buffer;
     }
     output_filename += options->getOutputExtension();
 

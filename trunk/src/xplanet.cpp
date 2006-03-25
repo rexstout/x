@@ -171,14 +171,14 @@ xplanet_main(int argc, char **argv)
 
         // Find the sub-observer lat & lon
         double obs_lat, obs_lon;
-        target->XYZToPlanetocentric(oX, oY, oZ, obs_lat, obs_lon);
+        target->XYZToPlanetographic(oX, oY, oZ, obs_lat, obs_lon);
         options->Latitude(obs_lat);
         options->Longitude(obs_lon);
 
         // Find the sub-solar lat & lon.  This is used for the image
         // label
         double sunLat, sunLon;
-        target->XYZToPlanetocentric(0, 0, 0, sunLat, sunLon);
+        target->XYZToPlanetographic(0, 0, 0, sunLat, sunLon);
         options->SunLat(sunLat);
         options->SunLon(sunLon);
 
