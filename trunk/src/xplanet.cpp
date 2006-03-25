@@ -8,6 +8,8 @@ using namespace std;
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "config.h"
+
 #include "buildPlanetMap.h"
 #include "keywords.h"
 #include "Options.h"
@@ -33,12 +35,10 @@ drawProjection(DisplayBase *display, Planet *target,
 extern void
 readConfigFile(string configFile, PlanetProperties *planetProperties[]);
 
-int
-main(int argc, char **argv)
+void
+xplanet_main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
-
-    int times_run = 0;
 
     Options *options = Options::getInstance();
     options->parseArgs(argc, argv);
@@ -68,6 +68,8 @@ main(int argc, char **argv)
     // Initialize the timer
     Timer *timer = getTimer(options->getWait(), options->Hibernate(),
 			    options->IdleWait());
+
+    int times_run = 0;
 
     while (1)
     {
@@ -150,7 +152,7 @@ main(int argc, char **argv)
 	// delete the markerbounds file, since we'll create a new one
 	string markerBounds(options->MarkerBounds());
 	if (!markerBounds.empty())
-	    unlink(markerBounds.c_str());
+	    unlinkFile(markerBounds.c_str());
 
         if (options->Projection() == MULTIPLE)
             drawMultipleBodies(display, target, planetsFromSunMap,
@@ -194,12 +196,21 @@ main(int argc, char **argv)
                                              * options->getWait()));
         }
 
-        // Sleep until the next update.  If Sleep() returns true, then
-        // quit.
-        if (timer->Sleep()) break;
+        // Sleep until the next update.  If Sleep() returns false,
+        // then quit.
+        if (!timer->Sleep()) break;
     }
 
     delete timer;
 
     for (int i = 0; i < RANDOM_BODY; i++) delete planetProperties[i];
 }
+
+//#ifndef HAVE_AQUA
+int
+main(int argc, char **argv)
+{
+    xplanet_main(argc, argv);
+    return(EXIT_SUCCESS);
+}
+//#endif

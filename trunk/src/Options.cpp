@@ -27,8 +27,6 @@ extern "C" {
 #include "keywords.h"
 #include "Options.h"
 #include "PlanetProperties.h"
-#include "xpDefines.h"
-#include "xpUtil.h"
 
 #include "libplanet/Planet.h"
 #include "libprojection/libprojection.h"
@@ -164,6 +162,19 @@ Options::Options() :
     color_[0] = 255;          // default label color is red
 
     searchdir.push_back(DATADIR);
+#if defined(HAVE_AQUA) || defined(HAVE_LIBX11)
+    char *homeDir = getenv("HOME");
+    if (homeDir != NULL)
+    {
+	ostringstream xplanetDir;
+#ifdef HAVE_AQUA
+	xplanetDir << homeDir << "/Library/Xplanet";
+#else
+	xplanetDir << homeDir << "/.xplanet";
+#endif
+	searchdir.push_back(xplanetDir.str());
+    }
+#endif
     searchdir.push_back("xplanet");
 
     struct timeval time;
@@ -299,7 +310,7 @@ Options::parseArgs(int argc, char **argv)
             font_.assign(optarg);
 #else
 	    {
-		stringstream errMsg;
+		ostringstream errMsg;
 		errMsg << "Sorry, this binary was built without FreeType "
 		       << "support. The -" << long_options[option_index].name 
 		       << " option will be ignored.\n";
@@ -315,7 +326,7 @@ Options::parseArgs(int argc, char **argv)
             if (val > 0) fontSize_ = val;
 #else
 	    {
-		stringstream errMsg;
+		ostringstream errMsg;
 		errMsg << "Sorry, this binary was built without FreeType "
 		       << "support. The -" << long_options[option_index].name 
 		       << " option will be ignored.\n";
@@ -355,7 +366,7 @@ Options::parseArgs(int argc, char **argv)
             hibernate_ *= 1000;
 #else
 	    {
-		stringstream errMsg;
+		ostringstream errMsg;
 		errMsg << "This binary was built without the X Screensaver extensions.\n"
 		       << "The -" << long_options[option_index].name 
 		       << " option will be ignored.\n";
@@ -369,7 +380,7 @@ Options::parseArgs(int argc, char **argv)
             idleWait_ *= 1000;
 #else
 	    {
-		stringstream errMsg;
+		ostringstream errMsg;
 		errMsg << "This binary was built without the X Screensaver extensions.\n"
 		       << "The -" << long_options[option_index].name 
 		       << " option will be ignored.\n";
@@ -417,7 +428,7 @@ Options::parseArgs(int argc, char **argv)
 	      localTime_ = fmod(localTime_, 24.);
 	      if (localTime_ < 0) localTime_ += 24;
 
-	      stringstream errStr;
+	      ostringstream errStr;
 	      errStr << "localtime set to " << localTime_ << "\n";
 	      xpWarn(errStr.str(), __FILE__, __LINE__);
 	  }
@@ -610,7 +621,9 @@ Options::parseArgs(int argc, char **argv)
             sscanf(optarg, "%d", &verbosity_);
 	    break;
 	case VERSIONNUMBER:
-	    cout << "Xplanet " << VERSION << endl;
+	    cout << "Xplanet " << VERSION << endl
+		 << "Copyright (C) 2003 "
+		 << "Hari Nair <hari@alumni.caltech.edu>" << endl;
 	    cout << "The latest version can be found at "
 		 << "http://xplanet.sourceforge.net\n";
 	    exit(EXIT_SUCCESS);
@@ -751,7 +764,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
 
 	    if (verbosity_ > 1)
 	    {
-		stringstream msg;
+		ostringstream msg;
 		msg << "target = " << body_string[target_] << ", origin = " 
 		       << body_string[origin_] << endl;
 		xpMsg(msg.str(), __FILE__, __LINE__);

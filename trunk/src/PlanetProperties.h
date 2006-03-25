@@ -68,7 +68,13 @@ class PlanetProperties
     void MapBounds(double &uly, double &ulx, 
 		   double &lry, double &lrx) const
         {
-            uly = map_uly; ulx = map_ulx; lry = map_lry; lrx = map_lrx;
+            uly = mapUly_; ulx = mapUlx_; lry = mapLry_; lrx = mapLrx_;
+        };
+    
+    void MapBounds(bool b, double uly, double ulx, 
+		   double lry, double lrx)
+        {
+            mapBounds_ = b; mapUly_ = uly; mapUlx_ = ulx; mapLry_ = lry; mapLrx_ = lrx;
         };
     
     double MinRadiusForLabel() const { return(minRadiusForLabel_); };
@@ -136,7 +142,7 @@ class PlanetProperties
     double magnify_;
 
     bool mapBounds_;
-    double map_ulx, map_uly, map_lrx, map_lry;
+    double mapUlx_, mapUly_, mapLrx_, mapLry_;
 
     unsigned char markerColor_[3];
     std::string markerFont_;

@@ -280,12 +280,19 @@ what to expect.
 Any files used by xplanet should be placed in one of the following
 directories depending on its type: "arcs", "config", "fonts",
 "images", "markers", "origin", "satellites", or "stars".  By default,
-xplanet will first look for a file in the current directory, then in
-the appropriate subdirectories of the directories specified by
-searchdir, then in the subdirectories of the directory xplanet, if it
-exists in the current directory, and finally in the subdirectories of
-DATADIR/xplanet (DATADIR is set at compile time and defaults to
-/usr/local/share).
+xplanet will look for a file in the following order:
+.nf
+.sp
+The current directory
+searchdir
+subdirectories of searchdir
+subdirectories of xplanet (if it exists in the current directory)
+subdirectories of ${HOME}/.xplanet on X11
+subdirectories of ${HOME}/Library/Xplanet on Mac OS X
+subdirectories of DATADIR/xplanet
+.sp
+.fi
+DATADIR is set at compile time and defaults to /usr/local/share.
 
 .TP
 .B \-starfreq frequency

@@ -39,15 +39,23 @@ DisplayOutput::renderImage(PlanetProperties *planetProperties[])
 {
     drawLabel(planetProperties);
 
-    const char * const filename = constructOutputFilename();
+    const char * const outputFilename = constructOutputFilename();
 
     Image i(width_, height_, rgb_data, alpha);
     i.Quality(quality_);
-    if (!i.Write(filename))
+    if (!i.Write(outputFilename))
     {
-	stringstream errStr;
-	errStr << "Can't create " << filename << ".\n";
+	ostringstream errStr;
+	errStr << "Can't create " << outputFilename << ".\n";
 	xpExit(errStr.str(), __FILE__, __LINE__);
+    }
+
+    Options *options = Options::getInstance();
+    if (options->Verbosity() > 1)
+    {
+	ostringstream msg;
+	msg << "Created image file " << outputFilename << "\n";
+	xpMsg(msg.str(), __FILE__, __LINE__);
     }
 }
 

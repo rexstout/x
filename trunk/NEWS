@@ -29,6 +29,7 @@ Version 0.95                    Version 1.0
                                 -date %Y%b%d.%H%M%S [specifying GMT]
 -dayside                        -origin sun
 -earthside                      -origin earth
+-labelformat <string>           -date_format <string>
 -moonside                       -origin moon
 -nightside                      -origin -sun
 
@@ -37,12 +38,14 @@ The following command line options should instead be set as parameters in
 the file specified with the '-config' option or the file "config/default"
 in the '-searchdir' directory.
 
+greatarcfile <file>             arc_file=<file>
 cloud_gamma <number>            cloud_gamma=<number>
 cloud_image <cloud_file>        cloud_map=<file>
 cloud_threshold <number>        cloud_threshold=<number>
 grid                            grid=true
 grid1 <number>                  grid1=<number>
 grid2 <number>                  grid2=<number>
+mapbounds <lat1,lon1,lat2,lon2> mapbounds=<lat1,lon1,lat2,lon2>
 markers                         marker_file=<file>
 markerfile                      marker_file=<file>
 night_image <file>              night_map=<file>
@@ -62,12 +65,9 @@ Finally, these options are not currently supported
 -fontdir <dir>
 -fullscreen
 -fuzz <fuzz>
--greatarcfile <file>
--labelformat <string>
 -labelname
 -labelrot
 -mapdir <dir>
--mapbounds <lat1,lon1,lat2,lon2>
 -nice <number>
 -notransparency
 -orbit <spec>

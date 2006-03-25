@@ -5,11 +5,11 @@ using namespace std;
 #include "ProjectionBase.h"
 
 ProjectionBase::ProjectionBase(const int flipped, const int w, const int h) 
-    : width_(w), height_(h)
+    : flipped_(flipped), width_(w), height_(h)
 {
     Options *options = Options::getInstance();
     centerLat_ = options->Latitude();
-    centerLon_ = options->Longitude() * flipped;
+    centerLon_ = options->Longitude() * flipped_;
     const double rotAngle = options->getRotate();
     
     centerX_ = options->getCenterX();

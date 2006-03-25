@@ -246,8 +246,13 @@ AC_ARG_WITH(aqua, [  --with-aqua             For Mac OS X Aqua [no]],use_aqua=ye
 
 if test "$use_aqua" = yes; then
   AC_DEFINE(HAVE_AQUA,,Define for Mac OS X)
-  AQUA_LIBS="-framework ApplicationServices"
+  AQUA_LIBS="-framework Carbon -framework Cocoa -bind_at_load"
   AC_SUBST(AQUA_LIBS)
+
+  OBJC="gcc"
+  OBJCFLAGS="-Wno-import"
+  AC_SUBST(OBJC)
+  AC_SUBST(OBJCFLAGS)
 fi
 
 AM_CONDITIONAL(HAVE_AQUA, test "$use_aqua" = 'yes')

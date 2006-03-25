@@ -1,7 +1,7 @@
 #include <cmath>
 using namespace std;
 
-#include "libdisplay/DisplayBase.h"
+#include "libdisplay/libdisplay.h"
 
 void
 drawSun(DisplayBase *display, const double X, const double Y, 

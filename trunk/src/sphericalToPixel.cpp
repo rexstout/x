@@ -16,12 +16,11 @@ sphericalToPixel(const double lat, const double lon, const double rad,
 {
     bool returnval = false;
 
-    Options *options = Options::getInstance();
-
     if (view != NULL)
     {
 	planet->PlanetocentricToXYZ(X, Y, Z, lat, lon, rad);
 
+	Options *options = Options::getInstance();
 	view->XYZToPixel(options->getRotate(), 
 			 X, Y, Z, X, Y, Z);
 	X += options->getCenterX();
@@ -31,7 +30,8 @@ sphericalToPixel(const double lat, const double lon, const double rad,
     }
     else if (projection != NULL)
     {
-	returnval = projection->sphericalToPixel(lon, lat, X, Y);
+	returnval = projection->sphericalToPixel(lon * planet->Flipped(), 
+						 lat, X, Y);
 	Z = 0;
     }
     else

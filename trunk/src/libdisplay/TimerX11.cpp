@@ -78,7 +78,7 @@ TimerX11::Sleep(time_t sleep_time)
 	    {
 		if ((unsigned int) event.xclient.data.l[0] 
 		    == wmDeleteWindow)
-		    return(true);
+		    return(false);
 	    }
 	    else if (XCheckTypedWindowEvent(display_, window,
 					    KeyPress, &event) == True)
@@ -87,7 +87,7 @@ TimerX11::Sleep(time_t sleep_time)
 		char keybuf;
 		XLookupString(&(event.xkey), &keybuf, 1, &keysym, NULL);
 		if (keybuf == 'q' || keybuf == 'Q') 
-		    return(true);
+		    return(false);
 	    }
 	    else
 	    {
@@ -99,11 +99,11 @@ TimerX11::Sleep(time_t sleep_time)
     {
 	sleep(sleep_time);
     }
-    return(false);
+    return(true);
 }
 
 
-// returns true if the program should exit after this sleep
+// returns false if the program should exit after this sleep
 bool
 TimerX11::Sleep()
 {
@@ -121,7 +121,7 @@ TimerX11::Sleep()
 		<<  ctime((time_t *) &nextUpdate_);
 	    xpMsg(msg.str(), __FILE__, __LINE__);
 	}
-	if (Sleep(sleep_time)) return(true);
+	if (!Sleep(sleep_time)) return(false);
     }
 
 #ifdef HAVE_XSS
@@ -132,8 +132,8 @@ TimerX11::Sleep()
 	    XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
 	    while (screenSaverInfo_->idle < idlewait_) 
 	    {
-		if (Sleep((idlewait_ - screenSaverInfo_->idle) / 1000))
-		    return(true);
+		if (!Sleep((idlewait_ - screenSaverInfo_->idle) / 1000))
+		    return(false);
 		XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
 	    }
 	}
@@ -143,12 +143,12 @@ TimerX11::Sleep()
 	    XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
 	    while (screenSaverInfo_->idle > hibernate_) 
 	    {
-		if (Sleep(1)) return(true);
+		if (!Sleep(1)) return(false);
 		XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
 	    }
 	}
     }
 #endif
 
-    return(false);
+    return(true);
 }

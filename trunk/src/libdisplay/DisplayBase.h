@@ -16,7 +16,7 @@ class PlanetProperties;
 
 class DisplayBase
 {
- public:
+public:
     DisplayBase(const int tr);
     virtual ~DisplayBase();
 
@@ -50,7 +50,7 @@ class DisplayBase
 
     virtual std::string TmpDir();
 
- protected:
+protected:
     const int times_run;
 
     int width_, height_;       // pixel dimensions of the display
@@ -62,7 +62,7 @@ class DisplayBase
     void drawLabel(PlanetProperties *planetProperties[]);
     void drawLabelLine(int &currentX, int &currentY, const std::string &text);
 
- private:
+private:
     unsigned char foregroundColor[3];
 
     bool CheckUnicode(const unsigned long unicode, 
@@ -84,5 +84,4 @@ class DisplayBase
     std::string font_;
     int fontSize_;
 };
-
 #endif

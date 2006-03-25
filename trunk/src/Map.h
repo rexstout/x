@@ -33,6 +33,12 @@ class Map
     double Width() const { return(width_); };
     double Height() const { return(height_); };
 
+    double StartLat() const { return(startLat_); };
+    double StartLon() const { return(startLon_); };
+
+    double MapHeight() const { return(mapHeight_); };
+    double MapWidth() const { return(mapWidth_); };
+
  private:
     int width_, height_, area_;
     bool mapbounds_;
@@ -47,6 +53,7 @@ class Map
     double *lonArray_;
 
     double delLon_, delLat_;
+    double mapHeight_, mapWidth_;
     double startLon_, startLat_;
 
     Planet *target_;

@@ -178,6 +178,20 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             currentProperties->Magnify(value);
         }
         break;
+	case MAP_BOUNDS:
+	{
+	    double uly, ulx, lry, lrx;
+	    if (sscanf(returnString, "%lf,%lf,%lf,%lf", &uly, &ulx, &lry, &lrx) == 4)
+	    {
+		currentProperties->MapBounds(true, uly, ulx, lry, lrx);
+	    }
+	    else
+	    {
+		xpWarn("Need four values for mapbounds\n",
+		       __FILE__, __LINE__);
+	    }
+	}
+	break;
         case MARKER_COLOR:
         {
             int r, g, b;

@@ -90,6 +90,10 @@ PlanetProperties::operator= (const PlanetProperties &p)
     magnify_ = p.magnify_;
 
     mapBounds_ = p.mapBounds_;
+    mapUly_ = p.mapUly_;
+    mapUlx_ = p.mapUlx_;
+    mapLry_ = p.mapLry_;
+    mapLrx_ = p.mapLrx_;
 
     markerFont_ = p.markerFont_;
 
