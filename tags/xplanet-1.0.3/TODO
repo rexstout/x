@@ -1,0 +1,9 @@
+Use gettext for date string
+
+Java gui
+
+pick up satellite locations from a PREDICT server
+
+use iconv library for marker files in different character sets
+
+use arbitrary "lookAt" position
