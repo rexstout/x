@@ -352,7 +352,7 @@ Map::AddShadows(map<double, Planet *> &planetsFromSunMap)
 
         const double p_sun_dist = it0->first;
 
-        // If this body is farther from the sun, than the target body
+        // If this body is farther from the sun than the target body
         // we're finished since the map is stored in order of
         // heliocentric distance
         if (p_sun_dist > sun_dist) return;
@@ -368,7 +368,7 @@ Map::AddShadows(map<double, Planet *> &planetsFromSunMap)
 
         // If the separation is bigger than the sum of the apparent radii,
         // there's no shadow
-        if (sep > (size + p_size)) continue;
+        if (sep > 1.1 * (size + p_size)) continue;
 
         if (options->Verbosity() > 1)
         {
@@ -376,7 +376,8 @@ Map::AddShadows(map<double, Planet *> &planetsFromSunMap)
             msg << "separation between " << body_string[p->Index()] 
                 << " and " << body_string[target_->Index()] << " is " 
                 << sep/deg_to_rad << "\n";
-            msg << "Adding shadow from " << body_string[p->Index()] << "\n";
+            msg << "Computing shadow from " 
+                << body_string[p->Index()] << "\n";
             xpMsg(msg.str(), __FILE__, __LINE__);
         }
 
@@ -391,18 +392,30 @@ Map::AddShadow(Planet *p, const double sun_size)
     double pX, pY, pZ;
     p->getPosition(pX, pY, pZ);
 
+    double tX, tY, tZ;
+    target_->getPosition(tX, tY, tZ);
+
+    const double ratio = 1/(1 - p->Flattening());
+    double sunX, sunY, sunZ;
+    p->XYZToPlanetaryXYZ(0, 0, 0, sunX, sunY, sunZ);
+    sunZ *= ratio;
+
     for (int j = 0; j < height_; j++)
     {
         const double lat = latArray_[j];
+        const double radius = target_->Radius(lat);
+
         for (int i = 0; i < width_; i++)
         {
             const double lon = lonArray_[i];
 
             double X, Y, Z;
-            target_->PlanetocentricToXYZ(X, Y, Z, lat, lon, 1);
+            target_->PlanetographicToXYZ(X, Y, Z, lat, lon, radius);
 
-            // angular size of the sun seen from this point
             const double sun_dist = sqrt(X*X + Y*Y + Z*Z);
+
+            // if this point is on the night side, skip it
+            if (ndot(tX - X, tY - Y, tZ - Z, tX, tY, tZ) < -0.05) continue;
 
             const double p_dist = sqrt((pX - X) * (pX - X)
                                        + (pY - Y) * (pY - Y)
@@ -423,8 +436,21 @@ Map::AddShadow(Planet *p, const double sun_size)
             if (sep > (sun_size + p_size)) continue;
 
             // compute the covered fraction of the Sun's disk
-            const double covered = Overlap(sep, sun_size, p_size);
-            if (covered > 0)
+            double covered;
+            if ((p->Index() == JUPITER || p->Index() == SATURN)
+                && target_->Primary() == p->Index())
+            {
+                // if a satellite of Jupiter or Saturn is in its
+                // primary's shadow
+                covered = OverlapEllipse(sep, sun_size, p_size, X, Y, Z, 
+                                         sunX, sunY, sunZ, ratio, p);
+            }
+            else
+            {
+                covered = Overlap(sep, sun_size, p_size);
+            }
+
+            if (covered >= 0)
             {
                 int ipos = 3 * (j * width_ + i);
                 for (int k = 0; k < 3; k++)
@@ -496,6 +522,70 @@ Map::Overlap(const double elong, const double sun_radius,
     return(coverage);
 }
 
+/*
+  Use for satellites shadowed by Jupiter or Saturn.  Assume that the
+  shadowing ellipse is much bigger than the sun.
+
+  To estimate coverage of the solar disk: treat shadowing planet limb
+  as a straight edge.
+*/
+double
+Map::OverlapEllipse(const double elong, const double sunRadius, 
+                    const double planetRadius, 
+                    const double X, const double Y, const double Z,
+                    const double sunX, const double sunY,
+                    const double sunZ, const double ratio,
+                    Planet *planet)
+{
+    const double p1X = sunX, p1Y = sunY, p1Z = sunZ;
+    double p2X, p2Y, p2Z; // point in shadow
+    double p3X = 0, p3Y = 0, p3Z = 0; // shadowing planet center
+
+    planet->XYZToPlanetaryXYZ(X, Y, Z, p2X, p2Y, p2Z);
+    p2Z *= ratio;
+
+    double u = dot(p3X - p1X, p3Y - p1Y, p3Z - p1Z,
+                   p2X - p1X, p2Y - p1Y, p2Z - p1Z);
+    u /= dot(p2X - p1X, p2Y - p1Y, p2Z - p1Z, 
+             p2X - p1X, p2Y - p1Y, p2Z - p1Z);
+
+    // coordinates of the closest point to shadowing planet's limb
+    double iX, iY, iZ;
+    iX = p1X + u * (p2X - p1X);
+    iY = p1Y + u * (p2Y - p1Y);
+    iZ = p1Z + u * (p2Z - p1Z);
+    
+    iZ /= ratio;
+
+    double lat, lon;
+    planet->PlanetaryXYZToXYZ(iX, iY, iZ, iX, iY, iZ);
+    planet->XYZToPlanetographic(iX, iY, iZ, lat, lon);
+
+    const double Re = planet->Radius(lat);
+    const double Rs = sunRadius/planetRadius;
+    const double sep = elong/planetRadius;
+
+    // d ranges from -1 to 1
+    const double d = (Re - sep) / Rs;
+    double coverage;
+    if (d < -1)
+    {
+        // The centers are separated by more than the sum of the
+        // radii, so no intersection
+        coverage = 0;
+    }
+    else if (d > 1)
+    {
+        // The centers are separated by less than the difference of
+        // the radii, so Sun is completely covered
+        coverage = 1;
+    }
+    else
+    {
+        coverage = (d * sqrt(1 - d*d) + asin(d) + M_PI_2)/M_PI;
+    }
+    return(coverage);
+}
 
 void
 Map::Reduce(const int factor)

@@ -25,8 +25,8 @@ class View;
 static void
 readArcFile(const char *line, Planet *planet, 
             View *view, ProjectionBase *projection,
-	    unsigned char *color,
-	    const double magnify,
+            unsigned char *color,
+            const double magnify,
             multimap<double, Annotation *> &annotationMap)
 {
     int i = 0, j = 0, k = 0;
@@ -40,7 +40,7 @@ readArcFile(const char *line, Planet *planet,
     Options *options = Options::getInstance();
 
     double coords[4];
-    double radius[2] = { 1, 1 };
+    double radius[2] = { -1, -1 };
     double spacing = 0.1;
     bool syntaxError = false;
 
@@ -76,9 +76,9 @@ readArcFile(const char *line, Planet *planet,
                 {
                     if (coords[j] < -90 || coords[j] > 90)
                     {
-			ostringstream errMsg;
-			errMsg << "Latitude value must be between -90 "
-			       << "and 90 degrees\n";
+                        ostringstream errMsg;
+                        errMsg << "Latitude value must be between -90 "
+                               << "and 90 degrees\n";
                         xpWarn(errMsg.str(), __FILE__, __LINE__);
                         syntaxError = true;
                     }
@@ -87,9 +87,9 @@ readArcFile(const char *line, Planet *planet,
                 {
                     if (coords[j] < -360 || coords[j] > 360)
                     {
-			ostringstream errMsg;
-			errMsg << "Longitude value must be between -360 "
-			       << "and 360 degrees\n";
+                        ostringstream errMsg;
+                        errMsg << "Longitude value must be between -360 "
+                               << "and 360 degrees\n";
                         xpWarn(errMsg.str(), __FILE__, __LINE__);
                         syntaxError = true;
                     }
@@ -110,11 +110,13 @@ readArcFile(const char *line, Planet *planet,
                 {
                     xpWarn("Radius value must be positive\n",
                            __FILE__, __LINE__);
-                    radius[k] = 1;
+                    radius[k] = -1;
                     syntaxError = true;
                 }
                 else
+                {
                     k++;
+                }
             }
             break;
         case SPACING:
@@ -169,25 +171,40 @@ readArcFile(const char *line, Planet *planet,
 
     if (k == 0) radius[1] = radius[0];
 
+    for (i = 0; i < 2; i++)
+    {
+        if (radius[i] < 0)
+        {
+            if (planet != NULL)
+            {
+                radius[i] = planet->Radius(coords[2*i]);
+            }
+            else
+            {
+                radius[i] = 1;
+            }
+        }
+    }
+
     if (planet == NULL)
     {
-	double X1, Y1, Z1;
-	double X2, Y2, Z2;
-	sphericalToPixel(coords[0], coords[1], 1.0,
-			 X1, Y1, Z1, NULL, view, NULL);
-	sphericalToPixel(coords[2], coords[3], 1.0,
-			 X2, Y2, Z2, NULL, view, NULL);
+        double X1, Y1, Z1;
+        double X2, Y2, Z2;
+        sphericalToPixel(coords[0], coords[1], 1.0,
+                         X1, Y1, Z1, NULL, view, NULL);
+        sphericalToPixel(coords[2], coords[3], 1.0,
+                         X2, Y2, Z2, NULL, view, NULL);
 
-	LineSegment *ls = new LineSegment(color, X2, Y2, X1, Y1);
-	double avgZ = 0.5 * (Z1 + Z2);
-	if (Z1 > 0 && Z2 > 0)
-	    annotationMap.insert(pair<const double, Annotation*>(avgZ, ls));
+        LineSegment *ls = new LineSegment(color, X2, Y2, X1, Y1);
+        double avgZ = 0.5 * (Z1 + Z2);
+        if (Z1 > 0 && Z2 > 0)
+            annotationMap.insert(pair<const double, Annotation*>(avgZ, ls));
     }
     else
     {
-	drawArc(coords[0], coords[1], radius[0], coords[2], coords[3], 
-		radius[1], color, spacing * deg_to_rad,
-		magnify, planet, view, projection, annotationMap);
+        drawArc(coords[0], coords[1], radius[0], coords[2], coords[3], 
+                radius[1], color, spacing * deg_to_rad,
+                magnify, planet, view, projection, annotationMap);
     }
 }
 
@@ -262,4 +279,3 @@ addArcs(View *view, multimap<double, Annotation *> &annotationMap)
         ii++;
     }
 }
-

@@ -18,15 +18,34 @@ class Planet
     void calcHeliocentricEquatorial();
     void calcHeliocentricEquatorial(const bool relativeToSun);
 
+    void PlanetographicToXYZ(double &X, double &Y, double &Z,
+                             double lat, double lon, 
+                             const double rad);
+
     void PlanetocentricToXYZ(double &X, double &Y, double &Z,
-			     const double lat, const double lon, 
-			     const double rad);
+                             const double lat, const double lon, 
+                             const double rad);
 
     void XYZToPlanetocentric(const double X, const double Y, const double Z,
-			     double &lat, double &lon);
+                             double &lat, double &lon);
 
     void XYZToPlanetocentric(const double X, const double Y, const double Z,
-			     double &lat, double &lon, double &rad);
+                             double &lat, double &lon, double &rad);
+
+    void XYZToPlanetographic(const double X, const double Y, const double Z,
+                             double &lat, double &lon);
+
+    void XYZToPlanetographic(const double X, const double Y, const double Z,
+                             double &lat, double &lon, double &rad);
+
+    void XYZToPlanetaryXYZ(const double X, const double Y, const double Z,
+                           double &pX, double &pY, double &pZ);
+
+    void PlanetaryXYZToXYZ(const double pX, const double pY, const double pZ,
+                           double &X, double &Y, double &Z);
+
+    void PlanetocentricToPlanetographic(double &lat, double &lon) const;
+    void PlanetographicToPlanetocentric(double &lat, double &lon) const;
 
     void getPosition(double &X, double &Y, double &Z) const;
 
@@ -40,7 +59,10 @@ class Planet
     double Flattening() const { return(flattening_); };
     int Flipped() const { return(flipped_); };
     double Period() const { return(period_); };
-    double Radius() const { return(radius_); };
+    double Radius() const { return(radiusEq_); };
+    double Radius(const double lat) const;
+
+    bool IsInMyShadow(const double x, const double y, const double z);
 
  private:
     body index_;
@@ -66,8 +88,14 @@ class Planet
     bool needRotationMatrix_; 
 
     double period_;           // orbital period, in days
-    double radius_;           // equatorial radius, km
+    double radiusEq_;         // equatorial radius
+    double radiusPol_;        // polar radius
     double flattening_;       // (Re - Rp)/Re
+    double omf2_;             // (1 - flattening_)^2
+
+    bool needShadowCoeffs_;   // used to compute shadows by ellipsoids
+    double sunX_, sunY_, sunZ_;
+    double ellipseCoeffC_;
 
     /* 
        flipped = 1 if planet's longitude increases to the east
@@ -79,6 +107,7 @@ class Planet
     double X_, Y_, Z_;      // Position vector
 
     void CreateRotationMatrix();
+    void ComputeShadowCoeffs();
 };
 
 #endif

@@ -102,9 +102,9 @@ double
 ndot(const double A0, const double A1, const double A2, 
      const double B0, const double B1, const double B2)
 {
-    const double len_a = sqrt(dot(A0, A1, A2, A0, A1, A2));
-    const double len_b = sqrt(dot(B0, B1, B2, B0, B1, B2));
-    return(dot(A0, A1, A2, B0, B1, B2) / (len_a * len_b));
+    const double len_a = dot(A0, A1, A2, A0, A1, A2);
+    const double len_b = dot(B0, B1, B2, B0, B1, B2);
+    return(dot(A0, A1, A2, B0, B1, B2) / sqrt(len_a * len_b));
 }
 
 double 

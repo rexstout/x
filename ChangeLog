@@ -1,3 +1,7 @@
+Version 1.0.3 (released 06 Jan 2004)
+
+	* Jupiter and Saturn are now drawn as oblate spheroids.
+
 Version 1.0.2 (released 22 Dec 2003)
 
 	* Added -interpolate_origin_file option so that origin_files may

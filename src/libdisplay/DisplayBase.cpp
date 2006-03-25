@@ -159,24 +159,24 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     {
         lookAt.assign(options->LabelString());
 
-	for (unsigned int i = 0; i < lookAt.size() - 1; i++)
-	{
-	    if (lookAt[i] == '%')
-	    {
-		switch (lookAt[i+1])
-		{
-		case 't':
-		    lookAt.replace(i, 2, planetProperties[target]->Name());
-		    break;
-		case 'o':
-		    lookAt.replace(i, 2, planetProperties[origin]->Name());
-		    break;
-		case '%':
-		    lookAt.erase(i, 1);
-		    break;
-		}
-	    }
-	}
+        for (unsigned int i = 0; i < lookAt.size() - 1; i++)
+        {
+            if (lookAt[i] == '%')
+            {
+                switch (lookAt[i+1])
+                {
+                case 't':
+                    lookAt.replace(i, 2, planetProperties[target]->Name());
+                    break;
+                case 'o':
+                    lookAt.replace(i, 2, planetProperties[origin]->Name());
+                    break;
+                case '%':
+                    lookAt.erase(i, 1);
+                    break;
+                }
+            }
+        }
    }
 
     time_t tv_sec = options->getTVSec();
@@ -443,7 +443,7 @@ DisplayBase::SetBackground(const int width, const int height,
                 || (image->Height() != height))
             {
                 ostringstream errStr;
-                errStr << "Warning: For better performance, "
+                errStr << "For better performance, "
                        << "background image should "
                        << "be the same size as the output image\n";
                 xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -487,7 +487,9 @@ DisplayBase::allocateRGBData()
         memset(alpha, 0, area_);
     }
 
-    SetBackground(width_, height_, rgb_data);
+    if (options->DisplayMode() != ROOT
+        || !options->GeometrySelected())
+        SetBackground(width_, height_, rgb_data);
 }
 
 string

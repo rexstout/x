@@ -88,8 +88,9 @@ representation.
 
 .TP
 .B \-dynamic_origin file
-Specify an observer location.  The last line of the file must be of
-the form
+Specify an observer location.  The location is relative to the body
+specified with -origin (by default, this is the Sun).  The last line
+of the file must be of the form
 .nf
 .sp
 YYYYMMDD.HHMMSS range lat lon [localtime]
@@ -101,13 +102,13 @@ For example,
 19951207.120000     10.328   -3.018   97.709    9.595
 .sp
 .fi
-The specified time is ignored and the current time is used.  The time
-is only there for consistency with the origin_file option.  The range
-is in planetary radii, and lat and lon are in degrees.  As with
-origin_file, localtime (in hours) is optional, but if present, it will
-be used in place of the longitude.  Only the last line of the file is
-used.  This file may be updated between renderings using a script
-executed with the -prev_command or -post_command options.
+The specified time is ignored and the current time is used.  The
+localtime is only there for consistency with the origin_file option.
+The range is in planetary radii, and lat and lon are in degrees.  As
+with origin_file, localtime (in hours) is optional, but if present, it
+will be used in place of the longitude.  Only the last line of the
+file is used.  This file may be updated between renderings using a
+script executed with the -prev_command or -post_command options.
 
 .TP
 .B \-ephemeris_file filename
@@ -291,8 +292,9 @@ AU farther from the sun than the earth.
 
 .TP
 .B \-origin_file origin_file
-Specify a list of observer positions in origin_file.  Each line should
-be of the form
+Specify a list of observer positions in origin_file.  The positions
+are relative to the body specified with -origin (by default, this is
+the Sun).  Each line should be of the form
 .nf
 .sp
 YYYYMMDD.HHMMSS range lat lon [localtime]

@@ -116,9 +116,13 @@ Planet::parseBodyName(char *name)
   Mechanics 63, 127--148.
 */
 Planet::Planet(const double jd, const body this_body) 
-    : index_(this_body), ephem_(NULL), ephemerisLow_(true),
+    : index_(this_body), 
+      ephem_(NULL), 
+      ephemerisLow_(true),
       julianDay_(jd), 
-      needRotationMatrix_(true), period_(0)
+      needRotationMatrix_(true), 
+      period_(0),
+      needShadowCoeffs_(true)
 {
     Options *options = Options::getInstance();
     if (options->UniversalTime())
@@ -132,17 +136,17 @@ Planet::Planet(const double jd, const body this_body)
     }
     else
     {
-	bool foundFile = findFile(ephemerisFile, "ephemeris");
-	if (foundFile)
-	{
-	    ephem_ = new EphemerisHigh(ephemerisFile.c_str());
-	}
-	else
-	{
-	    ostringstream errStr;
-	    errStr << "Can't load ephemeris file " << ephemerisFile << "\n";
-	    xpExit(errStr.str(), __FILE__, __LINE__);
-	}
+        bool foundFile = findFile(ephemerisFile, "ephemeris");
+        if (foundFile)
+        {
+            ephem_ = new EphemerisHigh(ephemerisFile.c_str());
+        }
+        else
+        {
+            ostringstream errStr;
+            errStr << "Can't load ephemeris file " << ephemerisFile << "\n";
+            xpExit(errStr.str(), __FILE__, __LINE__);
+        }
     }
 
     d2000_ = (julianDay_ - 2451545.0);
@@ -162,7 +166,7 @@ Planet::Planet(const double jd, const body this_body)
         flipped_ = 1;
 
         period_ = 0;
-        radius_ = 696000;
+        radiusEq_ = 696000;
         flattening_ = 0;
 
         break;
@@ -179,7 +183,7 @@ Planet::Planet(const double jd, const body this_body)
 
         period_ = 87.969;
 
-        radius_ = 2439;
+        radiusEq_ = 2439;
         flattening_ = 0;
 
         break;
@@ -196,7 +200,7 @@ Planet::Planet(const double jd, const body this_body)
 
         period_ = 224.701;
 
-        radius_ = 6051.9;
+        radiusEq_ = 6051.9;
         flattening_ = 0;
 
         break;
@@ -214,7 +218,7 @@ Planet::Planet(const double jd, const body this_body)
         period_ = 365.256;
         
         // WGS84 ellipsoid
-        radius_ = 6378.137;
+        radiusEq_ = 6378.137;
         flattening_ = 1/298.257223563; 
         
         break;
@@ -265,7 +269,7 @@ Planet::Planet(const double jd, const body this_body)
         
         period_ = 27.321661;
 
-        radius_ = 1737.5;
+        radiusEq_ = 1737.5;
         flattening_ = 0.002;
     }
     break;
@@ -292,7 +296,7 @@ Planet::Planet(const double jd, const body this_body)
             
             period_ = 686.980;
             
-            radius_ = 3397;
+            radiusEq_ = 3397;
             flattening_ = 0.0065;
             
             break;
@@ -308,7 +312,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 0.31891023;
 
-            radius_ = 10;  // non-spherical
+            radiusEq_ = 10;  // non-spherical
             flattening_ = 0;
             break;
         case DEIMOS:
@@ -317,12 +321,12 @@ Planet::Planet(const double jd, const body this_body)
             alpha0_ = 316.65 - 0.108 * T2000_ + 2.98 * sin(M3);
             delta0_ = 53.52 - 0.061 * T2000_ - 1.78 * cos(M3);
 
-            nullMeridian0_ = (79.41 - 0.520 * T2000_ * T2000_ - 2.58 * sin(M3) 
-                              + 0.19 * cos(M3));
+            nullMeridian0_ = (79.41 - 0.520 * T2000_ * T2000_ 
+                              - 2.58 * sin(M3) + 0.19 * cos(M3));
             wdot_ = 285.1618970;
 
             period_ = 1.2624407;
-            radius_ = 6;  // non-spherical
+            radiusEq_ = 6;  // non-spherical
             flattening_ = 0;
             break;
         default:
@@ -360,7 +364,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 4332.589;
 
-            radius_ = 71492;
+            radiusEq_ = 71492;
             flattening_ = 0.06487;
 
             break;
@@ -376,7 +380,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 1.769137786;
 
-            radius_ = 1821.6;
+            radiusEq_ = 1821.6;
             flattening_ = 0;
 
             break;
@@ -395,7 +399,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 3.551181041;
 
-            radius_ = 1560.8;
+            radiusEq_ = 1560.8;
             flattening_ = 0;
 
             break;
@@ -412,7 +416,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 7.15455296;
 
-            radius_ = 2631.2;
+            radiusEq_ = 2631.2;
             flattening_ = 0;
  
             break;
@@ -429,7 +433,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 16.6890184;
 
-            radius_ = 2410.3; 
+            radiusEq_ = 2410.3; 
             flattening_ = 0;
 
             break;
@@ -468,7 +472,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 10759.22;
 
-            radius_ = 60268;
+            radiusEq_ = 60268;
             flattening_ = 0.09796;
 
             break;
@@ -482,7 +486,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 0.942421813;
             
-            radius_ = 198.6;
+            radiusEq_ = 198.6;
             flattening_ = 0;
 
             break;
@@ -497,7 +501,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 1.370217855;
 
-            radius_ = 249.4;
+            radiusEq_ = 249.4;
             flattening_ = 0;
 
             break;
@@ -512,7 +516,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 1.887802160;
 
-            radius_ = 529.8;
+            radiusEq_ = 529.8;
             flattening_ = 0;
 
             break;
@@ -527,7 +531,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 2.736914742;
 
-            radius_ = 559;
+            radiusEq_ = 559;
             flattening_ = 0;
 
             break;
@@ -541,7 +545,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 4.517500436;
 
-            radius_ = 764;
+            radiusEq_ = 764;
             flattening_ = 0;
 
             break;
@@ -555,7 +559,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 15.94542068;
 
-            radius_ = 2575;
+            radiusEq_ = 2575;
             flattening_ = 0;
 
             break;
@@ -570,7 +574,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 21.2766088;
 
-            radius_ = 141.5;   // non-spherical
+            radiusEq_ = 141.5;   // non-spherical
             flattening_ = 0;
 
             break;
@@ -584,7 +588,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 79.3301825;
 
-            radius_ = 718;
+            radiusEq_ = 718;
             flattening_ = 0;
 
             break;
@@ -599,7 +603,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 550.48;
 
-            radius_ = 110;
+            radiusEq_ = 110;
             flattening_ = 0;
             break;
         default:
@@ -635,7 +639,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 30685.4;
             
-            radius_ = 25559;
+            radiusEq_ = 25559;
             flattening_ = 0.02293;
 
             break;
@@ -650,7 +654,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 1.41347925;
 
-            radius_ = 235.8;
+            radiusEq_ = 235.8;
             flattening_ = 0;
 
             break;
@@ -664,7 +668,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 2.52037935;
 
-            radius_ = 578.9;
+            radiusEq_ = 578.9;
             flattening_ = 0;
 
             break;
@@ -678,7 +682,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 4.1441772;
 
-            radius_ = 584.7;
+            radiusEq_ = 584.7;
             flattening_ = 0;
 
             break;
@@ -692,7 +696,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 8.7058717;
 
-            radius_ = 788.9;
+            radiusEq_ = 788.9;
             flattening_ = 0;
 
             break;
@@ -706,7 +710,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 13.4632389;
 
-            radius_ = 761.4;
+            radiusEq_ = 761.4;
             flattening_ = 0;
 
             break;
@@ -736,7 +740,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 60189.0;
             
-            radius_ = 24764;
+            radiusEq_ = 24764;
             flattening_ = 0.0171;
         }
         break;
@@ -765,7 +769,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 5.8768541;
 
-            radius_ = 1353;
+            radiusEq_ = 1353;
             flattening_ = 0;
         }
         break;
@@ -781,7 +785,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 360.13619;
 
-            radius_ = 170;
+            radiusEq_ = 170;
             flattening_ = 0;
         }
         break;
@@ -809,7 +813,7 @@ Planet::Planet(const double jd, const body this_body)
             
             period_ = 90465.0;
             
-            radius_ = 1151;
+            radiusEq_ = 1151;
             flattening_ = 0;
             break;
         case CHARON:
@@ -819,7 +823,7 @@ Planet::Planet(const double jd, const body this_body)
 
             period_ = 6.38723;
 
-            radius_ = 593;
+            radiusEq_ = 593;
             flattening_ = 0;
             break;
         default:
@@ -834,14 +838,35 @@ Planet::Planet(const double jd, const body this_body)
     alpha0_ *= deg_to_rad;
     delta0_ *= deg_to_rad;
 
-    radius_ /= AU_to_km;
+    radiusEq_ /= AU_to_km;
 
-    nullMeridian_ = fmod(nullMeridian0_ + wdot_ * d2000_, 360.0) * deg_to_rad;
+    nullMeridian_ = fmod(nullMeridian0_ + wdot_ * d2000_, 360.0);
+    nullMeridian_ *= deg_to_rad;
+
+    radiusPol_ = radiusEq_ * (1 - flattening_);
+    omf2_ = (1 - flattening_) * (1 - flattening_);
 }
 
 Planet::~Planet()
 {
     delete ephem_;
+}
+
+// Return the distance from the surface to the center, in units of
+// equatorial radius.  Input latitude is assumed to be planetographic.
+double
+Planet::Radius(const double lat) const
+{
+    double tmpLat = lat;
+    double tmpLon = 0;
+    PlanetographicToPlanetocentric(tmpLat, tmpLon);
+
+    const double ReSinLat = radiusEq_  * sin(tmpLat);
+    const double RpCosLat = radiusPol_ * cos(tmpLat);
+
+    // from http://mathworld.wolfram.com/Ellipse.html
+    return(radiusPol_ / sqrt(RpCosLat * RpCosLat 
+                            + ReSinLat * ReSinLat));
 }
 
 // Compute heliocentric equatorial coordinates of the planet
@@ -951,7 +976,6 @@ Planet::CreateRotationMatrix()
     needRotationMatrix_ = false;
 }
 
-//  Converts planetocentric to Heliocentric Equatorial coordinates
 void
 Planet::PlanetocentricToXYZ(double &X, double &Y, double &Z,
                             const double lat, const double lon, 
@@ -959,16 +983,12 @@ Planet::PlanetocentricToXYZ(double &X, double &Y, double &Z,
 {
     if (needRotationMatrix_) CreateRotationMatrix();
 
-    double newlon = lon;
-    if (index_ == EARTH || index_ == SUN) newlon *= -1;
-    if (wdot_ > 0) newlon *= -1;
-
     double r[3];
-    r[0] = cos(lat) * cos(newlon);
-    r[1] = cos(lat) * sin(newlon);
+    r[0] = cos(lat) * cos(lon);
+    r[1] = cos(lat) * sin(lon);
     r[2] = sin(lat);
 
-    double newrad = rad * radius_;
+    double newrad = rad * radiusEq_;
     X = dot(invRot_[0], r) * newrad;
     Y = dot(invRot_[1], r) * newrad;
     Z = dot(invRot_[2], r) * newrad;
@@ -978,7 +998,14 @@ Planet::PlanetocentricToXYZ(double &X, double &Y, double &Z,
     Z += Z_;
 }
 
-//  Converts Heliocentric Equatorial coordinates to planetocentric
+void
+Planet::PlanetographicToXYZ(double &X, double &Y, double &Z,
+                            double lat, double lon, const double rad)
+{
+    PlanetographicToPlanetocentric(lat, lon);
+    PlanetocentricToXYZ(X, Y, Z, lat, lon, rad);
+}
+
 void
 Planet::XYZToPlanetocentric(const double X, const double Y, const double Z,
                             double &lat, double &lon)
@@ -987,35 +1014,129 @@ Planet::XYZToPlanetocentric(const double X, const double Y, const double Z,
     XYZToPlanetocentric(X, Y, Z, lat, lon, rad);
 }
 
-//  Converts Heliocentric Equatorial coordinates to planetocentric
 void
 Planet::XYZToPlanetocentric(const double X, const double Y, const double Z,
                             double &lat, double &lon, double &rad)
 {
     if (needRotationMatrix_) CreateRotationMatrix();
 
-    double r[3] = { X - X_, Y - Y_, Z - Z_ };
+    const double r[3] = { X - X_, Y - Y_, Z - Z_ };
 
-    double sx = dot(rot_[0], r);
-    double sy = dot(rot_[1], r);
-    double sz = dot(rot_[2], r);
+    const double sx = dot(rot_[0], r);
+    const double sy = dot(rot_[1], r);
+    const double sz = dot(rot_[2], r);
 
-    lat = atan(sz/sqrt(sx * sx + sy*sy));
-
-    // convert to planetographic latitude
-//    lat = atan(tan(lat) / (1 - flattening_));
+    rad = sqrt(sx * sx + sy*sy);
+    if (rad > 0)
+	lat = atan(sz/rad);
+    else
+	lat = 0;
 
     if (cos(lat) > 1e-5)
         lon = atan2(sy, sx);
     else
         lon = 0;
 
-    if (index_ == EARTH || index_ == SUN) lon *= -1;
-    if (wdot_ > 0) lon *= -1;
     if (lon < 0) lon += TWO_PI;
 
     rad = sqrt(r[0]*r[0] + r[1]*r[1] + r[2]*r[2]);
-    rad /= radius_;
+    rad /= radiusEq_;
+}
+
+void
+Planet::XYZToPlanetographic(const double X, const double Y, const double Z,
+                            double &lat, double &lon)
+{
+    double rad = 0;
+    XYZToPlanetographic(X, Y, Z, lat, lon, rad);
+}
+
+void
+Planet::XYZToPlanetographic(const double X, const double Y, const double Z,
+                            double &lat, double &lon, double &rad)
+{
+    XYZToPlanetocentric(X, Y, Z, lat, lon, rad);
+    PlanetocentricToPlanetographic(lat, lon);
+}
+
+void
+Planet::XYZToPlanetaryXYZ(const double X, const double Y, const double Z,
+                          double &pX, double &pY, double &pZ)
+{
+    double lat, lon, rad;
+    XYZToPlanetocentric(X, Y, Z, lat, lon, rad);
+
+    pX = rad * cos(lat) * cos(lon);
+    pY = rad * cos(lat) * sin(lon);
+    pZ = rad * sin(lat);
+}
+
+void
+Planet::PlanetaryXYZToXYZ(const double pX, const double pY, const double pZ,
+                          double &X, double &Y, double &Z)
+{
+    const double lat = atan(pZ / sqrt(pX * pX + pY * pY));
+    double lon;
+    if (cos(lat) > 1e-5)
+        lon = atan2(pY, pX);
+    else
+        lon = 0;
+
+    const double rad = sqrt(pX * pX + pY * pY + pZ * pZ);
+
+    PlanetocentricToXYZ(X, Y, Z, lat, lon, rad);
+}
+
+void
+Planet::PlanetocentricToPlanetographic(double &lat, double &lon) const
+{
+    if (flattening_ > 0)
+        lat = atan(tan(lat) / omf2_);
+
+    if (index_ == EARTH || index_ == SUN) lon *= -1;
+    if (wdot_ > 0) lon *= -1;
+    if (lon < 0) lon += TWO_PI;
+}
+
+void
+Planet::PlanetographicToPlanetocentric(double &lat, double &lon) const
+{
+    if (flattening_ > 0)
+        lat = atan(omf2_ * tan(lat));
+
+    if (index_ == EARTH || index_ == SUN) lon *= -1;
+    if (wdot_ > 0) lon *= -1;
+}
+
+void
+Planet::ComputeShadowCoeffs()
+{
+    XYZToPlanetaryXYZ(0, 0, 0, sunX_, sunY_, sunZ_);
+
+    ellipseCoeffC_ = sunZ_ * sunZ_ / omf2_;
+    ellipseCoeffC_ += sunY_ * sunY_;
+    ellipseCoeffC_ += sunX_ * sunX_;
+    ellipseCoeffC_ -= 1;
+}
+
+// x, y, z must be in planetary XYZ frame
+bool
+Planet::IsInMyShadow(const double x, const double y, const double z)
+{
+    if (needShadowCoeffs_) ComputeShadowCoeffs();
+
+    double ellipseCoeffA = (z - sunZ_) * (z - sunZ_) / omf2_;
+    ellipseCoeffA += (y - sunY_) * (y - sunY_);
+    ellipseCoeffA += (x - sunX_) * (x - sunX_);
+
+    double ellipseCoeffB = (z - sunZ_) * sunZ_ / omf2_;
+    ellipseCoeffB += (y - sunY_) * sunY_;
+    ellipseCoeffB += (x - sunX_) * sunX_;
+
+    const double determinant = (ellipseCoeffB * ellipseCoeffB 
+                                - ellipseCoeffA * ellipseCoeffC_);
+
+    return(determinant > 0);
 }
 
 void
@@ -1071,4 +1192,3 @@ Planet::getBodyNorth(double &X, double &Y, double &Z) const
     Y = sin(alpha0_) * cos(delta0_);
     Z = sin(delta0_);
 }
-

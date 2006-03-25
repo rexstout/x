@@ -4,18 +4,17 @@ using namespace std;
 
 #include "Options.h"
 #include "Ring.h"
-#include "View.h"
 #include "xpUtil.h"
 
 #include "libplanet/Planet.h"
 
 Ring::Ring(const double inner_radius, const double outer_radius, 
-	   const double planet_radius, 
-	   const double *ring_brightness, const int num_bright,
-	   const double *ring_transparency, const int num_trans,
-	   const double sunlon, const double sunlat,
-	   const double shade, 
-	   Planet *p, View *view) : shade_(shade)
+           const double planet_radius, 
+           const double *ring_brightness, const int num_bright,
+           const double *ring_transparency, const int num_trans,
+           const double sunlon, const double sunlat,
+           const double shade, 
+           Planet *p) : planet_(p), shade_(shade)
 {
     r_out = outer_radius/planet_radius;
     dr_b = (outer_radius - inner_radius) / (num_bright * planet_radius);
@@ -35,8 +34,8 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     // drop the brightness to 0 at the outer radius
     for (int i = 0; i < outerPadding; i++)
     {
-	double weight = ((double) i) / (outerPadding - 1);
-	brightness[i] = weight * ring_brightness[0];
+        double weight = ((double) i) / (outerPadding - 1);
+        brightness[i] = weight * ring_brightness[0];
     }
 
     for (int i = 0; i < num_bright; i++) 
@@ -47,7 +46,7 @@ Ring::Ring(const double inner_radius, const double outer_radius,
 
     const double cos_sun_lat = cos(sunlat);
     for (int i = 0; i < num_b; i++)
-	brightness[i] *= cos_sun_lat;
+        brightness[i] *= cos_sun_lat;
 
     radius_t = new double[num_t];
     for (int i = 0; i < num_t; i++) 
@@ -57,8 +56,8 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     // bring the transparency up to 1 at the outer radius
     for (int i = 0; i < outerPadding; i++)
     {
-	double weight = ((double) i) / (outerPadding - 1);
-	transparency[i] = (1 - (1 - ring_transparency[0]) * weight);
+        double weight = ((double) i) / (outerPadding - 1);
+        transparency[i] = (1 - (1 - ring_transparency[0]) * weight);
     }
 
     for (int i = 0; i < num_trans; i++) 
@@ -69,23 +68,19 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     {
         double weight = 1 - ((double) i) / (innerPadding - 1);
         transparency[outerPadding + num_trans + i] = (1 - (1-ring_transparency[num_trans-1]) 
-						    * weight);
+                                                    * weight);
     }
 
-    planet = p;
+    planet_->XYZToPlanetaryXYZ(0, 0, 0, sunX_, sunY_, sunZ_);
 
     sun_lon = sunlon;
     sun_lat = sunlat;
 
-    sun_x = cos(sun_lat) * cos(sun_lon);
-    sun_y = cos(sun_lat) * sin(sun_lon);
-    sun_z = sin(sun_lat);
-
-    sun_view = view;
-
-    num_s = 180;
-    shadow_cosangle = new double[num_s];
-    shadow_radius = new double[num_s];
+    ellipseCoeffC_ = sunZ_ / (1 - planet_->Flattening());
+    ellipseCoeffC_ *= ellipseCoeffC_;
+    ellipseCoeffC_ += sunY_ * sunY_;
+    ellipseCoeffC_ += sunX_ * sunX_;
+    ellipseCoeffC_ -= 1;
 }
 
 Ring::~Ring()
@@ -95,57 +90,6 @@ Ring::~Ring()
 
     delete [] radius_t;
     delete [] transparency;
-
-    delete [] shadow_cosangle;
-    delete [] shadow_radius;
-}
-
-// Compute the distance of the edge of planet's shadow on the rings as
-// a function of longitude.
-void
-Ring::buildShadowRadiusTable()
-{
-    int i = 0, start_index = 0;
-    double d_angle = M_PI/num_s;
-    for (double angle = M_PI; angle > 0; angle -= d_angle)
-    {
-        shadow_cosangle[i] = cos(angle);
-        shadow_radius[i] = 0;
-        for (int j = start_index; j < num_t; j++)
-        {
-            if (isInShadow(sun_lon + angle, radius_t[j]))
-            {
-                shadow_radius[i] = radius_t[j];
-                start_index = j;
-                break;
-            }
-        }
-        if (shadow_radius[i] == 0)
-        {
-            num_s = i;
-            shadow_radius[i] = radius_t[num_t - 1];
-            break;
-        }
-
-	i++;
-    }
-}
-
-/*
-  If the part of the ring at the specified longitude and radius
-  isn't visible from the Sun, it's in shadow.
-*/
-bool
-Ring::isInShadow(const double lon, double r)
-{
-    double X, Y, Z;
-    planet->PlanetocentricToXYZ(X, Y, Z, 0, lon, r);
-    sun_view->XYZToPixel(0, X, Y, Z, X, Y, Z);
-
-    double distsq = X*X + Y*Y;
-
-    if (distsq < 1) return(true);
-    return(false);
 }
 
 /*
@@ -154,43 +98,25 @@ Ring::isInShadow(const double lon, double r)
   return the ring radius.
 */
 double
-Ring::getShadowRadius(const double lat, const double lon)
+Ring::getShadowRadius(double lat, double lon)
 {
     // If this point is on the same side of the rings as the sun,
     // there's no shadow.
     if(sun_lat * lat >= 0) return(-1);
 
-    const double x = cos(lat) * cos(lon);
-    const double y = cos(lat) * sin(lon);
-    const double z = sin(lat);
+    const double rad = planet_->Radius(lat);
+    planet_->PlanetographicToPlanetocentric(lat, lon);
 
-    const double dist = z/sun_z;
+    const double x = rad * cos(lat) * cos(lon);
+    const double y = rad * cos(lat) * sin(lon);
+    const double z = rad * sin(lat);
 
-    const double dx = x - sun_x * dist;
-    const double dy = y - sun_y * dist;
+    const double dist = z/sunZ_;
+
+    const double dx = x - sunX_ * dist;
+    const double dy = y - sunY_ * dist;
     
     return(sqrt(dx * dx + dy * dy));
-}
-
-/*
-  Given a cos(longitude), return the radius of the outermost point of the
-  planet's shadow on the ring.
-*/
-double Ring::getShadowRadius(const double x) 
-{
-    for (int i = 0; i < num_s; i++)
-    {
-        if (shadow_cosangle[i] > x) 
-        {
-            double frac = ((x - shadow_cosangle[i-1])
-                           /(shadow_cosangle[i] - shadow_cosangle[i-1]));
-            double returnval = (shadow_radius[i-1] 
-                                + frac * (shadow_radius[i] 
-                                          - shadow_radius[i-1]));
-            return(returnval);
-        }
-    }
-    return(0);
 }
 
 double 
@@ -247,7 +173,7 @@ Ring::getValue(const double *array, const int size, const int window,
     double cos_lon = cos(lon-sun_lon);
     if (cos_lon > -0.45) return(getValue(array, size, window, dr, r));
     
-    int i = (int) ((r_out - r)/dr);
+    int i = static_cast<int> ((r_out - r)/dr);
 
     if (i < 0 || i >= size) return(-1.0);
 
@@ -258,16 +184,19 @@ Ring::getValue(const double *array, const int size, const int window,
     if (j1 < 0) j1 = 0;
     if (j2 >= size) j2 = size - 1;
 
-    double shadow_rad = getShadowRadius(cos_lon);
-
     double r0 = r;
     double sum = 0;
     for (int j = j1; j < j2; j++) 
     {
-        if (r0 < shadow_rad)
+	const double x = r0 * cos(-lon);
+	const double y = r0 * sin(-lon);
+	const double z = 0;
+
+	if (planet_->IsInMyShadow(x, y, z))
             sum += (shade_ * array[j]);
         else
             sum += array[j];
+
         r0 += dr;
     }
     sum /= interval;
@@ -279,8 +208,8 @@ Ring::getValue(const double *array, const int size, const int window,
 void
 Ring::setDistPerPixel(const double dist_per_pixel)
 {
-    window_b = (int) (dist_per_pixel / dr_b + 0.5);
-    window_t = (int) (dist_per_pixel / dr_t + 0.5);
+    window_b = static_cast<int> (dist_per_pixel / dr_b + 0.5);
+    window_t = static_cast<int> (dist_per_pixel / dr_t + 0.5);
 
     window_b = window_b/2 + 1;
     window_t = window_t/2 + 1;

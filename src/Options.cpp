@@ -9,9 +9,12 @@ using namespace std;
 
 #include "config.h"
 #include "xpDefines.h"
-#include "xpGetopt.h"
 #include "xpUtil.h"
 
+#ifndef _GETOPT_H
+#include "xpGetopt.h"
+#endif
+ 
 #ifdef HAVE_LIBX11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -399,6 +402,7 @@ Options::parseArgs(int argc, char **argv)
         break;
         case LABEL_STRING:
             labelString_ = optarg;
+	    drawLabel_ = true;
             break;
         case LATITUDE:
             sscanf(optarg, "%lf", &latitude_);
@@ -638,7 +642,7 @@ Options::parseArgs(int argc, char **argv)
             break;
         case VERSIONNUMBER:
             cout << "Xplanet " << VERSION << endl
-                 << "Copyright (C) 2003 "
+                 << "Copyright (C) 2004 "
                  << "Hari Nair <hari@alumni.caltech.edu>" << endl;
             cout << "The latest version can be found at "
                  << "http://xplanet.sourceforge.net\n";
@@ -767,13 +771,13 @@ Options::setOrigin(PlanetProperties *planetProperties[])
         {
             double subSolarLat = 0;
             double subSolarLon = 0;
-            p.XYZToPlanetocentric(0, 0, 0, subSolarLat, subSolarLon);
+            p.XYZToPlanetographic(0, 0, 0, subSolarLat, subSolarLon);
 
             longitude_ = (subSolarLon - M_PI
                           + p.Flipped() * localTime_ * M_PI / 12);
         }
 
-        p.PlanetocentricToXYZ(oX, oY, oZ, latitude_, longitude_, range_);
+        p.PlanetographicToXYZ(oX, oY, oZ, latitude_, longitude_, range_);
     }
     break;
     case MAJOR:
@@ -863,8 +867,8 @@ Options::setOrigin(PlanetProperties *planetProperties[])
             Planet p2(julianDay_, target_);
             p2.calcHeliocentricEquatorial(); 
 
-            p2.XYZToPlanetocentric(oX, oY, oZ, latitude_, longitude_);
-            p2.PlanetocentricToXYZ(oX, oY, oZ, latitude_, longitude_, range_);
+            p2.XYZToPlanetographic(oX, oY, oZ, latitude_, longitude_);
+            p2.PlanetographicToXYZ(oX, oY, oZ, latitude_, longitude_, range_);
         }
     }
     break;

@@ -11,7 +11,6 @@ using namespace std;
 #include "Ring.h"
 #include "satrings.h"
 #include "sphericalToPixel.h"
-#include "View.h"
 #include "xpUtil.h"
 
 #include "libannotate/libannotate.h"
@@ -33,7 +32,7 @@ drawProjection(DisplayBase *display, Planet *target,
     const int width = display->Width();
 
     double sLat, sLon;
-    target->XYZToPlanetocentric(0, 0, 0, sLat, sLon);
+    target->XYZToPlanetographic(0, 0, 0, sLat, sLon);
 
     Options *options = Options::getInstance();
 
@@ -69,26 +68,23 @@ drawProjection(DisplayBase *display, Planet *target,
     }
 
     double nLat, nLon;
-    target->XYZToPlanetocentric(upX*1e6, upY*1e6, upZ*1e6, nLat, nLon);
+    target->XYZToPlanetographic(upX*1e6, upY*1e6, upZ*1e6, nLat, nLon);
     double tc, dist;
     calcGreatArc(options->Latitude(), 
                  options->Longitude() * target->Flipped(),
                  nLat, nLon * target->Flipped(), tc, dist);
     options->setRotate(-tc);
 
-    View *sun_view = NULL;
     Ring *ring = NULL;
     if (target->Index() == SATURN)
     {
         double X, Y, Z;
         target->getPosition(X, Y, Z);
-        sun_view = new View(0, 0, 0, X, Y, Z, 0, 0, 1e6, 
-                            target->Radius());
         ring = new Ring(inner_radius, outer_radius, saturn_radius, 
                         ring_brightness, LIT, ring_transparency, TRANSP,
                         sLon, sLat, 
                         planetProperties->Shade(), 
-                        target, sun_view);
+                        target);
     }
 
     const bool isSun = (target->Index() == SUN);
@@ -103,7 +99,6 @@ drawProjection(DisplayBase *display, Planet *target,
     if (target->Index() == SATURN) 
     {
         delete ring;
-        delete sun_view;
     }
 
     ProjectionBase *projection = NULL;
@@ -177,7 +172,8 @@ drawProjection(DisplayBase *display, Planet *target,
             for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/(grid1 * grid2))
             {
                 double X, Y, Z;
-                if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, NULL, projection)) 
+                if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, 
+				     NULL, projection)) 
                     display->setPixel(X, Y, color);
             }
         }
@@ -187,7 +183,8 @@ drawProjection(DisplayBase *display, Planet *target,
             for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/grid1)
             {
                 double X, Y, Z;
-                if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, NULL, projection)) 
+                if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, 
+				     NULL, projection)) 
                     display->setPixel(X, Y, color);
             }
         }

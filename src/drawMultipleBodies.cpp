@@ -156,7 +156,9 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         // its primary, although in most cases it's the same as its
         // primary's rotational north
         if (target->Primary() == SUN)
+        {
             target->getOrbitalNorth(upX, upY, upZ);
+        }
         else
         {
             Planet *primary = findPlanetinMap(planetsFromSunMap, 
@@ -184,7 +186,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     View *view = new View(oX, oY, oZ, 
                           tX, tY, tZ, 
                           upX*1e6, upY*1e6, upZ*1e6, 
-                          dist_per_pixel);
+                          dist_per_pixel, options->getRotate());
 
     multimap<double, Annotation *> annotationMap;
     annotationMap.clear();
@@ -235,8 +237,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         
         // Get the pixel location of this body
         double X, Y, Z;
-        view->XYZToPixel(options->getRotate(), 
-                         pX, pY, pZ, X, Y, Z);
+        view->XYZToPixel(pX, pY, pZ, X, Y, Z);
         X += options->getCenterX();
         Y += options->getCenterY();
 
@@ -276,19 +277,20 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         
         // Now calculate the sub-solar and sub-observer points
         double sun_lat, sun_lon;
-        current_planet->XYZToPlanetocentric(0, 0, 0, sun_lat, sun_lon);
+        current_planet->XYZToPlanetographic(0, 0, 0, sun_lat, sun_lon);
         
         double obs_lat, obs_lon;
-        current_planet->XYZToPlanetocentric(oX, oY, oZ, obs_lat, obs_lon);
+        current_planet->XYZToPlanetographic(oX, oY, oZ, obs_lat, obs_lon);
         
         // Label this body with its name
         if (pixel_radius >= currentProperties->MinRadiusForLabel() 
             && pixel_radius <= currentProperties->MaxRadiusForLabel())
         {
             Text *t = new Text(currentProperties->TextColor(),
-                               (int) (X + 0.5), (int) (Y + 0.5), 
-                               (int) (pixel_radius + 1), 
-                               (int) (pixel_radius + 1), 
+                               static_cast<int> (X + 0.5), 
+                               static_cast<int> (Y + 0.5), 
+                               static_cast<int> (pixel_radius + 1), 
+                               static_cast<int> (pixel_radius + 1), 
                                AUTO, currentProperties->Name());
 
             annotationMap.insert(pair<const double, Annotation*>(Z, t));
@@ -315,7 +317,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     drawStars(display, view);
 
     if (!options->ArcFiles().empty())
-	addArcs(view, annotationMap);
+        addArcs(view, annotationMap);
 
     if (!options->MarkerFiles().empty())
         addMarkers(view, width, height, planetsFromSunMap, annotationMap);
@@ -370,7 +372,8 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
         if (pR <= 1)
         {
-            display->setPixel((int) (pX + 0.5), (int) (pY + 0.5), 
+            display->setPixel(static_cast<int> (pX + 0.5), 
+                              static_cast<int> (pY + 0.5), 
                               currentProperties->Color());
             if (current_planet->Index() == SUN) 
                 drawSun(display, pX, pY, 1, currentProperties->Color());
@@ -384,27 +387,18 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         }
         else
         {
-            const double magnifiedRadius = (current_planet->Radius() 
-                                            * currentProperties->Magnify());
-
             double X, Y, Z;
             current_planet->getPosition(X, Y, Z);
         
-            View *sun_view = NULL;
             Ring *ring = NULL;
             // Draw the far side of Saturn's rings
             if (current_planet->Index() == SATURN) 
             {
-                sun_view = new View(0, 0, 0, X, Y, Z, 0, 0, 1e6, 
-                                    magnifiedRadius);
-
                 ring = new Ring(inner_radius, outer_radius, saturn_radius, 
                                 ring_brightness, LIT, ring_transparency, 
                                 TRANSP, sLon, sLat,
                                 currentProperties->Shade(), 
-                                current_planet, 
-                                sun_view);
-                ring->buildShadowRadiusTable();
+                                current_planet);
 
                 const bool lit_side = (sLat * oLat > 0);
                 drawRings(current_planet, display, view, ring, pX, pY, pR, 
@@ -415,83 +409,21 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
             m = createMap(sLat, sLon, oLat, oLon, width, height, pR,
                           current_planet, ring, planetsFromSunMap,
                           currentProperties);
-            
-            double lat, lon;
-            unsigned char color[3];
-            int j0 = (int) (floor(pY - pR - 2));
-            int j1 = (int) (ceil(pY + pR + 2));
-            int i0 = (int) (floor(pX - pR - 2));
-            int i1 = (int) (ceil(pX + pR + 2));
-            
-            if (j0 < 0) j0 = 0;
-            if (j1 > height) j1 = height;
-            if (i0 < 0) i0 = 0;
-            if (i1 > width) i1 = width;
-            
-            // P1 (Observer) is at (oX, oY, oZ), or (0, 0, 0) in view
-            // coordinates
-            // P2 (current pixel) is on the line from P1 to (vX, vY, vZ)
-            // P3 (Planet center) is at (X, Y, Z) in heliocentric
-            // rectangular
-            // Now find the intersection of the line with the planet's
-            // sphere
-            // This algorithm is from
-            // http://astronomy.swin.edu.au/~pbourke/geometry/sphereline
-
-            double p3X, p3Y, p3Z;
-            view->RotateToViewCoordinates(X, Y, Z, p3X, p3Y, p3Z);
-            
-            const double c = 2 * (dot(p3X, p3Y, p3Z, p3X, p3Y, p3Z) 
-                                  - magnifiedRadius
-                                  * magnifiedRadius);
-            
-            for (int j = j0; j < j1; j++)
+            if (current_planet->Index() == JUPITER
+                || current_planet->Index() == SATURN)
             {
-                for (int i = i0; i < i1; i++)
-                {
-                    dX = i - pX;
-                    dY = pY - j;
-                    double opacity = 1;
-                    double dist2 = (dX*dX + dY*dY)/(pR*pR);
-                    if (dist2 > 1) dist2 = 1;
-                    if (dist2 > 0.9) opacity = 1 - pow(dist2, pR/2);
-
-                    dX = options->getCenterX() - i;
-                    dY = options->getCenterY() - j;
-
-                    double vX, vY, vZ;
-                    view->PixelToViewCoordinates(options->getRotate(),
-                                                 dX, dY, 
-                                                 vX, vY, vZ);
-
-                    const double a = 2 * (dot(vX, vY, vZ, vX, vY, vZ));
-                    const double b = 2 * (dot(vX, vY, vZ, -p3X, -p3Y, -p3Z));
-
-                    const double determinant = b*b - a * c;
-
-                    if (determinant < 0) continue;
-
-                    double u = -(b + sqrt(determinant));
-                    u /= a;
-                    
-                    // coordinates of the intersection point
-                    double iX, iY, iZ;
-                    iX = u * vX;
-                    iY = u * vY;
-                    iZ = u * vZ;
-                    
-                    view->RotateToXYZ(iX, iY, iZ, iX, iY, iZ);
-                    current_planet->XYZToPlanetocentric(iX, iY, iZ, 
-                                                        lat, lon);
-                    const double darkening = sqrt(ndot(X - iX, Y - iY, Z - iZ, 
-                                                       X - oX, Y - oY, Z - oZ));        
-                    
-                    m->GetPixel(lat, lon, color);
-                    for (int k = 0; k < 3; k++) 
-                        color[k] = static_cast<unsigned char> (color[k] 
-                                                               * darkening);
-                    display->setPixel(i, j, color, opacity);
-                }
+                drawEllipsoid(pX, pY, pR, oX, oY, oZ, 
+                              X, Y, Z, display, view, m,
+                              current_planet, 
+                              currentProperties->Magnify());
+            }
+            else
+            {
+                drawSphere(pX, pY, pR, oX, oY, oZ, 
+                           X, Y, Z, display, view, m,
+                           current_planet, 
+                           current_planet->Radius() 
+                           * currentProperties->Magnify());
             }
             delete m;
 
@@ -503,10 +435,13 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                 const unsigned char *color = currentProperties->GridColor();
                 for (double lat = -M_PI_2; lat <= M_PI_2; lat += M_PI_2/grid1)
                 {
+                    const double radius = current_planet->Radius(lat);
+
                     for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/(grid1 * grid2))
                     {
                         double X, Y, Z;
-                        sphericalToPixel(lat, lon, currentProperties->Magnify(),
+                        sphericalToPixel(lat, lon, 
+                                         radius * currentProperties->Magnify(),
                                          X, Y, Z, current_planet, view, NULL);
                         if (Z < dist_to_planet) display->setPixel(X, Y, color);
                     }
@@ -514,10 +449,13 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                 
                 for (double lat = -M_PI_2; lat <= M_PI_2; lat += M_PI_2/(grid1 * grid2))
                 {
+                    const double radius = current_planet->Radius(lat);
+
                     for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/grid1)
                     {
                         double X, Y, Z;
-                        sphericalToPixel(lat, lon, currentProperties->Magnify(),
+                        sphericalToPixel(lat, lon, 
+                                         radius * currentProperties->Magnify(),
                                          X, Y, Z, current_planet, view, NULL);
                         if (Z < dist_to_planet) display->setPixel(X, Y, color);
                     }
@@ -533,8 +471,6 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
             }
 
             delete ring;
-            delete sun_view;
-
         }
 
         // draw all of the annotations in front of this body

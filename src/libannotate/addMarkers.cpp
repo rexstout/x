@@ -47,7 +47,7 @@ readMarkerFile(const char *line, Planet *planet,
     string image;
     string name("");
     bool pixelCoords = false;
-    double radius = 1;
+    double radius = -1;
     bool relativeToEdges = true;
     int symbolSize = 2;
     bool syntaxError = false;
@@ -161,7 +161,7 @@ readMarkerFile(const char *line, Planet *planet,
                                                               pIndex);
                         double X, Y, Z;
                         other->getPosition(X, Y, Z);
-                        planet->XYZToPlanetocentric(X, Y, Z, lat, lon);
+                        planet->XYZToPlanetographic(X, Y, Z, lat, lon);
                         
                         lat /= deg_to_rad;
                         lon /= deg_to_rad;
@@ -175,7 +175,7 @@ readMarkerFile(const char *line, Planet *planet,
             {
                 xpWarn("Radius value must be positive\n",
                        __FILE__, __LINE__);
-                radius = 1;
+                radius = -1;
                 syntaxError = true;
             }
             break;
@@ -253,6 +253,18 @@ readMarkerFile(const char *line, Planet *planet,
     {
         lat *= deg_to_rad;
         lon *= deg_to_rad;
+
+	if (radius < 0)
+	{
+	    if (planet != NULL)
+	    {
+		radius = planet->Radius(lat);
+	    }
+	    else
+	    {
+		radius = 1;
+	    }
+	}
 
         markerVisible = sphericalToPixel(lat, lon, radius * magnify, 
                                          X, Y, Z, planet, view, projection);
