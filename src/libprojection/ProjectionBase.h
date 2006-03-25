@@ -27,6 +27,7 @@ class ProjectionBase
 			      const double angle_y, 
 			      const double angle_z);
  protected:
+    const int flipped_;
     const int width_, height_;
     double radius_;
     double centerX_, centerY_;

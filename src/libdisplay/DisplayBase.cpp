@@ -62,7 +62,7 @@ DisplayBase::Font(const string &fontname)
 
     if (!findFile(font_, "fonts"))
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Can't open font file " << font_ << endl;
         xpWarn(errStr.str(), __FILE__, __LINE__);
         font_ = defaultFont;
@@ -77,7 +77,7 @@ DisplayBase::Font(const string &fontname)
     int error = FT_New_Face(library_, font_.c_str(), 0, &face_);
     if (error)
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Can't load font " << font_ << endl;
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
@@ -85,7 +85,7 @@ DisplayBase::Font(const string &fontname)
     error = FT_Select_Charmap(face_, ft_encoding_unicode);
     if (error)
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "No unicode map in font " << font_ << endl;
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
@@ -102,7 +102,7 @@ DisplayBase::FontSize(const int size)
     int error = FT_Set_Pixel_Sizes(face_, 0, fontSize_);
     if (error) 
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Can't set pixel size to " << fontSize_ << endl;
         xpWarn(errStr.str(), __FILE__, __LINE__);
         fontSize_ = 12;
@@ -110,7 +110,7 @@ DisplayBase::FontSize(const int size)
     }
     if (error)
     {
-	stringstream errStr;
+	ostringstream errStr;
 	errStr << "Can't set pixel size to " << fontSize_ << "\n";
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
@@ -294,7 +294,7 @@ DisplayBase::UTF8ToUnicode(const vector<unsigned char> &text)
         }
         else
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Multibyte UTF-8 code in single byte encoding:\n";
             for (unsigned int i = 0; i < text.size(); i++)
                 errStr << hex << static_cast<int> (text[i]) << dec;
@@ -305,7 +305,7 @@ DisplayBase::UTF8ToUnicode(const vector<unsigned char> &text)
     }
     else if (text.size() > 6)
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Too many bytes in UTF-8 sequence:\n";
         for (unsigned int i = 0; i < text.size(); i++)
             errStr << "(" << hex << static_cast<int> (text[i]) << dec << ")";
@@ -317,7 +317,7 @@ DisplayBase::UTF8ToUnicode(const vector<unsigned char> &text)
     bool goodChar = (text[0] >= 0xc0 && text[0] <= 0xfd);
     if (!goodChar)
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Invalid leading byte in UTF-8 sequence:\n";
         for (unsigned int i = 0; i < text.size(); i++)
             errStr << "(" << hex << static_cast<int> (text[i]) << dec << ")";
@@ -331,7 +331,7 @@ DisplayBase::UTF8ToUnicode(const vector<unsigned char> &text)
         goodChar = (text[i] >= 0x80 && text[i] <= 0xbf);
         if (!goodChar)
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Invalid continuation byte in UTF-8 sequence:\n";
             for (unsigned int i = 0; i < text.size(); i++)
                 errStr << hex << "(" << hex
@@ -364,7 +364,7 @@ DisplayBase::UTF8ToUnicode(const vector<unsigned char> &text)
         || (returnVal == 0xfffe || returnVal == 0xffff)    // U+FFFE and U+FFFF are just plain illegal
         || (!CheckUnicode(returnVal, text)))
     { 
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Malformed UTF-8 sequence:\n";
         for (unsigned int i = 0; i < text.size(); i++)
             errStr << "(" << hex << static_cast<int> (text[i]) << dec << ")";
@@ -627,7 +627,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
                 tz_save = "TZ=";
                 tz_save += get_tz;
             }
-            putenv("TZ=GMT");
+            putenv("TZ=UTC");
             tzset();
         }
 
@@ -854,33 +854,34 @@ DisplayBase::allocateRGBData()
         memset(alpha, 0, area_);
     }
 
-    if (options->Projection() != MULTIPLE)
+    string backgroundFile(options->Background());
+    if (!backgroundFile.empty())
     {
-        string backgroundFile(options->Background());
-        if (!backgroundFile.empty())
-        {
-            Image *image = new Image;
-            bool foundFile = findFile(backgroundFile, "images");
-            if (foundFile) 
-                foundFile = image->Read(backgroundFile.c_str());
-            
-            if (foundFile)
-            {
-                if ((image->Width() != width_)
-                    || (image->Height() != height_))
-                {
-                    stringstream errStr;
-                    errStr << "Warning: For better performance, background image should "
-                           << "be the same size as the output image\n";
-                    xpWarn(errStr.str(), __FILE__, __LINE__);
-                    image->Resize(width_, height_);
-                }
-                memcpy(rgb_data, image->getRGBData(), 3 * width_ * height_);
-            }
-            delete image;
-        }
-        else
-        {
+	Image *image = new Image;
+	bool foundFile = findFile(backgroundFile, "images");
+	if (foundFile) 
+	    foundFile = image->Read(backgroundFile.c_str());
+	
+	if (foundFile)
+	{
+	    if ((image->Width() != width_)
+		|| (image->Height() != height_))
+	    {
+		ostringstream errStr;
+		errStr << "Warning: For better performance, "
+		       << "background image should "
+		       << "be the same size as the output image\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+		image->Resize(width_, height_);
+	    }
+	    memcpy(rgb_data, image->getRGBData(), 3 * width_ * height_);
+	}
+	delete image;
+    }
+    else
+    {
+	if (options->Projection() != MULTIPLE)
+	{
             // add random stars
             int numStars = static_cast<int> (width_ * height_ * options->StarFreq());
             for (int i = 0; i < numStars; i++)

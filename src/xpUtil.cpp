@@ -1,6 +1,7 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
+#include <sstream>
 #include <string>
 using namespace std;
 
@@ -64,6 +65,17 @@ removeFromEnvironment(const char *name)
     }
 
 #endif
+}
+
+void
+unlinkFile(const char *name)
+{
+    if (unlink(name) == -1)
+    {
+        ostringstream errStr;
+        errStr << "Can't remove " << name << "\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
+    }
 }
 
 void
@@ -193,7 +205,7 @@ get_tv_sec(double jd)
 	tz_save = "TZ=";
 	tz_save += get_tz;
     }
-    putenv("TZ=GMT");
+    putenv("TZ=UTC");
     tzset();
 
     time_t returnval = mktime(&tm_struct);

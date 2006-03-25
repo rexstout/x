@@ -90,6 +90,8 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+OBJC = @OBJC@
+OBJCFLAGS = @OBJCFLAGS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -118,6 +120,8 @@ am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
 am__fastdepCXX_TRUE = @am__fastdepCXX_TRUE@
+am__fastdepOBJC_FALSE = @am__fastdepOBJC_FALSE@
+am__fastdepOBJC_TRUE = @am__fastdepOBJC_TRUE@
 am__include = @am__include@
 am__quote = @am__quote@
 bindir = @bindir@
@@ -200,9 +204,10 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	installdirs-recursive install-recursive uninstall-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = README $(nobase_dist_data_DATA) AUTHORS COPYING ChangeLog \
-	INSTALL Makefile.am Makefile.in NEWS acinclude.m4 aclocal.m4 \
-	config.guess config.h.in config.sub configure configure.ac \
-	depcomp install-sh missing mkinstalldirs xpDefines.h.in
+	INSTALL Makefile.am Makefile.in NEWS TODO acinclude.m4 \
+	aclocal.m4 config.guess config.h.in config.sub configure \
+	configure.ac depcomp install-sh missing mkinstalldirs \
+	xpDefines.h.in
 DIST_SUBDIRS = $(SUBDIRS)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

@@ -3,11 +3,6 @@
 
 #include "DisplayBase.h"
 
-namespace Aqua
-{
-#include <ApplicationServices/ApplicationServices.h>
-}
-
 class DisplayMacAqua : public DisplayBase
 {
  public:
@@ -17,7 +12,6 @@ class DisplayMacAqua : public DisplayBase
     void renderImage(PlanetProperties *planetProperties[]);
 
  private:
-    Aqua::CGContextRef context;
 };
 
 #endif

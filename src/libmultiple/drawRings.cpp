@@ -8,7 +8,7 @@ using namespace std;
 #include "xpUtil.h"
 
 #include "libplanet/Planet.h"
-#include "libdisplay/DisplayBase.h"
+#include "libdisplay/libdisplay.h"
 
 /*
   This routine gets the coefficients for the equation of the

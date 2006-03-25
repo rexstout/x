@@ -142,24 +142,31 @@ Map::~Map()
 void
 Map::SetUpMap()
 {
-    double map_width = TWO_PI;
-    double map_height = M_PI;
+    mapWidth_ = TWO_PI * target_->Flipped();
+    mapHeight_ = M_PI;
 
     startLon_ = -M_PI * target_->Flipped();
     startLat_ = M_PI_2;
 
     if (targetProperties_->MapBounds())
     {
-	double map_uly, map_ulx, map_lry, map_lrx;
-	targetProperties_->MapBounds(map_uly, map_ulx, map_lry, map_lrx);
-        map_width = fabs(map_lrx - map_ulx) * deg_to_rad;
-        map_height = (map_uly - map_lry) * deg_to_rad;
-        startLon_ = map_ulx * deg_to_rad * target_->Flipped();
-        startLat_ = map_uly * deg_to_rad;
+	double uly, ulx, lry, lrx;
+	targetProperties_->MapBounds(uly, ulx, lry, lrx);
+
+        mapHeight_ = (uly - lry) * deg_to_rad;
+	if (mapHeight_ > M_PI)
+	    xpWarn("Map is too high\n", __FILE__, __LINE__);
+
+        mapWidth_ = (lrx - ulx) * deg_to_rad;
+	if (mapWidth_ > TWO_PI)
+	    xpWarn("Map is too wide\n", __FILE__, __LINE__);
+
+        startLon_ = ulx * deg_to_rad;
+        startLat_ = uly * deg_to_rad;
     }
 
-    delLon_ = map_width/width_ * target_->Flipped();
-    delLat_ = map_height/height_;
+    delLon_ = mapWidth_/width_;
+    delLat_ = mapHeight_/height_;
 
     delete [] lonArray_;
     lonArray_ = new double[width_];

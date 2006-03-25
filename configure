@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_LIBX11_TRUE HAVE_LIBX11_FALSE EGREP XSS_LIBS HAVE_LIBGIF_TRUE HAVE_LIBGIF_FALSE HAVE_LIBJPEG_TRUE HAVE_LIBJPEG_FALSE HAVE_LIBPNG_TRUE HAVE_LIBPNG_FALSE HAVE_LIBPNM_TRUE HAVE_LIBPNM_FALSE HAVE_LIBTIFF_TRUE HAVE_LIBTIFF_FALSE GRAPHICS_LIBS FREETYPE_CONFIG FREETYPE_CFLAGS FREETYPE_LIBS AQUA_LIBS HAVE_AQUA_TRUE HAVE_AQUA_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE USE_AR_TRUE USE_AR_FALSE xplanet_ARFLAGS xplanet_LDFLAGS separator mapext LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB am__fastdepOBJC_TRUE am__fastdepOBJC_FALSE CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_LIBX11_TRUE HAVE_LIBX11_FALSE EGREP XSS_LIBS HAVE_LIBGIF_TRUE HAVE_LIBGIF_FALSE HAVE_LIBJPEG_TRUE HAVE_LIBJPEG_FALSE HAVE_LIBPNG_TRUE HAVE_LIBPNG_FALSE HAVE_LIBPNM_TRUE HAVE_LIBPNM_FALSE HAVE_LIBTIFF_TRUE HAVE_LIBTIFF_FALSE GRAPHICS_LIBS FREETYPE_CONFIG FREETYPE_CFLAGS FREETYPE_LIBS AQUA_LIBS OBJC OBJCFLAGS HAVE_AQUA_TRUE HAVE_AQUA_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE USE_AR_TRUE USE_AR_FALSE xplanet_ARFLAGS xplanet_LDFLAGS separator mapext LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1559,7 +1559,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=xplanet
- VERSION=1.0.0
+ VERSION=1.0.1
 
 
 cat >>confdefs.h <<_ACEOF
@@ -3189,6 +3189,17 @@ fi
   RANLIB=$ac_ct_RANLIB
 else
   RANLIB="$ac_cv_prog_RANLIB"
+fi
+
+
+
+
+if false; then
+  am__fastdepOBJC_TRUE=
+  am__fastdepOBJC_FALSE='#'
+else
+  am__fastdepOBJC_TRUE='#'
+  am__fastdepOBJC_FALSE=
 fi
 
 
@@ -6856,7 +6867,12 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_AQUA
 _ACEOF
 
-  AQUA_LIBS="-framework ApplicationServices"
+  AQUA_LIBS="-framework Carbon -framework Cocoa -bind_at_load"
+
+
+  OBJC="gcc"
+  OBJCFLAGS="-Wno-import"
+
 
 fi
 
@@ -7276,6 +7292,13 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${am__fastdepOBJC_TRUE}" && test -z "${am__fastdepOBJC_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"am__fastdepOBJC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"am__fastdepOBJC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -7926,6 +7949,8 @@ s,@am__fastdepCXX_TRUE@,$am__fastdepCXX_TRUE,;t t
 s,@am__fastdepCXX_FALSE@,$am__fastdepCXX_FALSE,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@am__fastdepOBJC_TRUE@,$am__fastdepOBJC_TRUE,;t t
+s,@am__fastdepOBJC_FALSE@,$am__fastdepOBJC_FALSE,;t t
 s,@CPP@,$CPP,;t t
 s,@X_CFLAGS@,$X_CFLAGS,;t t
 s,@X_PRE_LIBS@,$X_PRE_LIBS,;t t
@@ -7950,6 +7975,8 @@ s,@FREETYPE_CONFIG@,$FREETYPE_CONFIG,;t t
 s,@FREETYPE_CFLAGS@,$FREETYPE_CFLAGS,;t t
 s,@FREETYPE_LIBS@,$FREETYPE_LIBS,;t t
 s,@AQUA_LIBS@,$AQUA_LIBS,;t t
+s,@OBJC@,$OBJC,;t t
+s,@OBJCFLAGS@,$OBJCFLAGS,;t t
 s,@HAVE_AQUA_TRUE@,$HAVE_AQUA_TRUE,;t t
 s,@HAVE_AQUA_FALSE@,$HAVE_AQUA_FALSE,;t t
 s,@build@,$build,;t t

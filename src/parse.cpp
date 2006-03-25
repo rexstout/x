@@ -165,6 +165,8 @@ parse(int &i, const char *line, char *&returnString)
         returnval = NAME;
     else if (getValue(line, i, "magnify=", returnString))
         returnval = MAGNIFY;
+    else if (getValue(line, i, "mapbounds={", '}', returnString))
+	returnval = MAP_BOUNDS;
     else if (getValue(line, i, "marker_color={", '}', returnString))
         returnval = MARKER_COLOR;
     else if (getValue(line, i, "marker_color=", returnString))

@@ -90,6 +90,8 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+OBJC = @OBJC@
+OBJCFLAGS = @OBJCFLAGS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -118,6 +120,8 @@ am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
 am__fastdepCXX_TRUE = @am__fastdepCXX_TRUE@
+am__fastdepOBJC_FALSE = @am__fastdepOBJC_FALSE@
+am__fastdepOBJC_TRUE = @am__fastdepOBJC_TRUE@
 am__include = @am__include@
 am__quote = @am__quote@
 bindir = @bindir@
@@ -153,7 +157,7 @@ xplanet_ARFLAGS = @xplanet_ARFLAGS@
 xplanet_LDFLAGS = @xplanet_LDFLAGS@
 noinst_LIBRARIES = libdisplay.a libtimer.a
 
-@HAVE_AQUA_TRUE@displayaqua = DisplayMacAqua.cpp DisplayMacAqua.h
+@HAVE_AQUA_TRUE@displayaqua = DisplayMacAqua.cpp DisplayMacAqua.h DesktopPicture.m
 
 @HAVE_CYGWIN_TRUE@displaymswin = DisplayMSWin.cpp DisplayMSWin.h
 
@@ -198,9 +202,11 @@ libdisplay_a_LIBADD =
 am__libdisplay_a_SOURCES_DIST = DisplayBase.cpp DisplayBase.h \
 	DisplayOutput.h DisplayOutput.cpp getDisplay.cpp libdisplay.h \
 	DisplayX11.cpp DisplayX11.h vroot.h DisplayMacAqua.cpp \
-	DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h
+	DisplayMacAqua.h DesktopPicture.m DisplayMSWin.cpp \
+	DisplayMSWin.h
 @HAVE_LIBX11_TRUE@am__objects_1 = DisplayX11.$(OBJEXT)
-@HAVE_AQUA_TRUE@am__objects_2 = DisplayMacAqua.$(OBJEXT)
+@HAVE_AQUA_TRUE@am__objects_2 = DisplayMacAqua.$(OBJEXT) \
+@HAVE_AQUA_TRUE@	DesktopPicture.$(OBJEXT)
 @HAVE_CYGWIN_TRUE@am__objects_3 = DisplayMSWin.$(OBJEXT)
 am_libdisplay_a_OBJECTS = DisplayBase.$(OBJEXT) DisplayOutput.$(OBJEXT) \
 	getDisplay.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
@@ -217,7 +223,8 @@ libtimer_a_OBJECTS = $(am_libtimer_a_OBJECTS)
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/DisplayBase.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/DesktopPicture.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/DisplayBase.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/DisplayMSWin.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/DisplayMacAqua.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/DisplayOutput.Po \
@@ -229,6 +236,11 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+OBJCCOMPILE = $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_OBJCFLAGS) $(OBJCFLAGS)
+OBJCLD = $(OBJC)
+OBJCLINK = $(OBJCLD) $(AM_OBJCFLAGS) $(OBJCFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -241,7 +253,7 @@ SOURCES = $(libdisplay_a_SOURCES) $(EXTRA_libdisplay_a_SOURCES) $(libtimer_a_SOU
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .o .obj
+.SUFFIXES: .cpp .m .o .obj
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --gnu  src/libdisplay/Makefile
@@ -267,6 +279,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DesktopPicture.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DisplayBase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DisplayMSWin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DisplayMacAqua.Po@am__quote@
@@ -301,6 +314,28 @@ distclean-depend:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
+
+.m.o:
+@am__fastdepOBJC_TRUE@	if $(OBJCCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepOBJC_TRUE@	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<; \
+@am__fastdepOBJC_TRUE@	then mv "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepOBJC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepOBJC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(OBJCCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+.m.obj:
+@am__fastdepOBJC_TRUE@	if $(OBJCCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
+@am__fastdepOBJC_TRUE@	  -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`; \
+@am__fastdepOBJC_TRUE@	then mv "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
+@am__fastdepOBJC_TRUE@	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+@am__fastdepOBJC_TRUE@	fi
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(OBJCCOMPILE) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(srcdir)/$<'; fi`
 uninstall-info-am:
 
 ETAGS = etags
@@ -474,6 +509,9 @@ uninstall-am: uninstall-info-am
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-info-am
 
+
+@HAVE_AQUA_TRUE@%.o: %.m
+@HAVE_AQUA_TRUE@	$(OBJC) $(OBJCFLAGS) -c $<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

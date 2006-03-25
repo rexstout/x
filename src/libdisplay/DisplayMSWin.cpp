@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <sstream>
 #include <string>
 using namespace std;
@@ -66,7 +65,7 @@ DisplayMSWin::renderImage(PlanetProperties *planetProperties[])
     Image i(width_, height_, rgb_data, alpha);
     if (!i.Write(outputFilename.c_str()))
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Can't create image file " << outputFilename << "\n";
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
@@ -75,7 +74,7 @@ DisplayMSWin::renderImage(PlanetProperties *planetProperties[])
 	Options *options = Options::getInstance();
 	if (options->Verbosity() > 1)
 	{
-	    stringstream msg;
+	    ostringstream msg;
 	    msg << "Created image file " << outputFilename << "\n";
 	    xpMsg(msg.str(), __FILE__, __LINE__);
 	}
@@ -85,6 +84,9 @@ DisplayMSWin::renderImage(PlanetProperties *planetProperties[])
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, 
                          (char *) outputFilename.c_str(), 
                          SPIF_UPDATEINIFILE);
+
+    // remove the file
+    unlinkFile(outputFilename.c_str());
 }
 
 string

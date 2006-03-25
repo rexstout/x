@@ -18,6 +18,7 @@ using namespace std;
 #include "libdisplay/libdisplay.h"
 #include "libplanet/Planet.h"
 #include "libprojection/libprojection.h"
+#include "libprojection/ProjectionRectangular.h"
 
 extern void
 arrangeMarkers(multimap<double, Annotation *> &annotationMap,
@@ -105,9 +106,25 @@ drawProjection(DisplayBase *display, Planet *target,
 	delete sun_view;
     }
 
-    ProjectionBase *projection = getProjection(options->Projection(),
-					       target->Flipped(), 
-					       width, height);
+    ProjectionBase *projection = NULL;
+
+    if (options->Projection() == RECTANGULAR
+	&& planetProperties->MapBounds())
+    {
+	projection = new ProjectionRectangular(target->Flipped(), 
+					       width, height,
+					       m->StartLat(),
+					       m->StartLon(),
+					       m->MapHeight(),
+					       m->MapWidth());
+					       
+    }
+    else
+    {
+	projection = getProjection(options->Projection(),
+				   target->Flipped(), 
+				   width, height);
+    }
 
     multimap<double, Annotation *> annotationMap;
     if (planetProperties->DrawArcs())
@@ -160,7 +177,7 @@ drawProjection(DisplayBase *display, Planet *target,
 	    for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/(grid1 * grid2))
 	    {
 		double X, Y, Z;
-		if (sphericalToPixel(lat, lon, 1, X, Y, Z, NULL, NULL, projection)) 
+		if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, NULL, projection)) 
 		    display->setPixel(X, Y, color);
 	    }
 	}
@@ -170,7 +187,7 @@ drawProjection(DisplayBase *display, Planet *target,
 	    for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/grid1)
 	    {
 		double X, Y, Z;
-		if (sphericalToPixel(lat, lon, 1, X, Y, Z, NULL, NULL, projection)) 
+		if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, NULL, projection)) 
 		    display->setPixel(X, Y, color);
 	    }
 	}
@@ -194,7 +211,8 @@ drawProjection(DisplayBase *display, Planet *target,
 	    // the either side of the screen.
 	    if (options->Projection() == MERCATOR
 		|| options->Projection() == PETERS
-		|| options->Projection() == RECTANGULAR)
+		|| (options->Projection() == RECTANGULAR
+		    && !planetProperties->MapBounds()))
 	    {
 		a->Shift(-width);
 		a->Draw(display);

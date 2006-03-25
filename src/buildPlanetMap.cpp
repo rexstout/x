@@ -1,6 +1,7 @@
 #include <cmath>
-#include <map>
+#include <cstdio>
 #include <iostream>
+#include <map>
 using namespace std;
 
 #include "body.h"
@@ -86,10 +87,9 @@ buildPlanetMap(const double jd,
 	    Planet *p = it->second;
 	    double pX, pY, pZ;
 	    p->getPosition(pX, pY, pZ);
-	    snprintf(buffer, 256, "%10s: %16.6f %12.8f %12.8f %12.8f %12.8f\n", 
-		     body_string[p->Index()], 
-		     jd, 
-		     pX, pY, pZ, it->first);
+	    snprintf(buffer, 256, 
+		     "%10s: %16.6f %12.8f %12.8f %12.8f %12.8f\n", 
+		     body_string[p->Index()], jd, pX, pY, pZ, it->first);
 	    cout << buffer;
 	    it++;
 	}

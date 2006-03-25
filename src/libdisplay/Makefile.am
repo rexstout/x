@@ -1,7 +1,10 @@
 noinst_LIBRARIES = libdisplay.a libtimer.a
 
 if HAVE_AQUA
-  displayaqua = DisplayMacAqua.cpp DisplayMacAqua.h
+  displayaqua = DisplayMacAqua.cpp DisplayMacAqua.h DesktopPicture.m
+
+%.o: %.m
+	$(OBJC) $(OBJCFLAGS) -c $<
 endif
 
 if HAVE_CYGWIN

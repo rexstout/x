@@ -1,11 +1,13 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(xplanet, 1.0.0)
+AM_INIT_AUTOMAKE(xplanet, 1.0.1)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
+
+AM_CONDITIONAL([am__fastdepOBJC], false)
 
 # my functions
 AC_FIND_X11
