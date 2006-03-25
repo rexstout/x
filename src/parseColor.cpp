@@ -70,8 +70,9 @@ parseColor(string color, unsigned char RGB[3])
             color[i] = tolower(color[i]);
         
         // There's a DarkSlateGray but no DarkSlateGrey
-        unsigned int grey = color.find("grey");
-        if (grey != string::npos && grey < color.size()) color[grey+2] = 'a';
+        string::size_type grey = color.find("grey");
+        if (grey != string::npos && grey < color.size()) 
+	    color[grey+2] = 'a';
         
         memset(RGB, 0, 3);
         

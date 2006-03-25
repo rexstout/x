@@ -1,8 +1,11 @@
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <sstream>
 #include <string>
 using namespace std;
+
+#include <unistd.h>
 
 #include "keywords.h"
 #include "Options.h"
@@ -18,19 +21,27 @@ using namespace std;
 
 DisplayMSWin::DisplayMSWin(const int tr) : DisplayBase(tr)
 {
-    int screen_width = GetSystemMetrics(SM_CXSCREEN);
-    int screen_height = GetSystemMetrics(SM_CYSCREEN);
+    fullWidth_ = GetSystemMetrics(SM_CXSCREEN);
+    fullHeight_ = GetSystemMetrics(SM_CYSCREEN);
 
     Options *options = Options::getInstance();
-    switch (options->getDisplayMode())
+    switch (options->DisplayMode())
     {
     case WINDOW:
         xpWarn("-window option not supported for MS Windows.\n",
                __FILE__, __LINE__);
         // fall through
     case ROOT:
-        width_ = screen_width;
-        height_ = screen_height;
+        if (options->GeometrySelected())
+        {
+            width_ = options->getWidth();
+            height_ = options->getHeight();
+        }
+        else
+        {
+            width_ = fullWidth_;
+            height_ = fullHeight_;
+        }
         break;
     }
   
@@ -62,22 +73,22 @@ DisplayMSWin::renderImage(PlanetProperties *planetProperties[])
     string outputFilename(TmpDir());
     outputFilename += "\\XPlanet.bmp";
 
-    Image i(width_, height_, rgb_data, alpha);
+    Options *options = Options::getInstance();
+    if (options->GeometrySelected()) PlaceImageOnRoot();
+
+    Image i(fullWidth_, fullHeight_, rgb_data, alpha);
     if (!i.Write(outputFilename.c_str()))
     {
         ostringstream errStr;
         errStr << "Can't create image file " << outputFilename << "\n";
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
-    else
+    
+    if (options->Verbosity() > 1)
     {
-	Options *options = Options::getInstance();
-	if (options->Verbosity() > 1)
-	{
-	    ostringstream msg;
-	    msg << "Created image file " << outputFilename << "\n";
-	    xpMsg(msg.str(), __FILE__, __LINE__);
-	}
+        ostringstream msg;
+        msg << "Created image file " << outputFilename << "\n";
+        xpMsg(msg.str(), __FILE__, __LINE__);
     }
     
     // Tell Windows to update the desktop wallpaper
@@ -85,8 +96,8 @@ DisplayMSWin::renderImage(PlanetProperties *planetProperties[])
                          (char *) outputFilename.c_str(), 
                          SPIF_UPDATEINIFILE);
 
-    // remove the file
-    unlinkFile(outputFilename.c_str());
+    if (!options->SaveDesktopFile())
+        unlinkFile(outputFilename.c_str());
 }
 
 string

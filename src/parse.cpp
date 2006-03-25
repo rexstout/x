@@ -234,6 +234,8 @@ parse(int &i, const char *line, char *&returnString)
         returnval = TRAIL;
     else if (getValue(line, i, "transparent={", '}', returnString))
         returnval = TRANSPARENT;
+    else if (getValue(line, i, "twilight=", returnString))
+        returnval = TWILIGHT;
     else // assume it's a latitude/longitude value
     {
         int istart = i;

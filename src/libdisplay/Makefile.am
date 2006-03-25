@@ -11,12 +11,20 @@ if HAVE_CYGWIN
   displaymswin = DisplayMSWin.cpp DisplayMSWin.h
 endif
 
+if HAVE_LIBFREETYPE
+  textrendererft2 = TextRendererFT2.cpp TextRendererFT2.h
+endif
+
+if HAVE_LIBPANGOFT2
+  textrendererpangoft2 = TextRendererPangoFT2.cpp TextRendererPangoFT2.h
+endif
+
 if HAVE_LIBX11
   displayx11 = DisplayX11.cpp DisplayX11.h vroot.h 
   timerx11   = TimerX11.h TimerX11.cpp
 endif
 
-EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h DisplayX11.cpp DisplayX11.h vroot.h TimerX11.h TimerX11.cpp
+EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h TextRendererFT2.cpp TextRendererFT2.h TextRendererPangoFT2.cpp TextRendererPangoFT2.h DisplayX11.cpp DisplayX11.h vroot.h TimerX11.h TimerX11.cpp
 
 AM_CPPFLAGS = @X_CFLAGS@ @FREETYPE_CFLAGS@ -I@top_srcdir@/src
 
@@ -35,9 +43,14 @@ libdisplay_a_SOURCES = \
 	DisplayOutput.cpp	\
 	getDisplay.cpp 		\
 	libdisplay.h		\
+	TextRenderer.cpp	\
+	TextRenderer.h		\
+	getTextRenderer.cpp	\
 	$(displayx11)		\
 	$(displayaqua)		\
-	$(displaymswin)
+	$(displaymswin)		\
+	$(textrendererft2)	\
+	$(textrendererpangoft2)
 
 libtimer_a_SOURCES = \
 	getTimer.cpp		\

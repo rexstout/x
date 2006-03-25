@@ -1,6 +1,3 @@
-#include <cstdlib>
-using namespace std;
-
 #include "config.h"
 
 #include "keywords.h"
@@ -27,7 +24,7 @@ DisplayBase *getDisplay(const int times_run)
 {
     Options *options = Options::getInstance();
 
-    if (options->getDisplayMode() == OUTPUT)
+    if (options->DisplayMode() == OUTPUT)
 	return(new DisplayOutput(times_run));
 
 #ifdef HAVE_LIBX11

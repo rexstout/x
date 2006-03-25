@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <sstream>
 using namespace std;
 
@@ -20,22 +21,31 @@ extern "C" {
 
 DisplayMacAqua::DisplayMacAqua(const int tr) : DisplayBase(tr)
 {
-    int screen_width = (int) CGDisplayPixelsWide(kCGDirectMainDisplay);
-    int screen_height = (int) CGDisplayPixelsHigh(kCGDirectMainDisplay);
+    fullWidth_ = static_cast<int> (CGDisplayPixelsWide(kCGDirectMainDisplay));
+    fullHeight_ = static_cast<int> (CGDisplayPixelsHigh(kCGDirectMainDisplay));
 
-    if (screen_width == 0 || screen_height == 0)
-	xpExit("Can't set Aqua display\n", __FILE__, __LINE__);
+    if (fullWidth_ == 0 || fullHeight_ == 0)
+        xpExit("Can't set Aqua display\n", __FILE__, __LINE__);
 
     Options *options = Options::getInstance();
-    switch (options->getDisplayMode())
+    switch (options->DisplayMode())
     {
     case WINDOW:
         xpWarn("-window option not supported for Aqua.\n", 
                __FILE__, __LINE__);
         // fall through
     case ROOT:
-        width_ = screen_width;
-        height_ = screen_height;
+        if (options->GeometrySelected())
+        {
+            width_ = options->getWidth();
+            height_ = options->getHeight();
+        }
+        else
+        {
+            width_ = fullWidth_;
+            height_ = fullHeight_;
+        }
+        
         break;
     }
   
@@ -76,7 +86,10 @@ DisplayMacAqua::renderImage(PlanetProperties *planetProperties[])
     ostringstream outputStream;
     outputStream << TmpDir() << "/" << tmpFile << ".png";
 
-    Image i(width_, height_, rgb_data, alpha);
+    Options *options = Options::getInstance();
+    if (options->GeometrySelected()) PlaceImageOnRoot();
+
+    Image i(fullWidth_, fullHeight_, rgb_data, alpha);
     if (!i.Write(outputStream.str().c_str()))
     {
         ostringstream errStr;
@@ -84,23 +97,23 @@ DisplayMacAqua::renderImage(PlanetProperties *planetProperties[])
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
 
-    Options *options = Options::getInstance();
     if (options->Verbosity() > 1)
     {
-	ostringstream msg;
-	msg << "Created image file " << outputStream.str() << "\n";
-	xpMsg(msg.str(), __FILE__, __LINE__);
+        ostringstream msg;
+        msg << "Created image file " << outputStream.str() << "\n";
+        xpMsg(msg.str(), __FILE__, __LINE__);
     }
-    
+
     // This sometimes doesn't set the background correctly, but
     // doesn't return false in those cases.  Hopefully the real API to
     // set the desktop will be available soon.
+    sleep(1);
     if (!SetDesktopPictureFromCharString(outputStream.str().c_str()))
     {
-	ostringstream errStr;
-	errStr << "Failed to set desktop from " 
-	       << outputStream.str() << "\n";
-	xpWarn(errStr.str(), __FILE__, __LINE__);
+        ostringstream errStr;
+        errStr << "Failed to set desktop from " 
+               << outputStream.str() << "\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
     }
 
     // I have no idea, but maybe the failure to set the desktop is
@@ -108,5 +121,6 @@ DisplayMacAqua::renderImage(PlanetProperties *planetProperties[])
     // Sleep for a second before removing the temporary file to give
     // it some time.
     sleep(1);
-    unlinkFile(outputStream.str().c_str());
+    if (!options->SaveDesktopFile())
+        unlinkFile(outputStream.str().c_str());
 }

@@ -1,22 +1,124 @@
+AC_DEFUN([AC_FIND_JAVA],
+[
+have_java='no'
+AC_ARG_WITH(gui, [  --with-gui    Build java GUI [yes]])
+if test "$with_gui" != 'no'; then
+  AC_PATH_PROG(JAVA, java, no)
+  if test "$JAVA" = 'no'; then
+    AC_MSG_WARN(*** Java GUI will not be built ***)
+    have_java='no'
+  else
+    have_java='yes'
+  fi
+fi
+
+AM_CONDITIONAL(HAVE_JAVA, test "$have_java" = 'yes')
+])
+
+dnl adapted from openssh-3.6p1 configure script
+dnl Check for socklen_t: historically on BSD it is an int, and in
+dnl POSIX 1g it is a type of its own, but some platforms use different
+dnl types for the argument to getsockopt, getpeername, etc.  So we
+dnl have to test to find something that will work.
+AC_DEFUN([AC_FIND_SOCKLEN_T],
+[
+  AC_CHECK_TYPE([socklen_t],have_socklen_t='yes',have_socklen_t='no', [#include <sys/types.h>
+#include <sys/socket.h>])
+  if test "$have_socklen_t" != 'yes'; then
+    AC_MSG_CHECKING([for socklen_t equivalent])
+    socklen_t_equiv=""
+    # Systems have either "struct sockaddr *" or
+    # "void *" as the second argument to getpeername
+    for arg2 in "struct sockaddr" void; do
+      for t in int size_t unsigned long "unsigned long"; do
+        AC_TRY_COMPILE([
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int getpeername (int, $arg2 *, $t *);
+                       ],[
+$t len;
+getpeername(0,0,&len);
+                       ],[
+socklen_t_equiv="$t"
+break
+                       ])
+      done
+    done
+    if test "x$socklen_t_equiv" = x; then
+      AC_MSG_ERROR([Cannot find a type to use in place of socklen_t])
+    fi
+    AC_MSG_RESULT($socklen_t_equiv)
+    AC_DEFINE_UNQUOTED(socklen_t, $socklen_t_equiv,[type to use in place of socklen_t if not defined])
+  fi
+])
+
+AC_DEFUN(AC_FIND_PTHREADS,
+[
+if test "$with_gui" != 'no'; then
+  PTHREAD_LIB=""
+  AC_CHECK_LIB(pthread, pthread_create, PTHREAD_LIB="-lpthread",
+ 		[AC_CHECK_LIB(pthreads, pthread_create, PTHREAD_LIB="-lpthreads",
+ 		    [AC_CHECK_LIB(c_r, pthread_create, PTHREAD_LIB="-lc_r",
+ 			[AC_CHECK_FUNC(pthread_create)]
+ 		    )]
+ 		)]
+	       )
+  if test "$PTHREAD_LIB" = ""; then
+    AC_MSG_WARN(*** GUI will not be built ***)
+  fi
+  AC_SUBST(PTHREAD_LIB)
+fi
+
+AM_CONDITIONAL(HAVE_PTHREADS, test "$PTHREAD_LIB" != "")
+
+])
+
 AC_DEFUN(AC_FIND_FREETYPE,
 [
 
-AC_ARG_WITH(freetype, [  --with-freetype         Enable Freetype support for TrueType fonts [yes]])
+AC_ARG_WITH(freetype,AC_HELP_STRING([--with-freetype],[Enable Freetype support for TrueType fonts (YES)]))
 
+have_freetype='no'
 if test "$with_freetype" != 'no'; then
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
   if test "$FREETYPE_CONFIG" = no; then
     AC_MSG_WARN(*** Xplanet will be built without freetype support ***)
-    with_freetype='no'
   else
     FREETYPE_CFLAGS="`$FREETYPE_CONFIG --cflags` -I`$FREETYPE_CONFIG --prefix`/include"
     FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
     AC_SUBST(FREETYPE_CFLAGS)
     AC_SUBST(FREETYPE_LIBS)
     AC_DEFINE(HAVE_LIBFREETYPE,,Define if you have freetype)
+    have_freetype='yes'
   fi
 fi
 
+AM_CONDITIONAL(HAVE_LIBFREETYPE, test "$have_freetype" = 'yes')
+])
+
+AC_DEFUN(AC_FIND_PANGO,
+[
+AC_ARG_WITH(pango,AC_HELP_STRING([--with-pango],[Enable Pango (YES)]))
+
+have_pangoft2='no'
+if test "$with_pango" != 'no'; then
+   AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+   if test "$PKG_CONFIG" = no; then
+      AC_MSG_WARN(*** Xplanet will be built without pango support ***)
+   else
+      PKG_CHECK_MODULES([PANGOFT2], pangoft2 >= 1.2.0, have_pangoft2='yes', have_pangoft2='no')
+      FREETYPE_CFLAGS="$FREETYPE_CFLAGS $PANGOFT2_CFLAGS"
+      FREETYPE_LIBS="$FREETYPE_LIBS $PANGOFT2_LIBS"
+      AC_SUBST(FREETYPE_CFLAGS)
+      AC_SUBST(FREETYPE_LIBS)
+      if test "$have_pangoft2" = 'yes'; then
+        AC_DEFINE(HAVE_LIBPANGOFT2,,Define if you have pango with freetype 2)
+      fi
+   fi
+fi
+
+AM_CONDITIONAL(HAVE_LIBPANGOFT2, test "$have_pangoft2" = 'yes')
 ])
 
 dnl Autoconf stuff to check for graphics libraries is adapted from 
@@ -31,7 +133,7 @@ GRAPHICS_LIBS=""
 #
 # Check for GIF
 #
-AC_ARG_WITH(gif, [  --with-gif              Enable GIF support [yes]])
+AC_ARG_WITH(gif,AC_HELP_STRING([--with-gif],[Enable GIF support (YES)]))
 
 have_gif='no'
 if test "$with_gif" != 'no'; then
@@ -63,7 +165,7 @@ fi
 #
 # Check for JPEG
 #
-AC_ARG_WITH(jpeg, [  --with-jpeg             Enable JPEG support [yes]])
+AC_ARG_WITH(jpeg,AC_HELP_STRING([--with-jpeg],[Enable JPEG support (YES)]))
 
 have_jpeg='no'
 if test "$with_jpeg" != 'no'; then
@@ -86,7 +188,7 @@ fi
 #
 # Check for PNG
 #
-AC_ARG_WITH(png, [  --with-png              Enable PNG support [yes]])
+AC_ARG_WITH(png,AC_HELP_STRING([--with-png],[Enable PNG support (YES)]))
 
 have_png='no'
 if test "$with_png" != 'no'; then
@@ -109,7 +211,7 @@ fi
 #
 # Check for PNM
 #
-AC_ARG_WITH(pnm, [  --with-pnm              Enable PNM support [yes]])
+AC_ARG_WITH(pnm,AC_HELP_STRING([--with-pnm],[Enable PNM support (YES)]))
 
 have_pnm='no'
 if test "$with_pnm" != 'no'; then
@@ -139,7 +241,7 @@ fi
 #
 # Check for TIFF
 #
-AC_ARG_WITH(tiff, [  --with-tiff             Enable TIFF support [yes]])
+AC_ARG_WITH(tiff,AC_HELP_STRING([--with-tiff],[Enable TIFF support (YES)]))
 
 have_tiff='no'
 if test "$with_tiff" != 'no'; then
@@ -201,11 +303,12 @@ AM_CONDITIONAL(HAVE_LIBX11, test "$have_libx11" = 'yes')
 
 AC_DEFUN(AC_FIND_XSS,
 [
-AC_ARG_ENABLE(screensaver,   [  --disable-screensaver   compile without X screensaver extension],enable_xss=no,enable_xss=yes)
 dnl Check for XScreenSaver
-if test "$have_libx11" = "yes" ; then
-if test "$enable_xss" = "yes" ; then	
-    have_xss=no
+AC_ARG_WITH(xscreensaver,AC_HELP_STRING([--with-xscreensaver],[compile with X screensaver extension (YES)]))
+
+have_xss='no'
+if test "$have_libx11" = 'yes' ; then
+if test "$with_xscreensaver" != 'no' ; then	
     AC_CHECK_HEADERS([X11/Xlib.h])
     AC_CHECK_HEADERS([X11/extensions/scrnsaver.h], [have_xss=yes], [],
 [#if HAVE_X11_XLIB_H
@@ -226,12 +329,11 @@ fi
 fi
 ])
 
-
 AC_DEFUN(AC_USE_MACAQUA,
 [
-AC_ARG_WITH(aqua, [  --with-aqua             For Mac OS X Aqua [no]],use_aqua=yes,use_aqua=no)
+AC_ARG_WITH(aqua,AC_HELP_STRING([--with-aqua],[For Mac OS X Aqua (NO)]))
 
-if test "$use_aqua" = yes; then
+if test "$with_aqua" = yes; then
   AC_DEFINE(HAVE_AQUA,,Define for Mac OS X)
   AQUA_LIBS="-framework Carbon -framework Cocoa -bind_at_load"
   AC_SUBST(AQUA_LIBS)
@@ -242,6 +344,5 @@ if test "$use_aqua" = yes; then
   AC_SUBST(OBJCFLAGS)
 fi
 
-AM_CONDITIONAL(HAVE_AQUA, test "$use_aqua" = 'yes')
+AM_CONDITIONAL(HAVE_AQUA, test "$with_aqua" = 'yes')
 ])
-

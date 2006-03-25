@@ -23,145 +23,26 @@
 
 */
 
-#include <cmath>
-#include <complex>
-#include <cstdio>
-using namespace std;
-
-#include "body.h"
 #include "xpUtil.h"
+
+#include "EphemerisLow.h"
+using namespace std;
 
 extern 
 void pluto(const double JD, double &Px, double &Py, double &Pz, 
-	   double &Vx, double &Vy, double &Vz);
+           double &Vx, double &Vy, double &Vz);
 
-static void
-kepler(const double al, const complex<double> &z, const double u, 
-       complex<double> &zto, double &r)
+EphemerisLow::EphemerisLow() : Ephemeris()
 {
-    const double ex = abs(z);
-    const double ex2 = ex*ex;
-    const double ex3 = ex2*ex;
-
-    double e = (al + (ex - ex3/8)*sin(al) + 0.5 * ex2 * sin(2*al) 
-		+ 0.375 * ex3 * sin(3*al));
-
-    complex<double> z1 = conj(z);
-
-    for (int k = 0; k < 10; k++)
-    {
-	const complex<double> z2(0, e);
-	const complex<double> zteta = exp(z2);
-
-	const complex<double> z3 = z1*zteta;
-
-	const double dl = al - e + z3.imag();
-	r = 1 - z3.real();
-	if (fabs(dl) < 1e-12)
-	{
-	    z1 = u * z * z3.imag();
-	    const complex<double> z2(z1.imag(), -z1.real());
-	    zto = (-z + zteta + z2)/r;
-	    return;
-	}
-	e += dl/r;
-    }
-    xpWarn("Kepler: can't converge\n", __FILE__, __LINE__);
 }
 
-static void
-ellipx(const double a, const double dlm, const double e, const double p, 
-       const double dia, const double omega, const double dmas, 
-       double &Px, double &Py, double &Pz,
-       double &Vx, double &Vy, double &Vz)
+EphemerisLow::~EphemerisLow()
 {
-    const double xa = a;
-    const double xl = dlm;
-    const double xk = e*cos(p);
-    const double xh = e*sin(p);
-    const double xq = sin(dia/2) * cos(omega);
-    const double xp = sin(dia/2) * sin(omega);
-
-    const double asr = 648000/M_PI;
-    const double gk = 3548.1876069651;
-    const double xfi = sqrt(1 - xk*xk - xh*xh);
-    const double xki = sqrt(1 - xq*xq - xp*xp);
-
-    const double u = 1/(1+xfi);
-    
-    complex<double> z(xk, xh);
-    complex<double> zto;
-    double r;
-
-    kepler(xl, z, u, zto, r);
-
-    const double xcw = zto.real();
-    const double xsw = zto.imag();
-    
-    const double xm = xp*xcw - xq*xsw;
-    const double xxx = xa*r;
-
-    Px = xxx*(xcw - 2*xp*xm);
-    Py = xxx*(xsw + 2*xq*xm);
-    Pz = -2*xxx*xki*xm;
-
-    const double xms = xa*(xh+xsw)/xfi;
-    const double xmc = xa*(xk+xcw)/xfi;
-    const double xn = gk*sqrt((1+dmas)/(xa*xa*xa))/asr;
-
-    Vx = xn*((2*xp*xp - 1)*xms + 2*xp*xq*xmc);
-    Vy = xn*((1 - 2*xq*xq)*xmc - 2*xp*xq*xms);
-    Vz = 2*xn*xki*(xp*xms + xq*xmc);
-}
-
-static void 
-calcHeliocentricXYZ(const double tjd, const double dmas,
-		    double *a, double *dlm, double *e, 
-                    double *pi, double *dinc, double *omega,
-                    int *kp, double *ca, double *sa, 
-                    int *kq, double *cl, double *sl,
-                    double &Px, double &Py, double &Pz,
-		    double &Vx, double &Vy, double &Vz)
-{
-    const double t = (tjd - 2451545)/365250;
-    const double t2 = t*t;
-
-    double da = a[0] + t*a[1] + t2*a[2];
-    double dl = (3600*dlm[0] + t*dlm[1] + t2*dlm[2]) * deg_to_rad / 3600;
-    const double de = e[0] + t*e[1] + t2*e[2];
-    double dp = (3600*pi[0] + t*pi[1] + t2*pi[2]) * deg_to_rad / 3600;
-    const double di = ((3600*dinc[0] + t*dinc[1] + t2*dinc[2]) 
-		       * deg_to_rad / 3600);
-    double dm = ((3600*omega[0] + t*omega[1] + t2*omega[2]) 
-		 * deg_to_rad / 3600);
-
-    const double dmu = 0.35953620*t;
-    double arga, argl;
-    for (int j = 0; j < 8; j++)
-    {
-	arga = kp[j] * dmu;
-	da += (ca[j] * cos(arga) + sa[j] * sin(arga)) * 1e-7;
-
-	argl = kq[j] * dmu;
-	dl += (cl[j] * cos(argl) + sl[j] * sin(argl)) * 1e-7;
-    }
-    arga = kp[8] * dmu;
-    da += t*(ca[8] * cos(arga) + sa[8] * sin(arga)) * 1e-7;
-    for (int j = 8; j < 10; j++)
-    {
-	argl = kq[j] * dmu;
-	dl += t*(cl[j] * cos(argl) + sl[j] * sin(argl)) * 1e-7;
-    }
-    dl = fmod(dl, TWO_PI);
-    dp = fmod(dp, TWO_PI);
-    dm = fmod(dm, TWO_PI);
-
-    ellipx(da, dl, de, dp, di, dm, dmas, Px, Py, Pz, Vx, Vy, Vz);
 }
 
 void
-ephemeris(const body b, const double tjd, 
-          double &Px, double &Py, double &Pz)
+EphemerisLow::GetHeliocentricXYZ(const body b, const double tjd, 
+                                 double &Px, double &Py, double &Pz)
 {
     double a[8][3] = { { 0.3870983098,             0.,        0. },
                        { 0.7233298200,             0.,        0. },
@@ -280,64 +161,188 @@ ephemeris(const body b, const double tjd,
     switch (b)
     {
     case SUN:
-	Px = 0;
-	Py = 0;
-	Pz = 0;
-	Vx = 0;
-	Vy = 0;
-	Vz = 0;
-	return;
-	break;
+        Px = 0;
+        Py = 0;
+        Pz = 0;
+        Vx = 0;
+        Vy = 0;
+        Vz = 0;
+        return;
+        break;
     case MERCURY:
-	index = 0; 
+        index = 0; 
         break;
     case VENUS:
-	index = 1; 
+        index = 1; 
         break;
     case EARTH:
-	index = 2;
+        index = 2;
         break;
     case MARS:
-	index = 3;
+        index = 3;
         break;
     case JUPITER:
-	index = 4;
+        index = 4;
         break;
     case SATURN:
-	index = 5;
+        index = 5;
         break;
     case URANUS:
-	index = 6;
+        index = 6;
         break;
     case NEPTUNE:
-	index = 7;
+        index = 7;
         break;
     case PLUTO:
-	pluto(tjd, Px, Py, Pz, Vx, Vy, Vz);
-	break;
+        pluto(tjd, Px, Py, Pz, Vx, Vy, Vz);
+        break;
     default:
         break;
     }
 
     if (b != PLUTO)
     {
-	calcHeliocentricXYZ(tjd, 1/rmas[index], a[index], dlm[index], 
-			    e[index], pi[index], dinc[index], omega[index], 
-			    kp[index], ca[index], sa[index], 
-			    kq[index], cl[index], sl[index],
-			    Px, Py, Pz, Vx, Vy, Vz);
+        calcHeliocentricXYZ(tjd, 1/rmas[index], a[index], dlm[index], 
+                            e[index], pi[index], dinc[index], omega[index], 
+                            kp[index], ca[index], sa[index], 
+                            kq[index], cl[index], sl[index],
+                            Px, Py, Pz, Vx, Vy, Vz);
 
-	// rotate to earth equator J2000
-	const double eps = 23.4392911 * deg_to_rad;
+        // rotate to earth equator J2000
+        const double eps = 23.4392911 * deg_to_rad;
 
-	const double sEps = sin(eps);
-	const double cEps = cos(eps);
+        const double sEps = sin(eps);
+        const double cEps = cos(eps);
 
-	const double Y0 = Py;
-	const double Z0 = Pz;
-	
-	Py = Y0 * cEps - Z0 * sEps;
-	Pz = Z0 * cEps + Y0 * sEps;
+        const double Y0 = Py;
+        const double Z0 = Pz;
+        
+        Py = Y0 * cEps - Z0 * sEps;
+        Pz = Z0 * cEps + Y0 * sEps;
     }
 }
-                          
+
+void
+EphemerisLow::kepler(const double al, const complex<double> &z, 
+                     const double u, complex<double> &zto, double &r)
+{
+    const double ex = abs(z);
+    const double ex2 = ex*ex;
+    const double ex3 = ex2*ex;
+
+    double e = (al + (ex - ex3/8)*sin(al) + 0.5 * ex2 * sin(2*al) 
+                + 0.375 * ex3 * sin(3*al));
+
+    complex<double> z1 = conj(z);
+
+    for (int k = 0; k < 10; k++)
+    {
+        const complex<double> z2(0, e);
+        const complex<double> zteta = exp(z2);
+
+        const complex<double> z3 = z1*zteta;
+
+        const double dl = al - e + z3.imag();
+        r = 1 - z3.real();
+        if (fabs(dl) < 1e-12)
+        {
+            z1 = u * z * z3.imag();
+            const complex<double> z2(z1.imag(), -z1.real());
+            zto = (-z + zteta + z2)/r;
+            return;
+        }
+        e += dl/r;
+    }
+    xpWarn("Kepler: can't converge\n", __FILE__, __LINE__);
+}
+
+void
+EphemerisLow::ellipx(const double a, const double dlm, const double e, 
+                     const double p, const double dia, const double omega, 
+                     const double dmas, 
+                     double &Px, double &Py, double &Pz,
+                     double &Vx, double &Vy, double &Vz)
+{
+    const double xa = a;
+    const double xl = dlm;
+    const double xk = e*cos(p);
+    const double xh = e*sin(p);
+    const double xq = sin(dia/2) * cos(omega);
+    const double xp = sin(dia/2) * sin(omega);
+
+    const double asr = 648000/M_PI;
+    const double gk = 3548.1876069651;
+    const double xfi = sqrt(1 - xk*xk - xh*xh);
+    const double xki = sqrt(1 - xq*xq - xp*xp);
+
+    const double u = 1/(1+xfi);
+    
+    complex<double> z(xk, xh);
+    complex<double> zto;
+    double r;
+
+    kepler(xl, z, u, zto, r);
+
+    const double xcw = zto.real();
+    const double xsw = zto.imag();
+    
+    const double xm = xp*xcw - xq*xsw;
+    const double xxx = xa*r;
+
+    Px = xxx*(xcw - 2*xp*xm);
+    Py = xxx*(xsw + 2*xq*xm);
+    Pz = -2*xxx*xki*xm;
+
+    const double xms = xa*(xh+xsw)/xfi;
+    const double xmc = xa*(xk+xcw)/xfi;
+    const double xn = gk*sqrt((1+dmas)/(xa*xa*xa))/asr;
+
+    Vx = xn*((2*xp*xp - 1)*xms + 2*xp*xq*xmc);
+    Vy = xn*((1 - 2*xq*xq)*xmc - 2*xp*xq*xms);
+    Vz = 2*xn*xki*(xp*xms + xq*xmc);
+}
+
+void
+EphemerisLow::calcHeliocentricXYZ(const double tjd, const double dmas,
+                                  double *a, double *dlm, double *e, 
+                                  double *pi, double *dinc, double *omega,
+                                  int *kp, double *ca, double *sa, 
+                                  int *kq, double *cl, double *sl,
+                                  double &Px, double &Py, double &Pz,
+                                  double &Vx, double &Vy, double &Vz)
+{
+    const double t = (tjd - 2451545)/365250;
+    const double t2 = t*t;
+
+    double da = a[0] + t*a[1] + t2*a[2];
+    double dl = (3600*dlm[0] + t*dlm[1] + t2*dlm[2]) * deg_to_rad / 3600;
+    const double de = e[0] + t*e[1] + t2*e[2];
+    double dp = (3600*pi[0] + t*pi[1] + t2*pi[2]) * deg_to_rad / 3600;
+    const double di = ((3600*dinc[0] + t*dinc[1] + t2*dinc[2]) 
+                       * deg_to_rad / 3600);
+    double dm = ((3600*omega[0] + t*omega[1] + t2*omega[2]) 
+                 * deg_to_rad / 3600);
+
+    const double dmu = 0.35953620*t;
+    double arga, argl;
+    for (int j = 0; j < 8; j++)
+    {
+        arga = kp[j] * dmu;
+        da += (ca[j] * cos(arga) + sa[j] * sin(arga)) * 1e-7;
+
+        argl = kq[j] * dmu;
+        dl += (cl[j] * cos(argl) + sl[j] * sin(argl)) * 1e-7;
+    }
+    arga = kp[8] * dmu;
+    da += t*(ca[8] * cos(arga) + sa[8] * sin(arga)) * 1e-7;
+    for (int j = 8; j < 10; j++)
+    {
+        argl = kq[j] * dmu;
+        dl += t*(cl[j] * cos(argl) + sl[j] * sin(argl)) * 1e-7;
+    }
+    dl = fmod(dl, TWO_PI);
+    dp = fmod(dp, TWO_PI);
+    dm = fmod(dm, TWO_PI);
+
+    ellipx(da, dl, de, dp, di, dm, dmas, Px, Py, Pz, Vx, Vy, Vz);
+}

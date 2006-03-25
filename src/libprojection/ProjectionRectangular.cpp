@@ -5,10 +5,12 @@ using namespace std;
 #include "xpUtil.h"
 
 ProjectionRectangular::ProjectionRectangular(const int f, const int w,
-					     const int h) 
-    : ProjectionBase (f, w, h), 
+                                             const int h) 
+    : ProjectionBase (f, w, h),
       mapBounds_(false)
 {
+    isWrapAround_ = true;
+
     startLon_ = -M_PI + centerLon_;
     startLat_ = M_PI_2;
 
@@ -17,11 +19,11 @@ ProjectionRectangular::ProjectionRectangular(const int f, const int w,
 }
 
 ProjectionRectangular::ProjectionRectangular(const int f, const int w, 
-					     const int h,
-					     const double startLat,
-					     const double startLon,
-					     const double mapHeight,
-					     const double mapWidth)
+                                             const int h,
+                                             const double startLat,
+                                             const double startLon,
+                                             const double mapHeight,
+                                             const double mapWidth)
     : ProjectionBase (f, w, h), mapBounds_(true)
 {
     startLon_ = startLon * f;
@@ -51,10 +53,10 @@ ProjectionRectangular::sphericalToPixel(double lon, double lat,
 
     if (!mapBounds_)
     {
-	if (x >= width_) 
-	    x -= width_;
-	else if (x < 0) 
-	    x += width_;
+        if (x >= width_) 
+            x -= width_;
+        else if (x < 0) 
+            x += width_;
     }
 
     y = (startLat_ - lat)/delLat_;

@@ -8,6 +8,7 @@ using namespace std;
 ProjectionMercator::ProjectionMercator(const int f, const int w, const int h) 
     : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = true;
 }
 
 bool
@@ -30,7 +31,7 @@ ProjectionMercator::pixelToSpherical(const double x, const double y,
 
 bool
 ProjectionMercator::sphericalToPixel(double lon, double lat,
-				     double &x, double &y) const
+                                     double &x, double &y) const
 {
     if (rotate_) RotateZYX(lat, lon);
   

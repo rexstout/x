@@ -37,7 +37,8 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         int val = parse(i, line, returnString);
 
         if (val != BODY && currentProperties == NULL)
-            xpExit("No Planet defined in config file!\n", __FILE__, __LINE__);
+            xpExit("No Planet defined in config file!\n", 
+                   __FILE__, __LINE__);
 
         switch (val)
         {
@@ -52,7 +53,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for arc_color\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
             }
         }
         break;
@@ -64,14 +65,33 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             body index = Planet::parseBodyName(returnString);
             if (index < RANDOM_BODY)
             {
-                // assign planet properties to the default values.
-                *planetProperties[index] = *defaultProperties;
+                // [default] should come first in the config file.
+                // The first time we get to a body after [default],
+                // set all of the planet properties to the default
+                // value.  If [default] isn't first, all of the bodies
+                // specified before it get wiped out.
+                if (currentProperties == defaultProperties)
+                {
+                    for (int ibody = SUN; ibody < RANDOM_BODY; ibody++)
+                    {
+                        *planetProperties[ibody] = *defaultProperties;
+                    }
+                }
+
                 currentProperties = planetProperties[index];
             }
             else if (index == DEFAULT)
+            {
+                // We really shouldn't have to do this, since
+                // currentProperties is set to defaultProperties
+                // before the file is read in, and [default] should
+                // come at the top.
                 currentProperties = defaultProperties;
+            }
             else
+            {
                 xpExit("Unknown body in config file\n", __FILE__, __LINE__);
+            }
         }
         break;
         case CLOUD_GAMMA:
@@ -111,12 +131,12 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for color\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
             }
         }
         break;
         case DAY_MAP:
-	case IMAGE:
+        case IMAGE:
             currentProperties->DayMap(returnString);
             break;
         case DELIMITER:
@@ -142,7 +162,8 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             int grid1;
             sscanf(returnString, "%d", &grid1);
             if (grid1 < 0 || grid1 > 90) 
-                xpExit("grid1 must be between 0 and 90\n", __FILE__, __LINE__);
+                xpExit("grid1 must be between 0 and 90\n", 
+                       __FILE__, __LINE__);
             currentProperties->Grid1(grid1);
         }
         break;
@@ -166,7 +187,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for grid_color\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
             }
         }
         break;
@@ -178,20 +199,22 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             currentProperties->Magnify(value);
         }
         break;
-	case MAP_BOUNDS:
-	{
-	    double uly, ulx, lry, lrx;
-	    if (sscanf(returnString, "%lf,%lf,%lf,%lf", &uly, &ulx, &lry, &lrx) == 4)
-	    {
-		currentProperties->MapBounds(true, uly, ulx, lry, lrx);
-	    }
-	    else
-	    {
-		xpWarn("Need four values for mapbounds\n",
-		       __FILE__, __LINE__);
-	    }
-	}
-	break;
+        case MAP_BOUNDS:
+        {
+            double uly, ulx, lry, lrx;
+            int numRead = sscanf(returnString, "%lf,%lf,%lf,%lf", 
+                                 &uly, &ulx, &lry, &lrx);
+            if (numRead == 4)
+            {
+                currentProperties->MapBounds(true, uly, ulx, lry, lrx);
+            }
+            else
+            {
+                xpWarn("Need four values for mapbounds\n",
+                       __FILE__, __LINE__);
+            }
+        }
+        break;
         case MARKER_COLOR:
         {
             int r, g, b;
@@ -203,7 +226,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for marker_color\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
             }
         }
         break;
@@ -211,7 +234,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             currentProperties->AddMarkerFile(returnString);
             break;
         case MARKER_FONT:
-	    currentProperties->MarkerFont(returnString);
+            currentProperties->MarkerFont(returnString);
             break;
         case MAX_RAD_FOR_LABEL:
         {
@@ -243,7 +266,9 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         case ORBIT:
         {
             double start, stop, delta;
-            if (sscanf(returnString, "%lf,%lf,%lf", &start, &stop, &delta) == 3)
+            int numRead = sscanf(returnString, "%lf,%lf,%lf", 
+                                 &start, &stop, &delta);
+            if (numRead == 3)
             {
                 currentProperties->StartOrbit(start);
                 currentProperties->StopOrbit(stop);
@@ -252,7 +277,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for orbit\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
             }
         }
         break;
@@ -267,19 +292,19 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for orbit_color\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
             }
         }
         break;
-	case RANDOM_ORIGIN:
+        case RANDOM_ORIGIN:
             currentProperties->RandomOrigin(returnString[0] == 't' 
-					    || returnString[0] == 'T');
-	    break;
-	case RANDOM_TARGET:
+                                            || returnString[0] == 'T');
+            break;
+        case RANDOM_TARGET:
             currentProperties->RandomTarget(returnString[0] == 't' 
-					    || returnString[0] == 'T');
-	    break;
-	    break;
+                                            || returnString[0] == 'T');
+            break;
+            break;
         case SATELLITE_FILE:
             currentProperties->AddSatelliteFile(returnString);
             break;
@@ -308,28 +333,43 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             else
             {
                 xpWarn("Need three values for text_color\n", 
-		       __FILE__, __LINE__);
+                       __FILE__, __LINE__);
+            }
+        }
+        break;
+        case TWILIGHT:
+        {
+            int value;
+            sscanf(returnString, "%d", &value);
+            if (value >= 0 && value <= 90)
+            {
+                currentProperties->Twilight(value);
+            }
+            else
+            {
+                xpWarn("Twilight value should be between 0 and 90 degrees\n",
+                       __FILE__, __LINE__);
             }
         }
         break;
         default:
         {
-	    stringstream errStr;
-	    errStr << "Unknown keyword in configuration file:\n\t" 
-		   << line << endl;
-	    xpWarn(errStr.str(), __FILE__, __LINE__);
+            stringstream errStr;
+            errStr << "Unknown keyword in configuration file:\n\t" 
+                   << line << endl;
+            xpWarn(errStr.str(), __FILE__, __LINE__);
         }
         break;
         }
 
         if (val != DELIMITER && options->Verbosity() > 3)
         {
-	    stringstream msg;
+            stringstream msg;
             msg << "value is " << keyWordString[val - '?'];
             if (returnString != NULL)
-		msg << ", returnString is " << returnString;
+                msg << ", returnString is " << returnString;
             msg << endl;
-	    xpMsg(msg.str(), __FILE__, __LINE__);
+            xpMsg(msg.str(), __FILE__, __LINE__);
         }
 
         delete [] returnString;
@@ -345,7 +385,6 @@ readConfigFile(string configFile, PlanetProperties *planetProperties[])
     if (foundFile)
     {
         defaultProperties = new PlanetProperties(UNKNOWN_BODY);
-
         currentProperties = defaultProperties;
 
         ifstream inFile(configFile.c_str());
@@ -353,6 +392,17 @@ readConfigFile(string configFile, PlanetProperties *planetProperties[])
         while (inFile.getline(line, 256, '\n') != NULL)
             readConfig(line, planetProperties);
         
+        // This condition will only be true if [default] is the only
+        // section in the config file.  In this case, set all planet
+        // properties to the default values.
+        if (currentProperties == defaultProperties)
+        {
+            for (int ibody = SUN; ibody < RANDOM_BODY; ibody++)
+            {
+                *planetProperties[ibody] = *defaultProperties;
+            }
+        }
+
         inFile.close();
         delete [] line;
 
@@ -360,8 +410,8 @@ readConfigFile(string configFile, PlanetProperties *planetProperties[])
     }
     else
     {
-	stringstream errStr;
-	errStr << "Can't load configuration file " << configFile << endl;
+        stringstream errStr;
+        errStr << "Can't load configuration file " << configFile << endl;
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
 }

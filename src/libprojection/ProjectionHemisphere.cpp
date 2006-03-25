@@ -9,9 +9,11 @@ using namespace std;
 #define VERTICAL 0
 
 ProjectionHemisphere::ProjectionHemisphere(const int f, const int w, 
-					   const int h) 
-    : ProjectionBase(f, w, h) // call the Projection constructor
+                                           const int h) 
+    : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = false;
+
 #if VERTICAL
     if (height_/2 < width_)
         dispScale_ = height_/2;
@@ -42,10 +44,10 @@ ProjectionHemisphere::pixelToSpherical(const double x, const double y,
 #if VERTICAL
     if (Y<0) 
     {
-	Y += 0.5;
-	double arg = Y/radius_;
-	if (fabs(arg) > 1) return(false);
-	lat = asin(arg);
+        Y += 0.5;
+        double arg = Y/radius_;
+        if (fabs(arg) > 1) return(false);
+        lat = asin(arg);
 
         arg = -X / (radius_ * cos(lat));
         if (fabs(arg) > 1) return(false);
@@ -53,10 +55,10 @@ ProjectionHemisphere::pixelToSpherical(const double x, const double y,
     }
     else 
     {
-	Y -= 0.5;
-	double arg = Y/radius_;
-	if (fabs(arg) > 1) return(false);
-	lat = asin(arg);
+        Y -= 0.5;
+        double arg = Y/radius_;
+        if (fabs(arg) > 1) return(false);
+        lat = asin(arg);
 
         arg = -X / (radius_ * cos(lat));
         if (fabs(arg) > 1) return(false);
@@ -69,14 +71,14 @@ ProjectionHemisphere::pixelToSpherical(const double x, const double y,
 
     if (X<0) 
     {
-	X += 0.5;
+        X += 0.5;
         arg = -X / (radius_ * cos(lat));
         if (fabs(arg) > 1) return(false);
         lon = acos(arg) - M_PI;
     }
     else 
     {
-	X -= 0.5;
+        X -= 0.5;
         arg = -X / (radius_ * cos(lat));
         if (fabs(arg) > 1) return(false);
         lon = acos(arg);
@@ -111,12 +113,12 @@ ProjectionHemisphere::sphericalToPixel(double lon, double lat,
 #if VERTICAL
     if (lon < 0) 
     {
-	Y -= 0.5;
+        Y -= 0.5;
         X = radius_ * cos(lat) * sin(lon-3*M_PI/2);
     }
     else 
     {
-	Y += 0.5;
+        Y += 0.5;
         X = radius_ * cos(lat) * sin(lon-M_PI/2);
     }
 #else

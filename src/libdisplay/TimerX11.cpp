@@ -45,20 +45,13 @@ TimerX11::~TimerX11()
 #endif
 }
 
-void
-TimerX11::Update()
-{
-    gettimeofday(&currentTime_, NULL);
-    nextUpdate_ = currentTime_.tv_sec + wait_;
-}
-
 // Sleep for sleep_time seconds.  Also check if this is a window
 // that's been closed, in which case the program should quit.
 bool
 TimerX11::Sleep(time_t sleep_time)
 {
     Options *options = Options::getInstance();
-    if (options->getDisplayMode() == WINDOW)
+    if (options->DisplayMode() == WINDOW)
     {
 	Window window = DisplayX11::WindowID();
 	Atom wmDeleteWindow = XInternAtom(display_, 

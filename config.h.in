@@ -18,6 +18,9 @@
 /* Define if you have JPEG library */
 #undef HAVE_LIBJPEG
 
+/* Define if you have pango with freetype 2 */
+#undef HAVE_LIBPANGOFT2
+
 /* Define if you have PNG library */
 #undef HAVE_LIBPNG
 

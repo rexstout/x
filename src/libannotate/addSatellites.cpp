@@ -417,6 +417,8 @@ addSatellites(PlanetProperties *planetProperties, Planet *planet,
 	      View *view, ProjectionBase *projection, 
 	      multimap<double, Annotation *> &annotationMap)
 {
+    if (planet->Index() != EARTH) return;
+
     vector<string> satfiles = planetProperties->SatelliteFiles();
     vector<string>::iterator ii = satfiles.begin();
 

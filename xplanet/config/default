@@ -2,7 +2,8 @@
 # body.  It's best to leave this file alone and modify a copy. Use the
 # -config option to tell xplanet to read your copy.
 
-[default]                       # Values in this section apply to all bodies unless overridden below.  
+[default]                       # Values in this section apply to all
+				# bodies unless overridden below.   
 
 arc_color=white
 
@@ -14,9 +15,11 @@ cloud_gamma=1
 
 cloud_threshold=90
 
-color={255,255,255}             # fallback color in case an image map isn't found
+color={255,255,255}             # fallback color in case an image map
+				# isn't found 
 
-draw_orbit=false                # draw this body's orbit about its primary
+draw_orbit=false                # draw this body's orbit about its
+				# primary 
 
 grid=false
 
@@ -26,7 +29,8 @@ grid2=15
 
 #image=
 
-magnify=1                       # draw the body as if its radius were magnified by this factor
+magnify=1                       # draw the body as if its radius were
+				# magnified by this factor 
 
 marker_color=red
 
@@ -34,23 +38,31 @@ marker_color=red
 
 #marker_font=
 
-max_radius_for_label=3          # don't draw a label if the body's radius in pixels is more than this 
+max_radius_for_label=3          # don't draw a label if the body's
+				# radius in pixels is more than this  
 
-min_radius_for_label=.01        # don't draw a label if the body's radius in pixels is less than this 
+min_radius_for_label=.01        # don't draw a label if the body's
+				# radius in pixels is less than this  
 
-min_radius_for_markers=40       # don't draw markers if the body's radius in pixels is less than this 
+min_radius_for_markers=40       # don't draw markers if the body's
+				# radius in pixels is less than this  
 
 #night_map=
 
-orbit={-.5,.5,2}                # extent of orbit to draw, {start, end, delta}, where
-                                # start and end are in units of period of revolution 
-                                # and delta is angular increment to evaluate position
+orbit={-.5,.5,2}                # extent of orbit to draw, 
+				# {start, end, delta}, where 
+                                # start and end are in units of period
+				# of revolution and delta is angular
+				# increment in degrees to evaluate
+				# position 
 
 orbit_color={255,255,255}       # color for the orbit
 
-random_origin=true		# Can this body be considered if -origin random is used? 
+random_origin=true              # Can this body be considered if
+				# -origin random is used?  
 
-random_target=true		# Can this body be considered if -target random is used? 
+random_target=true              # Can this body be considered if
+				# -target random is used?  
 
 #satellite_file=
 
@@ -60,9 +72,13 @@ shade=30                        # 0 = black, 100 = same as dayside
 
 text_color={255,0,0}            # color for text (markers & body label)
 
+twilight=6                      # blend the day and night images for
+                                # pixels within this many degrees of
+                                # the terminator 
+
 [sun]
 "Sun"
-color={254,254,166}
+color={255,255,166}
 
 max_radius_for_label=0          # never draw a label for the sun
 

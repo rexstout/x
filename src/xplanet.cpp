@@ -60,14 +60,15 @@ xplanet_main(int argc, char **argv)
     if (origin_file) 
     {
         readOriginFile(options->OriginFile(), originVector);
-        options->NumTimes(originVector.size());
+        if (!options->InterpolateOriginFile())
+            options->NumTimes(originVector.size());
     }
 
     vector<LBRPoint>::iterator iterOriginVector = originVector.begin();
 
     // Initialize the timer
     Timer *timer = getTimer(options->getWait(), options->Hibernate(),
-			    options->IdleWait());
+                            options->IdleWait());
 
     int times_run = 0;
 
@@ -79,15 +80,12 @@ xplanet_main(int argc, char **argv)
         if (!options->PrevCommand().empty())
         {
             if (system(options->PrevCommand().c_str()) != 0)
-	    {
-		stringstream errStr;
-		errStr << "Can't execute " << options->PrevCommand() << "\n";
-		xpWarn(errStr.str(), __FILE__, __LINE__);
-	    }
+            {
+                stringstream errStr;
+                errStr << "Can't execute " << options->PrevCommand() << "\n";
+                xpWarn(errStr.str(), __FILE__, __LINE__);
+            }
         }
-
-        // Initialize display device
-        DisplayBase *display = getDisplay(times_run);
 
         // Set the time to the current time, if desired
         if (options->UseCurrentTime())
@@ -95,22 +93,50 @@ xplanet_main(int argc, char **argv)
             struct timeval time;
             gettimeofday(&time, NULL);
             
-            const double julianDay = toJulian(gmtime((time_t *) &time.tv_sec)->tm_year + 1900,
-                                              gmtime((time_t *) &time.tv_sec)->tm_mon + 1,
-                                              gmtime((time_t *) &time.tv_sec)->tm_mday,
-                                              gmtime((time_t *) &time.tv_sec)->tm_hour,
-                                              gmtime((time_t *) &time.tv_sec)->tm_min,
-                                              gmtime((time_t *) &time.tv_sec)->tm_sec);
+            time_t t = time.tv_sec;
+            const double julianDay = toJulian(gmtime(static_cast<time_t *> (&t))->tm_year + 1900,
+                                              gmtime(static_cast<time_t *> (&t))->tm_mon + 1,
+                                              gmtime(static_cast<time_t *> (&t))->tm_mday,
+                                              gmtime(static_cast<time_t *> (&t))->tm_hour,
+                                              gmtime(static_cast<time_t *> (&t))->tm_min,
+                                              gmtime(static_cast<time_t *> (&t))->tm_sec);
             options->setTime(julianDay);
         }
         
         if (origin_file)
         {
-            // Set the time & position
-            options->setTime(iterOriginVector->time);
-            options->Latitude(iterOriginVector->latitude);
-            options->Longitude(iterOriginVector->longitude);
-            options->setRange(iterOriginVector->radius);
+            if (options->InterpolateOriginFile())
+            {
+                // interpolate positions in the origin file to the
+                // current time
+                double thisRad, thisLat, thisLon, thisLocalTime = -1;
+                interpolateOriginFile(options->getJulianDay(), 
+                                      originVector, thisRad, 
+                                      thisLat, thisLon, thisLocalTime);
+                options->setRange (thisRad);
+                options->Latitude (thisLat);
+                options->Longitude(thisLon);
+                options->LocalTime(thisLocalTime);
+            }
+            else
+            {
+                // Use the next time and position in the origin file
+                options->setTime(iterOriginVector->time);
+                options->setRange(iterOriginVector->radius);
+                options->Latitude(iterOriginVector->latitude);
+                options->Longitude(iterOriginVector->longitude);
+                options->LocalTime(iterOriginVector->localTime);
+            }
+        }
+
+        if (!options->DynamicOrigin().empty())
+        {
+            LBRPoint originPoint;
+            readDynamicOrigin(options->DynamicOrigin(), originPoint);
+            options->setRange(originPoint.radius);
+            options->Latitude(originPoint.latitude);
+            options->Longitude(originPoint.longitude);
+            options->LocalTime(originPoint.localTime);
         }
     
         options->setTarget(planetProperties);
@@ -126,7 +152,7 @@ xplanet_main(int argc, char **argv)
         // easier.
         map<double, Planet *> planetsFromSunMap;
         buildPlanetMap(options->getJulianDay(), oX, oY, oZ, 
-		       options->LightTime(), 
+                       options->LightTime(), 
                        planetsFromSunMap);
 
         // Find the target body in the list
@@ -134,7 +160,7 @@ xplanet_main(int argc, char **argv)
         Planet *target = findPlanetinMap(planetsFromSunMap, 
                                          target_body);
         if (target == NULL)
-            xpExit("Can't find target body?", __FILE__, __LINE__);
+            xpExit("Can't find target body?\n", __FILE__, __LINE__);
 
         if (options->LightTime())
         {
@@ -149,10 +175,20 @@ xplanet_main(int argc, char **argv)
         options->Latitude(obs_lat);
         options->Longitude(obs_lon);
 
-	// delete the markerbounds file, since we'll create a new one
-	string markerBounds(options->MarkerBounds());
-	if (!markerBounds.empty())
-	    unlinkFile(markerBounds.c_str());
+        // Find the sub-solar lat & lon.  This is used for the image
+        // label
+        double sunLat, sunLon;
+        target->XYZToPlanetocentric(0, 0, 0, sunLat, sunLon);
+        options->SunLat(sunLat);
+        options->SunLon(sunLon);
+
+        // delete the markerbounds file, since we'll create a new one
+        string markerBounds(options->MarkerBounds());
+        if (!markerBounds.empty())
+            unlinkFile(markerBounds.c_str());
+
+        // Initialize display device
+        DisplayBase *display = getDisplay(times_run);
 
         if (options->Projection() == MULTIPLE)
             drawMultipleBodies(display, target, planetsFromSunMap,
@@ -168,28 +204,28 @@ xplanet_main(int argc, char **argv)
 
         times_run++;
 
-       if (!options->PostCommand().empty())
+        if (!options->PostCommand().empty())
         {
             if (system(options->PostCommand().c_str()) != 0)
-	    {
-		stringstream errStr;
-		errStr << "Can't execute " << options->PostCommand() << "\n";
-		xpWarn(errStr.str(), __FILE__, __LINE__);
-	    }
+            {
+                stringstream errStr;
+                errStr << "Can't execute " << options->PostCommand() << "\n";
+                xpWarn(errStr.str(), __FILE__, __LINE__);
+            }
         }
 
-        if (options->NumTimes() > 0
-            && options->NumTimes() <= times_run) 
+        if (options->NumTimes() > 0 && times_run >= options->NumTimes())
             break;
 
-        if (origin_file)
+        if (origin_file && !options->InterpolateOriginFile())
         {
             // If we've run through the origin file, break out of the
             // while(1) loop.
             iterOriginVector++;
             if (iterOriginVector == originVector.end()) break;
         }
-        else if (!options->UseCurrentTime())
+
+        if (!options->UseCurrentTime())
         {
             // Set the time to the next update
             options->incrementTime((time_t) (options->getTimeWarp() 
@@ -206,11 +242,9 @@ xplanet_main(int argc, char **argv)
     for (int i = 0; i < RANDOM_BODY; i++) delete planetProperties[i];
 }
 
-//#ifndef HAVE_AQUA
 int
 main(int argc, char **argv)
 {
     xplanet_main(argc, argv);
     return(EXIT_SUCCESS);
 }
-//#endif

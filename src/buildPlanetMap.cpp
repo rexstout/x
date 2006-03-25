@@ -1,6 +1,5 @@
 #include <cmath>
 #include <cstdio>
-#include <iostream>
 #include <map>
 using namespace std;
 
@@ -37,6 +36,14 @@ buildPlanetMap(const double jd,
 {
     planetMap.clear();
 
+    Options *options = Options::getInstance();
+    if (options->PrintEphemeris())
+    {
+	printf("%10s: %12s %13s %13s %13s %13s\n", 
+	       "Name", "Julian Day", 
+	       "X", "Y", "Z", "R");
+    }
+
     for (int ibody = SUN; ibody < RANDOM_BODY; ibody++)
     {
 	body b = (body) ibody;
@@ -69,30 +76,42 @@ buildPlanetMap(const double jd,
  	// distance as the key
 	dist = sqrt(pX*pX + pY*pY + pZ*pZ);
 	planetMap.insert(make_pair(dist, p[ibody]));
-    }
 
-    Options *options = Options::getInstance();
+	if (options->PrintEphemeris())
+	{
+	    printf("%10s: %12.4f %13.9f %13.9f %13.9f %13.9f\n", 
+		   body_string[ibody], jd, pX, pY, pZ, dist);
+	}
+    }
+/*
     if (options->PrintEphemeris())
     {
-	char buffer[256];
-	snprintf(buffer, 256, "%10s: %16s %12s %12s %12s %12s\n", 
-		 "Name", "Julian Day", 
-		 "X", "Y", "Z", "R");
+	printf("%10s: %12s %13s %13s %13s %13s\n", 
+	       "Name", "Julian Day", 
+	       "X", "Y", "Z", "R");
 
-	cout << buffer;
-
-	map<double, Planet *>::iterator it = planetMap.begin();
-	while (it != planetMap.end())
+	for (int ibody = SUN; ibody < RANDOM_BODY; ibody++)
 	{
-	    Planet *p = it->second;
-	    double pX, pY, pZ;
-	    p->getPosition(pX, pY, pZ);
-	    snprintf(buffer, 256, 
-		     "%10s: %16.6f %12.8f %12.8f %12.8f %12.8f\n", 
-		     body_string[p->Index()], jd, pX, pY, pZ, it->first);
-	    cout << buffer;
-	    it++;
+	    map<double, Planet *>::iterator it = planetMap.begin();
+	    while (it != planetMap.end())
+	    {
+		Planet *p = it->second;
+		double pX, pY, pZ;
+		p->getPosition(pX, pY, pZ);
+		if (p->Index() == ibody)
+		{
+		    printf("%10s: %12.4f %13.9f %13.9f %13.9f %13.9f\n", 
+			   body_string[p->Index()], 
+			   jd, 
+			   pX, pY, pZ, it->first);
+		}
+		it++;
+	    }
 	}
+    }
+*/
+    if (options->PrintEphemeris())
+    {
 	exit(EXIT_SUCCESS);
     }
 

@@ -13,11 +13,9 @@ class DisplayX11 : public DisplayBase
 
     void renderImage(PlanetProperties *planetProperties[]);
 
-//    static Display *const DisplayID() { return(display); };
     static Window WindowID() { return(window); };
 
  private:
-//    static Display *display;
     Display *display;
     static Window window;
     Window root;

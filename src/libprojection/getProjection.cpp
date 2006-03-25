@@ -9,6 +9,7 @@ using namespace std;
 #include "ProjectionAncient.h"
 #include "ProjectionAzimuthal.h"
 #include "ProjectionHemisphere.h"
+#include "ProjectionLambert.h"
 #include "ProjectionMercator.h"
 #include "ProjectionMollweide.h"
 #include "ProjectionOrthographic.h"
@@ -29,6 +30,8 @@ getProjectionType(char *proj_string)
         projection = AZIMUTHAL;
     else if (strncmp(lowercase, "hemisphere", 1) == 0)
         projection = HEMISPHERE;
+    else if (strncmp(lowercase, "lambert", 1) == 0)
+        projection = LAMBERT;
     else if (strncmp(lowercase, "mercator", 2) == 0)
         projection = MERCATOR;
     else if (strncmp(lowercase, "mollweide", 2) == 0)
@@ -63,6 +66,9 @@ getProjection(const int projection, const int flipped,
         break;
     case HEMISPHERE:
         thisProjection = new ProjectionHemisphere(flipped, width, height);
+        break;
+    case LAMBERT:
+        thisProjection = new ProjectionLambert(flipped, width, height);
         break;
     case MERCATOR:
         thisProjection = new ProjectionMercator(flipped, width, height);
