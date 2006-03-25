@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cctype>
 #include <string>
 #include <vector>
 using namespace std;
@@ -19,6 +20,7 @@ PlanetProperties::PlanetProperties(const body index)
       grid2_(15),
       magnify_(1.0), 
       mapBounds_(false), 
+      mapUlx_(0), mapUly_(0), mapLrx_(0), mapLry_(0),
       markerFont_(""),
       minRadiusForLabel_(.01),
       maxRadiusForLabel_(3.0),
@@ -28,7 +30,8 @@ PlanetProperties::PlanetProperties(const body index)
       randomTarget_(true),
       shade_(0.3),
       specularMap_(""),
-      startOrbit_(-0.5), stopOrbit_(0.5)
+      startOrbit_(-0.5), stopOrbit_(0.5),
+      twilight_(6)
 {
     memset(arcColor_, 255, 3);              // default arc color is white
     memset(color_, 255, 3);
@@ -46,18 +49,22 @@ PlanetProperties::PlanetProperties(const body index)
 
     if (index < RANDOM_BODY) 
     {
-	name_ = body_string[index];
-	dayMap_ = name_ + defaultMapExt;
+        name_ = body_string[index];
+        dayMap_ = name_ + defaultMapExt;
+        name_[0] = toupper(name_[0]);
     }
 
+    if (index == SUN)
+        color_[2] = 166;
+
     if (index == EARTH)
-	nightMap_ = "night" + defaultMapExt;
+        nightMap_ = "night" + defaultMapExt;
 }
 
 PlanetProperties::~PlanetProperties()
 {
 }
-    
+
 PlanetProperties &
 PlanetProperties::operator= (const PlanetProperties &p)
 {
@@ -69,13 +76,13 @@ PlanetProperties::operator= (const PlanetProperties &p)
     memcpy(textColor_, p.textColor_, 3);
 
     for (unsigned int i = 0; i < p.arcFiles_.size(); i++)
-	arcFiles_.push_back(p.arcFiles_[i]);
+        arcFiles_.push_back(p.arcFiles_[i]);
 
     for (unsigned int i = 0; i < p.markerFiles_.size(); i++)
-	markerFiles_.push_back(p.markerFiles_[i]);
+        markerFiles_.push_back(p.markerFiles_[i]);
 
     for (unsigned int i = 0; i < p.satelliteFiles_.size(); i++)
-	satelliteFiles_.push_back(p.satelliteFiles_[i]);
+        satelliteFiles_.push_back(p.satelliteFiles_[i]);
 
     cloudGamma_ = p.cloudGamma_;
     cloudMap_ = p.cloudMap_;

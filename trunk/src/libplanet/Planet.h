@@ -5,12 +5,15 @@
 
 #include "body.h"
 
+class Ephemeris;
+
 class Planet
 {
  public:
     static body parseBodyName(char *name);
 
     Planet(const double jd, const body this_body);
+    ~Planet();
 
     void calcHeliocentricEquatorial();
     void calcHeliocentricEquatorial(const bool relativeToSun);
@@ -41,6 +44,9 @@ class Planet
 
  private:
     body index_;
+
+    Ephemeris *ephem_;
+    bool ephemerisLow_;
 
     double julianDay_;
     double T2000_;            // Julian centuries from 2000

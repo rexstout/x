@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstdio>
 #include <ctime>
 #include <iostream>
 #include <sstream>
@@ -27,9 +28,10 @@ xpWarn(const string &message, const char *file, const int line)
     Options *options = Options::getInstance();
     if (options->Verbosity() >= 0) 
     {
-	cerr << "Warning: " << message;
-	if (options->Verbosity() > 0) 
-	    cerr << "In " << file << " at line " << line << endl << endl;
+        cerr << "Warning: " << message;
+        if (options->Verbosity() > 0) 
+            cerr << "In " << file << " at line " << line << endl << endl;
+        cerr.flush();
     }
 }
 
@@ -38,7 +40,10 @@ xpMsg(const string &message, const char *file, const int line)
 {
     Options *options = Options::getInstance();
     if (options->Verbosity() > 0) 
-	cout << message;
+    {
+        cout << message;
+        cout.flush();
+    }
 }
 
 void
@@ -55,13 +60,13 @@ removeFromEnvironment(const char *name)
     // executing anything.
     char **cur, **move;
     for (cur = environ; *cur; cur++) {
-	if (strncmp(*cur, badname.c_str(), badname.length()) == 0)
-	{
-   	    /* Found variable; move subsequent variables over it */
-	    for (move = cur; *move; move++)
-		*move = *(move + 1);
-	    cur--;
-	}
+        if (strncmp(*cur, badname.c_str(), badname.length()) == 0)
+        {
+            /* Found variable; move subsequent variables over it */
+            for (move = cur; *move; move++)
+                *move = *(move + 1);
+            cur--;
+        }
     }
 
 #endif
@@ -132,7 +137,7 @@ invertMatrix(double in[3][3], double out[3][3])
     double c3 = in[2][2];
 
     double det = (a1*(b2*c3 - b3*c2) + a2*(b3*c1 - b1 * c3) 
-		  + a3*(b1*c2 - b2*c1));
+                  + a3*(b1*c2 - b2*c1));
     
     out[0][0] = (b2*c3 - b3*c2)/det;
     out[0][1] = (a3*c2 - a2*c3)/det;
@@ -148,8 +153,20 @@ invertMatrix(double in[3][3], double out[3][3])
 }
 
 void
+RADecToXYZ(double RA, double Dec, double &X, double &Y, double &Z)
+{
+    double dist = 1e6;
+    
+    RA *= 15;
+    
+    X = dist * cos(Dec) * cos(RA);
+    Y = dist * cos(Dec) * sin(RA);
+    Z = dist * sin(Dec);
+}
+
+void
 fromJulian(double jd, int &year, int &month, int &day, 
-	   int &hour, int &min, double &sec)
+           int &hour, int &min, double &sec)
 {
     jd += 0.5;
     int Z = (int) jd;
@@ -158,8 +175,8 @@ fromJulian(double jd, int &year, int &month, int &day,
     int A = Z;
     if (Z >= 2291161)
     {
-	int alpha = (int) ((Z - 1867216.25)/36524.25);
-	A = Z + 1 + alpha - alpha/4;
+        int alpha = (int) ((Z - 1867216.25)/36524.25);
+        A = Z + 1 + alpha - alpha/4;
     }
 
     int B = A + 1524;
@@ -185,6 +202,22 @@ fromJulian(double jd, int &year, int &month, int &day,
     sec = 60 * (dmin - min);
 }
 
+string
+fromJulian(double date)
+{
+    char timeString[16];
+    int year, month, day, hour, min;
+    double sec;
+    
+    fromJulian(date, year, month, day, hour, min, sec);
+    snprintf(timeString, 16, 
+             "%4.4d%2.2d%2.2d.%2.2d%2.2d%2.2d",
+             year, month, day, 
+             hour, min, (int) floor(sec));
+
+    return(string(timeString));
+}
+
 time_t
 get_tv_sec(double jd)
 {
@@ -193,7 +226,7 @@ get_tv_sec(double jd)
     fromJulian(jd, year, month, day, hour, min, sec);
 
     tm tm_struct = { (int) floor(sec + 0.5), min, hour, day,
-		     month - 1, year - 1900, 0, 0, -1 };
+                     month - 1, year - 1900, 0, 0, -1 };
 
 #ifdef HAVE_TIMEGM
     time_t returnval = timegm(&tm_struct);
@@ -202,8 +235,8 @@ get_tv_sec(double jd)
     char *get_tz = getenv("TZ");
     if (get_tz != NULL)
     {
-	tz_save = "TZ=";
-	tz_save += get_tz;
+        tz_save = "TZ=";
+        tz_save += get_tz;
     }
     putenv("TZ=UTC");
     tzset();
@@ -211,9 +244,9 @@ get_tv_sec(double jd)
     time_t returnval = mktime(&tm_struct);
 
     if (tz_save.empty()) 
-	removeFromEnvironment("TZ"); 
+        removeFromEnvironment("TZ"); 
     else
-	putenv((char *) tz_save.c_str()); 
+        putenv((char *) tz_save.c_str()); 
     tzset();
 #endif
     return(returnval);
@@ -224,8 +257,8 @@ toJulian(int year, int month, int day, int hour, int min, int sec)
 {
     // Gregorian calendar (after 1582 Oct 15)
     const bool gregorian = (year > 1582 
-			    || (year == 1582 && month > 10)
-			    || (year == 1582 && month == 10 && day >= 15));
+                            || (year == 1582 && month > 10)
+                            || (year == 1582 && month == 10 && day >= 15));
 
     if(month < 3) 
     {
@@ -257,18 +290,18 @@ delT(const double jd)
     const double t = (jd - j1800)/36525;
     const double delT = 5.156 + 13.3066 * (t - 0.19) * (t - 0.19);
 #else
-    // From Montenbruck & Pfelger (2000), p 188
+    // Valid from 1825 to 2000, Montenbruck & Pfelger (2000), p 188
     const double T = (jd - 2451545)/36525;
     const int i = (int) floor(T/0.25);
 
     const double c[7][4] = {
-	{ 10.4, -80.8,  413.9,  -572.3 },
-	{  6.6,  46.3, -358.4,    18.8 },
-	{ -3.9, -10.8, -166.2,   867.4 },
-	{ -2.6, 114.1,  327.5, -1467.4 },
-	{ 24.2,  -6.3,   -8.2,   483.4 },
-	{ 29.3,  32.5,   -3.8,   550.7 },
-	{ 45.3, 130.5, -570.5,  1516.7 }
+        { 10.4, -80.8,  413.9,  -572.3 },
+        {  6.6,  46.3, -358.4,    18.8 },
+        { -3.9, -10.8, -166.2,   867.4 },
+        { -2.6, 114.1,  327.5, -1467.4 },
+        { 24.2,  -6.3,   -8.2,   483.4 },
+        { 29.3,  32.5,   -3.8,   550.7 },
+        { 45.3, 130.5, -570.5,  1516.7 }
     };
 
     double t = T - i * 0.25;
@@ -276,17 +309,18 @@ delT(const double jd)
     int ii = i + 7;
     if (ii < 0) 
     {
-	t = 0;
-	ii = 0;
+        t = 0;
+        ii = 0;
     }
     else if (ii > 6) 
     {
-	ii = 6;
-	t = 0.25;
+        ii = 6;
+        t = 0.25;
     }
 
-    const double delT = c[ii][0] + t * (c[ii][1] + t * (c[ii][2] + t * c[ii][3]));
-
+    const double delT = c[ii][0] + t * (c[ii][1] 
+                                        + t * (c[ii][2] 
+                                               + t * c[ii][3]));
 #endif
 
     return(delT);
@@ -395,10 +429,10 @@ kepler(const double e, double M)
 void
 precessB1950J2000(double &X, double &Y, double &Z)
 {
-    static double p[3][3] =
-	{ { 0.9999256791774783, -0.0111815116768724, -0.0048590038154553 },
-	  { 0.0111815116959975,  0.9999374845751042, -0.0000271625775175 },
-	  { 0.0048590037714450, -0.0000271704492210,  0.9999881946023742 } };
+    const static double p[3][3] =
+        { { 0.9999256791774783, -0.0111815116768724, -0.0048590038154553 },
+          { 0.0111815116959975,  0.9999374845751042, -0.0000271625775175 },
+          { 0.0048590037714450, -0.0000271704492210,  0.9999881946023742 } };
 
     double newX = p[0][0] * X + p[0][1] * Y + p[0][2] * Z;
     double newY = p[1][0] * X + p[1][1] * Y + p[1][2] * Z;

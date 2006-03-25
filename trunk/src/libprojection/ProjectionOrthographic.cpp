@@ -9,6 +9,8 @@ using namespace std;
 ProjectionOrthographic::ProjectionOrthographic(const int f, const int w, const int h)
     : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = false;
+
     Options *options = Options::getInstance();
 
     radius_ = options->Radius() * height_;
@@ -49,25 +51,25 @@ ProjectionOrthographic::pixelToSpherical(const double x, const double y,
 
     if (rho == 0)
     {
-	lat = 0; 
-	lon = 0;
+        lat = 0; 
+        lon = 0;
     }
     else
     {
-	double arg = Pm1*(Pm1 - rho2 * Pp1);
-	if (arg < 0) return(false);
+        double arg = Pm1*(Pm1 - rho2 * Pp1);
+        if (arg < 0) return(false);
 
-	const double N = rho * (PPm1 - sqrt(arg));
-	const double D = (Pm1sq + rho2);
+        const double N = rho * (PPm1 - sqrt(arg));
+        const double D = (Pm1sq + rho2);
 
-	const double sinc = N/D;
-	const double cosc = sqrt(1 - sinc*sinc);
+        const double sinc = N/D;
+        const double cosc = sqrt(1 - sinc*sinc);
 
-	arg = Y * sinc / rho;
-	if (fabs(arg) > 1) return(false);
-	
-	lat = asin(arg);
-	lon = atan2(X * sinc, rho * cosc);
+        arg = Y * sinc / rho;
+        if (fabs(arg) > 1) return(false);
+        
+        lat = asin(arg);
+        lon = atan2(X * sinc, rho * cosc);
     }
 
     // This is the cosine of the observer-planet center-normal angle

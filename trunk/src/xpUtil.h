@@ -17,10 +17,10 @@ const double AU_to_km = 149597870.66;
 extern void cross(const double a[3], const double b[3], double c[3]);
 
 extern double dot(const double A0, const double A1, const double A2, 
-		  const double B0, const double B1, const double B2);
+                  const double B0, const double B1, const double B2);
 
 extern double ndot(const double A0, const double A1, const double A2, 
-		   const double B0, const double B1, const double B2);
+                   const double B0, const double B1, const double B2);
 
 extern double dot(const double a[3], const double b[3]);
 extern double ndot(const double a[3], const double b[3]);
@@ -29,16 +29,20 @@ extern void invertMatrix(double in[3][3], double out[3][3]);
 
 extern time_t get_tv_sec(double jd);
 
+extern void RADecToXYZ(double RA, double Dec, double &X, double &Y, 
+                       double &Z);
+
 extern void fromJulian(double jd, int &year, int &month, int &day, 
-		       int &hour, int &min, double &sec);
+                       int &hour, int &min, double &sec);
+extern std::string fromJulian(double date);
 
 extern double toJulian(int year, int month, int day, 
-		       int hour, int min, int sec);
+                       int hour, int min, int sec);
 
 extern double delT(const double jd);
 
 extern double poly(const double a1, const double a2, const double a3, 
-		   const double a4, const double t);
+                   const double a4, const double t);
 
 extern void rotateX(double &X, double &Y, double &Z, const double theta);
 

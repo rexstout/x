@@ -8,5 +8,14 @@ else
   libephemeris_a_AR = $(CXX) @xplanet_ARFLAGS@
 endif
 
-EXTRA_libephemeris_a_SOURCES = driver.cpp
-libephemeris_a_SOURCES = ephemeris.cpp pluto.cpp
+libephemeris_a_SOURCES = \
+			Ephemeris.cpp		\
+			Ephemeris.h		\
+			EphemerisHigh.cpp	\
+			EphemerisHigh.h		\
+			EphemerisLow.cpp	\
+			EphemerisLow.h		\
+			jpl_int.h		\
+			jpleph.cpp		\
+			jpleph.h		\
+			pluto.cpp

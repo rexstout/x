@@ -15,9 +15,17 @@ class ProjectionBase;
 class View;
 
 extern void
+addArcs(View *view, multimap<double, Annotation *> &annotationMap);
+
+extern void
 addArcs(PlanetProperties *planetProperties, Planet *planet, 
 	View *view, ProjectionBase *projection, 
 	multimap<double, Annotation *> &annotationMap);
+
+extern void
+addMarkers(View *view, const int width, const int height, 
+           map<double, Planet *> &planetsFromSunMap, 
+           multimap<double, Annotation *> &annotationMap);
 
 extern void
 addMarkers(PlanetProperties *planetProperties, Planet *planet, 

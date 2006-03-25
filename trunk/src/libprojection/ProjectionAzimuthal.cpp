@@ -5,9 +5,10 @@ using namespace std;
 #include "xpUtil.h"
 
 ProjectionAzimuthal::ProjectionAzimuthal(const int f, const int w, 
-					 const int h) 
-    : ProjectionBase(f, w, h)  // call the Projection constructor
+                                         const int h) 
+    : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = false;
     radius_ = sqrt(2 * radius_);
 
     // The rendered globe is contained in a square with sides of length
@@ -49,12 +50,16 @@ ProjectionAzimuthal::pixelToSpherical(const double x, const double y,
 
 bool
 ProjectionAzimuthal::sphericalToPixel(double lon, double lat,
-				      double &x, double &y) const
+                                      double &x, double &y) const
 {
     if (rotate_) RotateZYX(lat, lon);
     
     const double c = acos(cos(lat) * cos(lon));
-    const double k = radius_ * c / (M_PI * sin(c));
+    if (c == M_PI) return(false);
+
+    double k = radius_ / M_PI;
+    if (c != 0)
+        k *= c / sin(c);
     
     const double X = k * cos(lat) * sin(lon);
     const double Y = k * sin(lat);

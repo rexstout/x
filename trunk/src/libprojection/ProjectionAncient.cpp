@@ -1,4 +1,4 @@
-//   This projection was contributed by Richard Rognlie <rrognlie@gamerz.net>
+// This projection was contributed by Richard Rognlie <rrognlie@gamerz.net>
 
 #include <cmath>
 using namespace std;
@@ -9,6 +9,8 @@ using namespace std;
 ProjectionAncient::ProjectionAncient(const int f, const int w, const int h)
     : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = false;
+
     if (width_/2 < height_)
         dispScale_ = width_/2;
     else
@@ -75,7 +77,7 @@ ProjectionAncient::pixelToSpherical(const double x, const double y,
 
 bool
 ProjectionAncient::sphericalToPixel(double lon, double lat, 
-				    double &x, double &y) const
+                                    double &x, double &y) const
 {
     if (rotate_) RotateZYX(lat, lon);
 
@@ -83,13 +85,15 @@ ProjectionAncient::sphericalToPixel(double lon, double lat,
 
     if (lon > M_PI) lon -= TWO_PI;
 
-    double c,k,X,Y;
+    double c,X,Y;
+    double k = 2*radius_ / M_PI;
 
     if (lon < 0) 
     {
         lon += M_PI/2;
         c = acos(cos(lat) * cos(lon));
-        k = 2*radius_ * c / (M_PI * sin(c));
+        if (c != 0)
+            k *= c / sin(c);
         X = -radius_ + k * cos(lat) * sin(lon);
         Y = k * sin(lat);
     }
@@ -97,7 +101,8 @@ ProjectionAncient::sphericalToPixel(double lon, double lat,
     {
         lon -= M_PI/2;
         c = acos(cos(lat) * cos(lon));
-        k = 2*radius_ * c / (M_PI * sin(c));
+        if (c != 0)
+            k *= c / sin(c);
         X = radius_ + k * cos(lat) * sin(lon);
         Y = k * sin(lat);
     }

@@ -5,8 +5,9 @@ using namespace std;
 #include "xpUtil.h"
 
 ProjectionMollweide::ProjectionMollweide(const int f, const int w, const int h) 
-    : ProjectionBase(f, w, h) // call the Projection constructor
+    : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = false;
     // radius is M_SQRT2 * R from Snyder (1987), p 251
 }
 
@@ -43,7 +44,7 @@ ProjectionMollweide::pixelToSpherical(const double x, const double y,
 
 bool
 ProjectionMollweide::sphericalToPixel(double lon, double lat,
-				      double &x, double &y) const
+                                      double &x, double &y) const
 {
     if (rotate_) RotateZYX(lat, lon);
 

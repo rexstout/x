@@ -21,7 +21,6 @@ class TimerX11 : public Timer
     ~TimerX11();
 
     static Display *const DisplayID() { return(display_); };
-    void Update();
     bool Sleep();
 
  private:

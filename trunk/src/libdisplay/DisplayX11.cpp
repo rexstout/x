@@ -21,88 +21,96 @@ DisplayX11::DisplayX11(const int tr) : DisplayBase(tr)
 {
     Options *options = Options::getInstance();
 
-    if (options->getDisplayMode() == WINDOW)
-	display = TimerX11::DisplayID();
+    if (options->DisplayMode() == WINDOW)
+        display = TimerX11::DisplayID();
     else
-	display = XOpenDisplay(NULL);
+        display = XOpenDisplay(NULL);
 
     if (display == NULL)
-	xpExit("Can't open X display\n", __FILE__, __LINE__);
+        xpExit("Can't open X display\n", __FILE__, __LINE__);
 
     const int screen_num    = DefaultScreen(display);
-    const int screen_width  = DisplayWidth(display, screen_num);
-    const int screen_height = DisplayHeight(display, screen_num);
+    fullWidth_  = DisplayWidth(display, screen_num);
+    fullHeight_ = DisplayHeight(display, screen_num);
 
     if (options->VirtualRoot())
-	root = VirtualRootWindowOfScreen(ScreenOfDisplay(display, screen_num));
+        root = VirtualRootWindowOfScreen(ScreenOfDisplay(display, screen_num));
     else
-	root = ScreenOfDisplay(display, screen_num)->root;
+        root = ScreenOfDisplay(display, screen_num)->root;
 
-    switch (options->getDisplayMode())
+    switch (options->DisplayMode())
     {
     case WINDOW:
-	width_ = options->getWidth();
-	height_ = options->getHeight();
-	    
-	if (times_run == 0)
-	{
-	    int x = options->getWindowX();
-	    int y = options->getWindowY();
-	    if (options->GeometryMask() & XNegative) 
-		x += (screen_width - width_);
-	    if (options->GeometryMask() & YNegative) 
-		y += (screen_height - height_);
-	    
-	    window = XCreateSimpleWindow(display, root, x, y, 
-					 width_, height_, 4,
-					 WhitePixel(display, screen_num),
-					 BlackPixel(display, screen_num));
-	    
-	    if (options->GeometryMask() != NoValue)
-	    {
-		XSizeHints *hints = XAllocSizeHints();
-		hints->flags = USPosition;
-		XSetWMNormalHints(display, window, hints);
-	    }
+        width_ = options->getWidth();
+        height_ = options->getHeight();
+            
+        if (times_run == 0)
+        {
+            int x = options->getWindowX();
+            int y = options->getWindowY();
+            if (options->GeometryMask() & XNegative) 
+                x += (fullWidth_ - width_);
+            if (options->GeometryMask() & YNegative) 
+                y += (fullHeight_ - height_);
+            
+            window = XCreateSimpleWindow(display, root, x, y, 
+                                         width_, height_, 4,
+                                         WhitePixel(display, screen_num),
+                                         BlackPixel(display, screen_num));
+            
+            if (options->GeometryMask() != NoValue)
+            {
+                XSizeHints *hints = XAllocSizeHints();
+                hints->flags = USPosition;
+                XSetWMNormalHints(display, window, hints);
+            }
 
-	    string title;
+            string title;
             if (options->WindowTitle().empty()) 
-	    {
-		title.assign("Xplanet ");
-		title += VERSION;
-	    }
-	    else
-	    {
-		title.assign(options->WindowTitle());
-	    }
+            {
+                title.assign("Xplanet ");
+                title += VERSION;
+            }
+            else
+            {
+                title.assign(options->WindowTitle());
+            }
 
-	    XTextProperty windowName;
-	    char *titlec = (char *) title.c_str();
+            XTextProperty windowName;
+            char *titlec = (char *) title.c_str();
             XStringListToTextProperty(&titlec, 1, &windowName);
-            XSetWMName(display, window, &windowName);	    
-	}
-	break;
+            XSetWMName(display, window, &windowName);       
+        }
+        break;
     case ROOT:
-	width_ = screen_width;
-	height_ = screen_height;
-	
-	window = root;
-	break;
+        if (options->GeometrySelected())
+        {
+            width_ = options->getWidth();
+            height_ = options->getHeight();
+        }
+        else
+        {
+            width_ = fullWidth_;
+            height_ = fullHeight_;
+        }
+        
+        window = root;
+        break;
     default:
-	xpExit("DisplayX11: Unknown display mode?\n", __FILE__, __LINE__);
+        xpExit("DisplayX11: Unknown display mode?\n", __FILE__, __LINE__);
     }
 
     if (!options->CenterSelected())
     {
-	if (width_ % 2 == 0)
-	    options->setCenterX(width_/2 - 0.5);
-	else
-	    options->setCenterX(width_/2);
+        if (width_ % 2 == 0)
+            options->setCenterX(width_/2 - 0.5);
+        else
+            options->setCenterX(width_/2);
 
-	if (height_ % 2 == 0)
-	    options->setCenterY(height_/2 - 0.5);
-	else
-	    options->setCenterY(height_/2);
+        if (height_ % 2 == 0)
+            options->setCenterY(height_/2 - 0.5);
+        else
+            options->setCenterY(height_/2);
     }
 
     allocateRGBData();
@@ -117,77 +125,82 @@ DisplayX11::renderImage(PlanetProperties *planetProperties[])
 {
     drawLabel(planetProperties);
 
-    Pixmap pixmap = createPixmap(rgb_data, width_, height_);
- 
     Options *options = Options::getInstance();
 
-    switch (options->getDisplayMode())
+    Pixmap pixmap;
+        
+    switch (options->DisplayMode())
     {
     case WINDOW:
-	XMapWindow(display, window);
-	break;
+        pixmap = createPixmap(rgb_data, width_, height_);
+        XMapWindow(display, window);
+        break;
     case ROOT:
-	if (options->Transparency())
-	{
+        if (options->GeometrySelected()) PlaceImageOnRoot();
+
+        pixmap = createPixmap(rgb_data, fullWidth_, fullHeight_);
+
+        if (options->Transparency())
+        {
             // Set the background pixmap for Eterms and aterms.  This
             // code is taken from the Esetroot source.
-	    Atom prop_root, prop_esetroot, type;
-	    int format;
-	    unsigned long length, after;
-	    unsigned char *data_root, *data_esetroot;
-	    
-	    prop_root = XInternAtom(display, "_XROOTPMAP_ID", True);
-	    prop_esetroot = XInternAtom(display, "ESETROOT_PMAP_ID", True);
-	    
-	    if (prop_root != None && prop_esetroot != None) 
-	    {
-		XGetWindowProperty(display, root, prop_root, 
-				   0L, 1L, False, AnyPropertyType,
-				   &type, &format, &length, 
-				   &after, &data_root);
-		if (type == XA_PIXMAP) 
-		{
-		    XGetWindowProperty(display, root, prop_esetroot, 
-				       0L, 1L, False, AnyPropertyType,
-				       &type, &format, &length, 
-				       &after, &data_esetroot);
-		    if (data_root && data_esetroot) 
-		    {
-			if (type == XA_PIXMAP 
-			    && *((Pixmap *) data_root) == *((Pixmap *) data_esetroot)) 
-			{
-			    XKillClient(display, *((Pixmap *) data_root));
-			}
-		    }
-		}
-	    }
-	    /* This will locate the property, creating it if it
-	     * doesn't exist */
-	    prop_root = XInternAtom(display, "_XROOTPMAP_ID", False);
-	    prop_esetroot = XInternAtom(display, "ESETROOT_PMAP_ID", False);
-	    
-	    /* The call above should have created it.  If that failed,
-	     * we can't continue. */
-	    if (prop_root == None || prop_esetroot == None) 
-	    {
-		xpWarn("Can't set pixmap for transparency\n", 
-		       __FILE__, __LINE__);
-	    }
-	    else
-	    {
-		XChangeProperty(display, root, prop_root, XA_PIXMAP, 
-				32, PropModeReplace,
-				(unsigned char *) &pixmap, 1);
-		XChangeProperty(display, root, prop_esetroot, XA_PIXMAP,
-				32, PropModeReplace,
-				(unsigned char *) &pixmap, 1);
-		XSetCloseDownMode(display, RetainPermanent);
-		XFlush(display);
-	    }
-	}
-	break;
+            Atom prop_root, prop_esetroot, type;
+            int format;
+            unsigned long length, after;
+            unsigned char *data_root, *data_esetroot;
+            
+            prop_root = XInternAtom(display, "_XROOTPMAP_ID", True);
+            prop_esetroot = XInternAtom(display, "ESETROOT_PMAP_ID", True);
+            
+            if (prop_root != None && prop_esetroot != None) 
+            {
+                XGetWindowProperty(display, root, prop_root, 
+                                   0L, 1L, False, AnyPropertyType,
+                                   &type, &format, &length, 
+                                   &after, &data_root);
+                if (type == XA_PIXMAP) 
+                {
+                    XGetWindowProperty(display, root, prop_esetroot, 
+                                       0L, 1L, False, AnyPropertyType,
+                                       &type, &format, &length, 
+                                       &after, &data_esetroot);
+                    if (data_root && data_esetroot) 
+                    {
+                        if (type == XA_PIXMAP 
+                            && *((Pixmap *) data_root) == *((Pixmap *) data_esetroot)) 
+                        {
+                            XKillClient(display, *((Pixmap *) data_root));
+                        }
+                    }
+                }
+            }
+            /* This will locate the property, creating it if it
+             * doesn't exist */
+            prop_root = XInternAtom(display, "_XROOTPMAP_ID", False);
+            prop_esetroot = XInternAtom(display, "ESETROOT_PMAP_ID", False);
+            
+            /* The call above should have created it.  If that failed,
+             * we can't continue. */
+            if (prop_root == None || prop_esetroot == None) 
+            {
+                xpWarn("Can't set pixmap for transparency\n", 
+                       __FILE__, __LINE__);
+            }
+            else
+            {
+                XChangeProperty(display, root, prop_root, XA_PIXMAP, 
+                                32, PropModeReplace,
+                                (unsigned char *) &pixmap, 1);
+                XChangeProperty(display, root, prop_esetroot, XA_PIXMAP,
+                                32, PropModeReplace,
+                                (unsigned char *) &pixmap, 1);
+                XSetCloseDownMode(display, RetainPermanent);
+                XFlush(display);
+            }
+        }
+        break;
     default:
-	xpExit("Unknown X11 display mode?\n", __FILE__, __LINE__);
+        xpExit("Unknown X11 display mode?\n", __FILE__, __LINE__);
     }
 
     XSetWindowBackgroundPixmap(display, window, pixmap);
@@ -195,13 +208,13 @@ DisplayX11::renderImage(PlanetProperties *planetProperties[])
     XClearWindow(display, window);
     XFlush(display);
 
-    if (options->getDisplayMode() == ROOT) XCloseDisplay(display);
+    if (options->DisplayMode() == ROOT) XCloseDisplay(display);
 }
 
 void
 DisplayX11::computeShift(unsigned long mask, 
-			 unsigned char &left_shift, 
-			 unsigned char &right_shift)
+                         unsigned char &left_shift, 
+                         unsigned char &right_shift)
 {
     left_shift = 0;
     right_shift = 8;
@@ -222,7 +235,7 @@ DisplayX11::computeShift(unsigned long mask,
 
 Pixmap
 DisplayX11::createPixmap(const unsigned char *rgb, 
-			 const int pixmap_width, const int pixmap_height)
+                         const int pixmap_width, const int pixmap_height)
 {
     int i, j;   // loop variables 
 
@@ -233,7 +246,7 @@ DisplayX11::createPixmap(const unsigned char *rgb,
     Colormap colormap = DefaultColormap(display, screen_num);
 
     Pixmap tmp = XCreatePixmap(display, window, pixmap_width, pixmap_height, 
-			       depth);
+                               depth);
 
     char *pixmap_data = NULL;
     switch (depth)
@@ -255,13 +268,13 @@ DisplayX11::createPixmap(const unsigned char *rgb,
 
     XImage *ximage = XCreateImage(display, visual, depth, ZPixmap, 0,
                                   pixmap_data, pixmap_width, pixmap_height, 
-				  8, 0);
+                                  8, 0);
 
     int entries;
     XVisualInfo v_template;
     v_template.visualid = XVisualIDFromVisual(visual);
     XVisualInfo *visual_info = XGetVisualInfo(display, VisualIDMask, 
-					      &v_template, &entries);
+                                              &v_template, &entries);
 
     unsigned long ipos = 0;
     switch (visual_info->c_class)
@@ -362,17 +375,17 @@ DisplayX11::createPixmap(const unsigned char *rgb,
     break;
     default:
     {
-	stringstream errStr;
+        stringstream errStr;
         errStr << "createPixmap: visual = " << visual_info->c_class << endl
-	       << "Visual should be either PseudoColor or TrueColor\n";
-	xpWarn(errStr.str(), __FILE__, __LINE__);
+               << "Visual should be either PseudoColor or TrueColor\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
         return(tmp);
     }
     }
     
     GC gc = XCreateGC(display, window, 0, NULL);
     XPutImage(display, tmp, gc, ximage, 0, 0, 0, 0, pixmap_width, 
-	      pixmap_height);
+              pixmap_height);
 
     XFreeGC(display, gc);
 
@@ -400,7 +413,7 @@ DisplayX11::decomposePixmap(const Pixmap p, unsigned char *rgb)
     XVisualInfo v_template;
     v_template.visualid = XVisualIDFromVisual(visual);
     XVisualInfo *visual_info = XGetVisualInfo(display, VisualIDMask,
-					      &v_template, &entries);
+                                              &v_template, &entries);
 
     Colormap colormap = DefaultColormap(display, screen_num);
 
@@ -448,7 +461,7 @@ DisplayX11::decomposePixmap(const Pixmap p, unsigned char *rgb)
         
         unsigned long pixel;
         for (j = 0; j < height_; j++)
-	{
+        {
             for (i = 0; i < width_; i++)
             {
                 pixel = XGetPixel(ximage, i, j);
@@ -465,15 +478,15 @@ DisplayX11::decomposePixmap(const Pixmap p, unsigned char *rgb)
                                  >> blue_left_shift)
                                 << blue_right_shift));
             }
-	}
+        }
     }
     break;
     default:
     {
-	stringstream errStr;
+        stringstream errStr;
         errStr << "decomposePixmap: visual = " << visual_info->c_class << endl
-	       << "Visual should be either PseudoColor or TrueColor\n";
-	xpWarn(errStr.str(), __FILE__, __LINE__);
+               << "Visual should be either PseudoColor or TrueColor\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
     }
     }
 

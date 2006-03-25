@@ -1,0 +1,30 @@
+#!@PERL@
+
+if (@ARGV)
+{
+    open(INFILE, "<$ARGV[0]") || die("Can't open $ARGV[0]\n");
+    <INFILE>;
+    while (<INFILE>)
+    {
+        @fields = split(" ", $_);
+        $year = $fields[0];
+        $month = $fields[1];
+        $day = $fields[2];
+        $hour = $fields[3];
+        $min = $fields[4];
+        $sec = $fields[5];
+        $rad = $fields[6];
+        $lat = $fields[7];
+        $lon = $fields[8];
+        printf("%4.4d%2.2d%2.2d.%2.2d%2.2d%2.2d %10.3f %8.3f %8.3f\n",
+               $year, $month, $day, $hour, $min, $sec, $rad/60268, $lat, $lon);
+    }
+}
+else
+{
+    print "Use this perl script with the Cassini/Saturn Ephemeris Generator 1.1 at http://ringmaster.arc.nasa.gov/tools/ephem2_satc.html\n";
+    print "Choose the following columns:\n";
+    print "\tYear, Month, Day, Hour, Minute (UTC)\n";
+    print "\tCassini-Saturn distance (km)\n";
+    print"\tSub-spacecraft planetocentric latitude & rotating longitude (deg)\n";
+}

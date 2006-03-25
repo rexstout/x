@@ -13,22 +13,22 @@ using namespace std;
 #include "libdisplay/libdisplay.h"
 
 Text::Text(const unsigned char color[3], 
-	   const int x, const int y, 
-	   const int iconWidth, const int iconHeight,
-	   const int align, 
-	   const std::string &text)
+           const int x, const int y, 
+           const int iconWidth, const int iconHeight,
+           const int align, 
+           const std::string &text)
     : Annotation(color), align_(align), font_(""), fontSize_(-1), 
       iconHeight_(iconHeight), iconWidth_(iconWidth), needAlign_(true),
       needBoundingBox_(true), text_(text), x_(x), y_(y)
 {
     if (align_ == AUTO)
     {
-	fixedAlign_ = false;
-	align_ = RIGHT;
+        fixedAlign_ = false;
+        align_ = RIGHT;
     }
     else
     {
-	fixedAlign_ = true;
+        fixedAlign_ = true;
     }
 }
 
@@ -43,22 +43,22 @@ Text::ComputeBoundingBox(DisplayBase *display)
     int saveFontSize = display->FontSize();
     
     if (!font_.empty())
-	display->Font(font_);
+        display->Font(font_);
     
     if (fontSize_ < 0)
-	display->FontSize(saveFontSize);
+        display->FontSize(saveFontSize);
     else
-	display->FontSize(fontSize_);
+        display->FontSize(fontSize_);
     
     display->setText(text_);
     display->getTextBox(textWidth_, textHeight_);
     display->FreeText();
     
     if (!font_.empty())
-	display->Font(saveFont);
+        display->Font(saveFont);
     
     if (fontSize_ > 0)
-	display->FontSize(saveFontSize);
+        display->FontSize(saveFontSize);
 
     needBoundingBox_ = false;
 
@@ -73,14 +73,14 @@ Text::Overlap(const int ulx, const int uly, const int lrx, const int lry)
 
     int width, height;
     if (ulx_ > ulx)
-	width = min(lrx, lrx_) - ulx_;
+        width = min(lrx, lrx_) - ulx_;
     else
-	width = min(lrx, lrx_) - max(ulx, ulx_);
+        width = min(lrx, lrx_) - max(ulx, ulx_);
 
     if (uly_ > uly)
-	height = min(lry, lry_) - uly_;
+        height = min(lry, lry_) - uly_;
     else
-	height = min(lry, lry_) - max(uly, uly_);
+        height = min(lry, lry_) - max(uly, uly_);
 
     return(width * height);
 }
@@ -121,41 +121,41 @@ void
 Text::Align(const int align)
 {
     if (needBoundingBox_)
-	align_ = RIGHT;
+        align_ = RIGHT;
     else
-	align_ = align;
+        align_ = align;
 
     switch (align_)
     {
     case RIGHT:
-	xOffset_ = iconWidth_/2 + 2;
-	yOffset_ = 0;
-	break;
+        xOffset_ = iconWidth_/2 + 2;
+        yOffset_ = 0;
+        break;
     case LEFT:
-	xOffset_ = -(iconWidth_/2 + textWidth_ + 2);
-	yOffset_ = 0;
-	break;
+        xOffset_ = -(iconWidth_/2 + textWidth_ + 2);
+        yOffset_ = 0;
+        break;
     case ABOVE:
-	xOffset_ = -(iconWidth_ + textWidth_)/2;
-	yOffset_ = -(iconHeight_ + textHeight_)/2 - 2;
-	break;
+        xOffset_ = -(iconWidth_ + textWidth_)/2;
+        yOffset_ = -(iconHeight_ + textHeight_)/2 - 2;
+        break;
     case BELOW:
-	xOffset_ = -(iconWidth_ + textWidth_)/2;
-	yOffset_ = (iconHeight_ + textHeight_)/2 + 2;
-	break;
+        xOffset_ = -(iconWidth_ + textWidth_)/2;
+        yOffset_ = (iconHeight_ + textHeight_)/2 + 2;
+        break;
     case CENTER:
-	xOffset_ = 0;
-	yOffset_ = 0;
-	break;
+        xOffset_ = 0;
+        yOffset_ = 0;
+        break;
     default:
     {
-	stringstream errStr;
-	errStr << "Unknown alignment for marker " << text_
-	       << ", using RIGHT\n";
-	xpWarn(errStr.str(), __FILE__, __LINE__);
-	
-	xOffset_ = iconWidth_/2 + 2;
-	yOffset_ = 0;
+        ostringstream errStr;
+        errStr << "Unknown alignment for marker " << text_
+               << ", using RIGHT\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
+        
+        xOffset_ = iconWidth_/2 + 2;
+        yOffset_ = 0;
     }
     }
 
@@ -175,10 +175,10 @@ Text::Draw(DisplayBase *display)
     int saveFontSize = display->FontSize();
 
     if (!font_.empty())
-	display->Font(font_);
+        display->Font(font_);
     
     if (fontSize_ > 0)
-	display->FontSize(fontSize_);
+        display->FontSize(fontSize_);
 
     if (needBoundingBox_) ComputeBoundingBox(display);
     if (needAlign_) Align(align_);
@@ -187,35 +187,44 @@ Text::Draw(DisplayBase *display)
     string markerBounds(options->MarkerBounds());
     if (!markerBounds.empty())
     {
-	ofstream outfile(markerBounds.c_str(), ios_base::app);
-	if (outfile.is_open())
-	{
-	    if (x_ < display->Width() && x_ > -(lrx_ - ulx_))
-		outfile << ulx_ << "," << uly_ << " "
-			<< lrx_ << "," << lry_ << "\t" 
-			<< text_ << endl;
-/*	    
-	    for (int i = ulx_; i <= lrx_; i++)
-	    {
-		display->setPixel(i, uly_, 255);
-		display->setPixel(i, lry_, 255);
-	    }
-	    
-	    for (int i = uly_; i <= lry_; i++)
-	    {
-		display->setPixel(ulx_, i, 255);
-		display->setPixel(lrx_, i, 255);
-	    }
+        // gcc 2.95 complains about ios_base::app
+        ofstream outfile(markerBounds.c_str(), ios::app);
+        if (outfile.is_open())
+        {
+            if (x_ < display->Width() && x_ > -(lrx_ - ulx_))
+                outfile << ulx_ << "," << uly_ << " "
+                        << lrx_ << "," << lry_ << "\t" 
+                        << text_ << endl;
+            outfile.close();
+/*
+            for (int i = ulx_; i <= lrx_; i++)
+            {
+                display->setPixel(i, uly_, 255);
+                display->setPixel(i, lry_, 255);
+            }
+            
+            for (int i = uly_; i <= lry_; i++)
+            {
+                display->setPixel(ulx_, i, 255);
+                display->setPixel(lrx_, i, 255);
+            }
 */
-	}
+        }
+        else
+        {
+            ostringstream errStr;
+            errStr << "Can't open markerbounds file " << markerBounds
+                   << " for output\n";
+            xpWarn(errStr.str(), __FILE__, __LINE__);
+        }
     }
 
     display->DrawOutlinedText(x_ + xOffset_, y_ + yOffset_, text_, color_);
 
     if (!font_.empty())
-	display->Font(saveFont);
+        display->Font(saveFont);
 
     if (fontSize_ > 0)
-	display->FontSize(saveFontSize);
+        display->FontSize(saveFontSize);
 }
 

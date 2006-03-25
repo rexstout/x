@@ -14,6 +14,8 @@ class ProjectionBase
     virtual bool sphericalToPixel(const double lon, const double lat,
 				  double &x, double &y) const = 0;
 
+    bool IsWrapAround() const { return(isWrapAround_); };
+
     void RotateXYZ(double &lat, double &lon) const;
     void RotateZYX(double &lat, double &lon) const;
 
@@ -31,6 +33,8 @@ class ProjectionBase
     const int width_, height_;
     double radius_;
     double centerX_, centerY_;
+
+    bool isWrapAround_;
 
     double centerLat_, centerLon_;
     bool rotate_;

@@ -30,8 +30,9 @@ using namespace std;
  */
 
 ProjectionPeters::ProjectionPeters(const int f, const int w, const int h) 
-    : ProjectionBase(f, w, h)  // call the Projection constructor
+    : ProjectionBase(f, w, h)
 {
+    isWrapAround_ = true;
     wd_ = static_cast<int> (2 * width_ * radius_);
     ht_ = wd_/2;
 }
@@ -58,7 +59,7 @@ ProjectionPeters::pixelToSpherical(const double x, const double y,
 
 bool
 ProjectionPeters::sphericalToPixel(double lon, double lat, 
-				   double &x, double &y) const
+                                   double &x, double &y) const
 {
     if (rotate_) RotateZYX(lat, lon);
 

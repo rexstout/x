@@ -17,6 +17,8 @@ libprojection_a_SOURCES = 	\
 		ProjectionBase.h		\
 		ProjectionHemisphere.cpp	\
 		ProjectionHemisphere.h		\
+		ProjectionLambert.cpp		\
+		ProjectionLambert.h		\
 		ProjectionMercator.cpp		\
 		ProjectionMercator.h		\
 		ProjectionMollweide.cpp		\

@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.7.2 -*- Autoconf -*-
+# generated automatically by aclocal 1.7.9 -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 # Free Software Foundation, Inc.
@@ -11,25 +11,127 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+AC_DEFUN([AC_FIND_JAVA],
+[
+have_java='no'
+AC_ARG_WITH(gui, [  --with-gui    Build java GUI [yes]])
+if test "$with_gui" != 'no'; then
+  AC_PATH_PROG(JAVA, java, no)
+  if test "$JAVA" = 'no'; then
+    AC_MSG_WARN(*** Java GUI will not be built ***)
+    have_java='no'
+  else
+    have_java='yes'
+  fi
+fi
+
+AM_CONDITIONAL(HAVE_JAVA, test "$have_java" = 'yes')
+])
+
+dnl adapted from openssh-3.6p1 configure script
+dnl Check for socklen_t: historically on BSD it is an int, and in
+dnl POSIX 1g it is a type of its own, but some platforms use different
+dnl types for the argument to getsockopt, getpeername, etc.  So we
+dnl have to test to find something that will work.
+AC_DEFUN([AC_FIND_SOCKLEN_T],
+[
+  AC_CHECK_TYPE([socklen_t],have_socklen_t='yes',have_socklen_t='no', [#include <sys/types.h>
+#include <sys/socket.h>])
+  if test "$have_socklen_t" != 'yes'; then
+    AC_MSG_CHECKING([for socklen_t equivalent])
+    socklen_t_equiv=""
+    # Systems have either "struct sockaddr *" or
+    # "void *" as the second argument to getpeername
+    for arg2 in "struct sockaddr" void; do
+      for t in int size_t unsigned long "unsigned long"; do
+        AC_TRY_COMPILE([
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int getpeername (int, $arg2 *, $t *);
+                       ],[
+$t len;
+getpeername(0,0,&len);
+                       ],[
+socklen_t_equiv="$t"
+break
+                       ])
+      done
+    done
+    if test "x$socklen_t_equiv" = x; then
+      AC_MSG_ERROR([Cannot find a type to use in place of socklen_t])
+    fi
+    AC_MSG_RESULT($socklen_t_equiv)
+    AC_DEFINE_UNQUOTED(socklen_t, $socklen_t_equiv,[type to use in place of socklen_t if not defined])
+  fi
+])
+
+AC_DEFUN(AC_FIND_PTHREADS,
+[
+if test "$with_gui" != 'no'; then
+  PTHREAD_LIB=""
+  AC_CHECK_LIB(pthread, pthread_create, PTHREAD_LIB="-lpthread",
+ 		[AC_CHECK_LIB(pthreads, pthread_create, PTHREAD_LIB="-lpthreads",
+ 		    [AC_CHECK_LIB(c_r, pthread_create, PTHREAD_LIB="-lc_r",
+ 			[AC_CHECK_FUNC(pthread_create)]
+ 		    )]
+ 		)]
+	       )
+  if test "$PTHREAD_LIB" = ""; then
+    AC_MSG_WARN(*** GUI will not be built ***)
+  fi
+  AC_SUBST(PTHREAD_LIB)
+fi
+
+AM_CONDITIONAL(HAVE_PTHREADS, test "$PTHREAD_LIB" != "")
+
+])
+
 AC_DEFUN(AC_FIND_FREETYPE,
 [
 
-AC_ARG_WITH(freetype, [  --with-freetype         Enable Freetype support for TrueType fonts [yes]])
+AC_ARG_WITH(freetype,AC_HELP_STRING([--with-freetype],[Enable Freetype support for TrueType fonts (YES)]))
 
+have_freetype='no'
 if test "$with_freetype" != 'no'; then
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
   if test "$FREETYPE_CONFIG" = no; then
     AC_MSG_WARN(*** Xplanet will be built without freetype support ***)
-    with_freetype='no'
   else
     FREETYPE_CFLAGS="`$FREETYPE_CONFIG --cflags` -I`$FREETYPE_CONFIG --prefix`/include"
     FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
     AC_SUBST(FREETYPE_CFLAGS)
     AC_SUBST(FREETYPE_LIBS)
     AC_DEFINE(HAVE_LIBFREETYPE,,Define if you have freetype)
+    have_freetype='yes'
   fi
 fi
 
+AM_CONDITIONAL(HAVE_LIBFREETYPE, test "$have_freetype" = 'yes')
+])
+
+AC_DEFUN(AC_FIND_PANGO,
+[
+AC_ARG_WITH(pango,AC_HELP_STRING([--with-pango],[Enable Pango (YES)]))
+
+have_pangoft2='no'
+if test "$with_pango" != 'no'; then
+   AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+   if test "$PKG_CONFIG" = no; then
+      AC_MSG_WARN(*** Xplanet will be built without pango support ***)
+   else
+      PKG_CHECK_MODULES([PANGOFT2], pangoft2 >= 1.2.0, have_pangoft2='yes', have_pangoft2='no')
+      FREETYPE_CFLAGS="$FREETYPE_CFLAGS $PANGOFT2_CFLAGS"
+      FREETYPE_LIBS="$FREETYPE_LIBS $PANGOFT2_LIBS"
+      AC_SUBST(FREETYPE_CFLAGS)
+      AC_SUBST(FREETYPE_LIBS)
+      if test "$have_pangoft2" = 'yes'; then
+        AC_DEFINE(HAVE_LIBPANGOFT2,,Define if you have pango with freetype 2)
+      fi
+   fi
+fi
+
+AM_CONDITIONAL(HAVE_LIBPANGOFT2, test "$have_pangoft2" = 'yes')
 ])
 
 dnl Autoconf stuff to check for graphics libraries is adapted from 
@@ -44,7 +146,7 @@ GRAPHICS_LIBS=""
 #
 # Check for GIF
 #
-AC_ARG_WITH(gif, [  --with-gif              Enable GIF support [yes]])
+AC_ARG_WITH(gif,AC_HELP_STRING([--with-gif],[Enable GIF support (YES)]))
 
 have_gif='no'
 if test "$with_gif" != 'no'; then
@@ -76,7 +178,7 @@ fi
 #
 # Check for JPEG
 #
-AC_ARG_WITH(jpeg, [  --with-jpeg             Enable JPEG support [yes]])
+AC_ARG_WITH(jpeg,AC_HELP_STRING([--with-jpeg],[Enable JPEG support (YES)]))
 
 have_jpeg='no'
 if test "$with_jpeg" != 'no'; then
@@ -99,7 +201,7 @@ fi
 #
 # Check for PNG
 #
-AC_ARG_WITH(png, [  --with-png              Enable PNG support [yes]])
+AC_ARG_WITH(png,AC_HELP_STRING([--with-png],[Enable PNG support (YES)]))
 
 have_png='no'
 if test "$with_png" != 'no'; then
@@ -122,7 +224,7 @@ fi
 #
 # Check for PNM
 #
-AC_ARG_WITH(pnm, [  --with-pnm              Enable PNM support [yes]])
+AC_ARG_WITH(pnm,AC_HELP_STRING([--with-pnm],[Enable PNM support (YES)]))
 
 have_pnm='no'
 if test "$with_pnm" != 'no'; then
@@ -152,7 +254,7 @@ fi
 #
 # Check for TIFF
 #
-AC_ARG_WITH(tiff, [  --with-tiff             Enable TIFF support [yes]])
+AC_ARG_WITH(tiff,AC_HELP_STRING([--with-tiff],[Enable TIFF support (YES)]))
 
 have_tiff='no'
 if test "$with_tiff" != 'no'; then
@@ -214,11 +316,12 @@ AM_CONDITIONAL(HAVE_LIBX11, test "$have_libx11" = 'yes')
 
 AC_DEFUN(AC_FIND_XSS,
 [
-AC_ARG_ENABLE(screensaver,   [  --disable-screensaver   compile without X screensaver extension],enable_xss=no,enable_xss=yes)
 dnl Check for XScreenSaver
-if test "$have_libx11" = "yes" ; then
-if test "$enable_xss" = "yes" ; then	
-    have_xss=no
+AC_ARG_WITH(xscreensaver,AC_HELP_STRING([--with-xscreensaver],[compile with X screensaver extension (YES)]))
+
+have_xss='no'
+if test "$have_libx11" = 'yes' ; then
+if test "$with_xscreensaver" != 'no' ; then	
     AC_CHECK_HEADERS([X11/Xlib.h])
     AC_CHECK_HEADERS([X11/extensions/scrnsaver.h], [have_xss=yes], [],
 [#if HAVE_X11_XLIB_H
@@ -239,12 +342,11 @@ fi
 fi
 ])
 
-
 AC_DEFUN(AC_USE_MACAQUA,
 [
-AC_ARG_WITH(aqua, [  --with-aqua             For Mac OS X Aqua [no]],use_aqua=yes,use_aqua=no)
+AC_ARG_WITH(aqua,AC_HELP_STRING([--with-aqua],[For Mac OS X Aqua (NO)]))
 
-if test "$use_aqua" = yes; then
+if test "$with_aqua" = yes; then
   AC_DEFINE(HAVE_AQUA,,Define for Mac OS X)
   AQUA_LIBS="-framework Carbon -framework Cocoa -bind_at_load"
   AC_SUBST(AQUA_LIBS)
@@ -255,9 +357,8 @@ if test "$use_aqua" = yes; then
   AC_SUBST(OBJCFLAGS)
 fi
 
-AM_CONDITIONAL(HAVE_AQUA, test "$use_aqua" = 'yes')
+AM_CONDITIONAL(HAVE_AQUA, test "$with_aqua" = 'yes')
 ])
-
 
 # AM_CONDITIONAL                                              -*- Autoconf -*-
 
@@ -303,12 +404,70 @@ AC_CONFIG_COMMANDS_PRE(
 Usually this means the macro was only invoked conditionally.])
 fi])])
 
+
+dnl PKG_CHECK_MODULES(GSTUFF, gtk+-2.0 >= 1.3 glib = 1.3.4, action-if, action-not)
+dnl defines GSTUFF_LIBS, GSTUFF_CFLAGS, see pkg-config man page
+dnl also defines GSTUFF_PKG_ERRORS on error
+AC_DEFUN(PKG_CHECK_MODULES, [
+  succeeded=no
+
+  if test -z "$PKG_CONFIG"; then
+    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+  fi
+
+  if test "$PKG_CONFIG" = "no" ; then
+     echo "*** The pkg-config script could not be found. Make sure it is"
+     echo "*** in your path, or set the PKG_CONFIG environment variable"
+     echo "*** to the full path to pkg-config."
+     echo "*** Or see http://www.freedesktop.org/software/pkgconfig to get pkg-config."
+  else
+     PKG_CONFIG_MIN_VERSION=0.9.0
+     if $PKG_CONFIG --atleast-pkgconfig-version $PKG_CONFIG_MIN_VERSION; then
+        AC_MSG_CHECKING(for $2)
+
+        if $PKG_CONFIG --exists "$2" ; then
+            AC_MSG_RESULT(yes)
+            succeeded=yes
+
+            AC_MSG_CHECKING($1_CFLAGS)
+            $1_CFLAGS=`$PKG_CONFIG --cflags "$2"`
+            AC_MSG_RESULT($$1_CFLAGS)
+
+            AC_MSG_CHECKING($1_LIBS)
+            $1_LIBS=`$PKG_CONFIG --libs "$2"`
+            AC_MSG_RESULT($$1_LIBS)
+        else
+            $1_CFLAGS=""
+            $1_LIBS=""
+            ## If we have a custom action on failure, don't print errors, but 
+            ## do set a variable so people can do so.
+            $1_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
+            ifelse([$4], ,echo $$1_PKG_ERRORS,)
+        fi
+
+        AC_SUBST($1_CFLAGS)
+        AC_SUBST($1_LIBS)
+     else
+        echo "*** Your version of pkg-config is too old. You need version $PKG_CONFIG_MIN_VERSION or newer."
+        echo "*** See http://www.freedesktop.org/software/pkgconfig"
+     fi
+  fi
+
+  if test $succeeded = yes; then
+     ifelse([$3], , :, [$3])
+  else
+     ifelse([$4], , AC_MSG_ERROR([Library requirements ($2) not met; consider adjusting the PKG_CONFIG_PATH environment variable if your libraries are in a nonstandard prefix so pkg-config can find them.]), [$4])
+  fi
+])
+
+
+
 # Do all the work for Automake.                            -*- Autoconf -*-
 
 # This macro actually does too much some checks are only needed if
 # your package does certain things.  But this isn't really a big deal.
 
-# Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -326,14 +485,7 @@ fi])])
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-# serial 8
-
-# There are a few dirty hacks below to avoid letting `AC_PROG_CC' be
-# written in clear, in which case automake, when reading aclocal.m4,
-# will think it sees a *use*, and therefore will trigger all it's
-# C support machinery.  Also note that it means that autoscan, seeing
-# CC etc. in the Makefile, will ask for an AC_PROG_CC use...
-
+# serial 10
 
 AC_PREREQ([2.54])
 
@@ -378,8 +530,8 @@ m4_ifval([$2],
  AC_SUBST([PACKAGE], [$1])dnl
  AC_SUBST([VERSION], [$2])],
 [_AM_SET_OPTIONS([$1])dnl
- AC_SUBST([PACKAGE], [AC_PACKAGE_TARNAME])dnl
- AC_SUBST([VERSION], [AC_PACKAGE_VERSION])])dnl
+ AC_SUBST([PACKAGE], ['AC_PACKAGE_TARNAME'])dnl
+ AC_SUBST([VERSION], ['AC_PACKAGE_VERSION'])])dnl
 
 _AM_IF_OPTION([no-define],,
 [AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Name of package])
@@ -400,6 +552,7 @@ AM_PROG_INSTALL_STRIP
 # some platforms.
 AC_REQUIRE([AC_PROG_AWK])dnl
 AC_REQUIRE([AC_PROG_MAKE_SET])dnl
+AC_REQUIRE([AM_SET_LEADING_DOT])dnl
 
 _AM_IF_OPTION([no-dependencies],,
 [AC_PROVIDE_IFELSE([AC_PROG_CC],
@@ -422,7 +575,16 @@ AC_PROVIDE_IFELSE([AC_PROG_CXX],
 # loop where config.status creates the headers, so we can generate
 # our stamp files there.
 AC_DEFUN([_AC_AM_CONFIG_HEADER_HOOK],
-[_am_stamp_count=`expr ${_am_stamp_count-0} + 1`
+[# Compute $1's index in $config_headers.
+_am_stamp_count=1
+for _am_header in $config_headers :; do
+  case $_am_header in
+    $1 | $1:* )
+      break ;;
+    * )
+      _am_stamp_count=`expr $_am_stamp_count + 1` ;;
+  esac
+done
 echo "timestamp for $1" >`AS_DIRNAME([$1])`/stamp-h[]$_am_stamp_count])
 
 # Copyright 2002  Free Software Foundation, Inc.
@@ -452,7 +614,7 @@ AC_DEFUN([AM_AUTOMAKE_VERSION],[am__api_version="1.7"])
 # Call AM_AUTOMAKE_VERSION so it can be traced.
 # This function is AC_REQUIREd by AC_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-	 [AM_AUTOMAKE_VERSION([1.7.2])])
+	 [AM_AUTOMAKE_VERSION([1.7.9])])
 
 # Helper functions for option handling.                    -*- Autoconf -*-
 
@@ -738,9 +900,42 @@ fi
 INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 AC_SUBST([INSTALL_STRIP_PROGRAM])])
 
-# serial 4						-*- Autoconf -*-
+#                                                          -*- Autoconf -*-
+# Copyright (C) 2003  Free Software Foundation, Inc.
 
-# Copyright 1999, 2000, 2001 Free Software Foundation, Inc.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+# serial 1
+
+# Check whether the underlying file-system supports filenames
+# with a leading dot.  For instance MS-DOS doesn't.
+AC_DEFUN([AM_SET_LEADING_DOT],
+[rm -rf .tst 2>/dev/null
+mkdir .tst 2>/dev/null
+if test -d .tst; then
+  am__leading_dot=.
+else
+  am__leading_dot=_
+fi
+rmdir .tst 2>/dev/null
+AC_SUBST([am__leading_dot])])
+
+# serial 5						-*- Autoconf -*-
+
+# Copyright (C) 1999, 2000, 2001, 2002, 2003  Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -801,18 +996,32 @@ AC_CACHE_CHECK([dependency style of $depcc],
   # using a relative directory.
   cp "$am_depcomp" conftest.dir
   cd conftest.dir
+  # We will build objects and dependencies in a subdirectory because
+  # it helps to detect inapplicable dependency modes.  For instance
+  # both Tru64's cc and ICC support -MD to output dependencies as a
+  # side effect of compilation, but ICC will put the dependencies in
+  # the current directory while Tru64 will put them in the object
+  # directory.
+  mkdir sub
 
   am_cv_$1_dependencies_compiler_type=none
   if test "$am_compiler_list" = ""; then
      am_compiler_list=`sed -n ['s/^#*\([a-zA-Z0-9]*\))$/\1/p'] < ./depcomp`
   fi
   for depmode in $am_compiler_list; do
+    # Setup a source with many dependencies, because some compilers
+    # like to wrap large dependency lists on column 80 (with \), and
+    # we should not choose a depcomp mode which is confused by this.
+    #
     # We need to recreate these files for each test, as the compiler may
     # overwrite some of them when testing with obscure command lines.
     # This happens at least with the AIX C compiler.
-    echo '#include "conftest.h"' > conftest.c
-    echo 'int i;' > conftest.h
-    echo "${am__include} ${am__quote}conftest.Po${am__quote}" > confmf
+    : > sub/conftest.c
+    for i in 1 2 3 4 5 6; do
+      echo '#include "conftst'$i'.h"' >> sub/conftest.c
+      : > sub/conftst$i.h
+    done
+    echo "${am__include} ${am__quote}sub/conftest.Po${am__quote}" > confmf
 
     case $depmode in
     nosideeffect)
@@ -830,13 +1039,20 @@ AC_CACHE_CHECK([dependency style of $depcc],
     # mode.  It turns out that the SunPro C++ compiler does not properly
     # handle `-M -o', and we need to detect this.
     if depmode=$depmode \
-       source=conftest.c object=conftest.o \
-       depfile=conftest.Po tmpdepfile=conftest.TPo \
-       $SHELL ./depcomp $depcc -c -o conftest.o conftest.c >/dev/null 2>&1 &&
-       grep conftest.h conftest.Po > /dev/null 2>&1 &&
+       source=sub/conftest.c object=sub/conftest.${OBJEXT-o} \
+       depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
+       $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
+         >/dev/null 2>conftest.err &&
+       grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
+       grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
-      am_cv_$1_dependencies_compiler_type=$depmode
-      break
+      # icc doesn't choke on unknown options, it will just issue warnings
+      # (even with -Werror).  So we grep stderr for any message
+      # that says an option was ignored.
+      if grep 'ignoring option' conftest.err >/dev/null 2>&1; then :; else
+        am_cv_$1_dependencies_compiler_type=$depmode
+        break
+      fi
     fi
   done
 
@@ -858,16 +1074,8 @@ AM_CONDITIONAL([am__fastdep$1], [
 # Choose a directory name for dependency files.
 # This macro is AC_REQUIREd in _AM_DEPENDENCIES
 AC_DEFUN([AM_SET_DEPDIR],
-[rm -f .deps 2>/dev/null
-mkdir .deps 2>/dev/null
-if test -d .deps; then
-  DEPDIR=.deps
-else
-  # MS-DOS does not allow filenames that begin with a dot.
-  DEPDIR=_deps
-fi
-rmdir .deps 2>/dev/null
-AC_SUBST([DEPDIR])
+[AC_REQUIRE([AM_SET_LEADING_DOT])dnl
+AC_SUBST([DEPDIR], ["${am__leading_dot}deps"])dnl
 ])
 
 
@@ -971,7 +1179,7 @@ AC_DEFUN([AM_OUTPUT_DEPENDENCY_COMMANDS],
 
 # Check to see how 'make' treats includes.	-*- Autoconf -*-
 
-# Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2003 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -996,8 +1204,9 @@ AC_DEFUN([AM_OUTPUT_DEPENDENCY_COMMANDS],
 AC_DEFUN([AM_MAKE_INCLUDE],
 [am_make=${MAKE-make}
 cat > confinc << 'END'
-doit:
+am__doit:
 	@echo done
+.PHONY: am__doit
 END
 # If we don't find an include directive, just comment out the code.
 AC_MSG_CHECKING([for style of include used by $am_make])
@@ -1025,9 +1234,9 @@ if test "$am__include" = "#"; then
       _am_result=BSD
    fi
 fi
-AC_SUBST(am__include)
-AC_SUBST(am__quote)
-AC_MSG_RESULT($_am_result)
+AC_SUBST([am__include])
+AC_SUBST([am__quote])
+AC_MSG_RESULT([$_am_result])
 rm -f confinc confmf
 ])
 

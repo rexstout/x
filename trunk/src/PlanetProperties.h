@@ -107,6 +107,9 @@ class PlanetProperties
     double Shade() const { return(shade_); };
     void Shade(double s) { shade_ = s; };
 
+    double Twilight() const { return(twilight_); };
+    void Twilight(double t) { twilight_ = t; };
+
     void DrawOrbit(const bool d) { drawOrbit_ = d; };
     bool DrawOrbit() const { return(drawOrbit_); };
     void StartOrbit(const double s) { startOrbit_ = s; };
@@ -170,6 +173,9 @@ class PlanetProperties
 
     unsigned char textColor_[3];
 
+    double twilight_;    // if the sun is within twilight degrees of
+			 // the horizon, blend the day and night
+			 // images together
 };
 
 #endif

@@ -12,34 +12,30 @@ using namespace std;
 #include "libimage/Image.h"
 #include "libplanet/Planet.h"
 
-Map::Map(const int w, const int h) : width_(w), height_(h), 
-				     area_(w*h), 
-				     mapData_(NULL), nightData_(NULL),
-				     latArray_(NULL), lonArray_(NULL),
-				     target_(NULL), targetProperties_(NULL), 
-				     ring_(NULL), sunLat_(0), sunLon_(0)
+Map::Map(const int w, const int h) 
+    : width_(w), height_(h), area_(w*h), 
+      mapData_(NULL), nightData_(NULL),
+      latArray_(NULL), lonArray_(NULL),
+      target_(NULL), targetProperties_(NULL), 
+      ring_(NULL), sunLat_(0), sunLon_(0)
 {
     SetUpMap();
 }
 
 Map::Map(const int w, const int h, 
-	 const double sunLat, const double sunLon, 
-	 Planet *t, PlanetProperties *tp, Ring *r, 
-	 map<double, Planet *> &planetsFromSunMap) : width_(w), height_(h), 
-						     area_(w*h), 
-						     latArray_(NULL),
-						     lonArray_(NULL), 
-						     target_(t),
-						     targetProperties_(tp), 
-						     ring_(r),
-						     sunLat_(sunLat), 
-						     sunLon_(sunLon)
+         const double sunLat, const double sunLon, 
+         Planet *t, PlanetProperties *tp, Ring *r, 
+         map<double, Planet *> &planetsFromSunMap) 
+    : width_(w), height_(h), area_(w*h), 
+      latArray_(NULL), lonArray_(NULL), 
+      target_(t), targetProperties_(tp), 
+      ring_(r), sunLat_(sunLat), sunLon_(sunLon)
 {
     memcpy(color_, tp->Color(), 3);
 
     dayData_ = new unsigned char [3*area_];
     for (int i = 0; i < 3*area_; i +=3)
-	memcpy(dayData_ + i, color_, 3);
+        memcpy(dayData_ + i, color_, 3);
 
     nightData_ = new unsigned char [3*area_];
     memcpy(nightData_, dayData_, 3 * area_);
@@ -47,12 +43,12 @@ Map::Map(const int w, const int h,
     const double shade = tp->Shade();
     if (shade == 0)
     {
-	memset(nightData_, 0, 3 * area_);
+        memset(nightData_, 0, 3 * area_);
     }
     else if (shade < 1)
     {
-	for (int i = 0; i < 3 * area_; i++)
-	    nightData_[i] = (unsigned char) (shade * nightData_[i]);
+        for (int i = 0; i < 3 * area_; i++)
+            nightData_[i] = (unsigned char) (shade * nightData_[i]);
     }
 
     SetUpMap();
@@ -69,20 +65,16 @@ Map::Map(const int w, const int h,
 }
 
 Map::Map(const int w, const int h, 
-	 const double sunLat, const double sunLon, 
-	 const double obsLat, const double obsLon, 
-	 const unsigned char *day, const unsigned char *night,
-	 const unsigned char *specular, const unsigned char *clouds, 
-	 Planet *t, PlanetProperties *tp, Ring *r, 
-	 map<double, Planet *> &planetsFromSunMap) : width_(w), height_(h),
-						     area_(w*h), 
-						     latArray_(NULL), 
-						     lonArray_(NULL), 
-						     target_(t),
-						     targetProperties_(tp),
-						     ring_(r),
-						     sunLat_(sunLat), 
-						     sunLon_(sunLon)
+         const double sunLat, const double sunLon, 
+         const double obsLat, const double obsLon, 
+         const unsigned char *day, const unsigned char *night,
+         const unsigned char *specular, const unsigned char *clouds, 
+         Planet *t, PlanetProperties *tp, Ring *r, 
+         map<double, Planet *> &planetsFromSunMap)
+    : width_(w), height_(h), area_(w*h), 
+      latArray_(NULL), lonArray_(NULL), 
+      target_(t), targetProperties_(tp),
+      ring_(r), sunLat_(sunLat), sunLon_(sunLon)
 {
     memcpy(color_, tp->Color(), 3);
 
@@ -91,28 +83,29 @@ Map::Map(const int w, const int h,
 
     nightData_ = new unsigned char [3*area_];
     const double shade = tp->Shade();
-    if (night != NULL)
+
+    if (shade == 0)        // night side is completely dark (shade is 0%)
     {
-	if (shade == 0)
-	    memset(nightData_, 0, 3 * area_);
-	else if (shade == 1)
-	    memcpy(nightData_, dayData_, 3 * area_);
-	else
-	    memcpy(nightData_, night, 3 * area_);
+        memset(nightData_, 0, 3 * area_);
+    }
+    else if (shade == 1)   // night side is same as day side (shade is 100%)
+    {
+        memcpy(nightData_, dayData_, 3 * area_);
     }
     else
     {
-	if (shade == 0)
-	    memset(nightData_, 0, 3 * area_);
-	else if (shade == 1)
-	    memcpy(nightData_, dayData_, 3 * area_);
-	else
-	{
-	    memcpy(nightData_, dayData_, 3 * area_);
+        if (night == NULL) // no night image specified, so shade the day map
+        {
+            memcpy(nightData_, dayData_, 3 * area_);
 
-	    for (int i = 0; i < 3 * area_; i++)
-		nightData_[i] = (unsigned char) (shade * nightData_[i]);
-	}
+            for (int i = 0; i < 3 * area_; i++)
+                nightData_[i] = static_cast<unsigned char> (shade 
+                                                            * nightData_[i]);
+        }
+        else
+        {
+            memcpy(nightData_, night, 3 * area_);
+        }
     }
 
     SetUpMap();
@@ -150,16 +143,16 @@ Map::SetUpMap()
 
     if (targetProperties_->MapBounds())
     {
-	double uly, ulx, lry, lrx;
-	targetProperties_->MapBounds(uly, ulx, lry, lrx);
+        double uly, ulx, lry, lrx;
+        targetProperties_->MapBounds(uly, ulx, lry, lrx);
 
         mapHeight_ = (uly - lry) * deg_to_rad;
-	if (mapHeight_ > M_PI)
-	    xpWarn("Map is too high\n", __FILE__, __LINE__);
+        if (mapHeight_ > M_PI)
+            xpWarn("Map is too high\n", __FILE__, __LINE__);
 
         mapWidth_ = (lrx - ulx) * deg_to_rad;
-	if (mapWidth_ > TWO_PI)
-	    xpWarn("Map is too wide\n", __FILE__, __LINE__);
+        if (mapWidth_ > TWO_PI)
+            xpWarn("Map is too wide\n", __FILE__, __LINE__);
 
         startLon_ = ulx * deg_to_rad;
         startLat_ = uly * deg_to_rad;
@@ -181,7 +174,7 @@ Map::SetUpMap()
 
 void
 Map::AddSpecularReflection(const unsigned char *specular,
-			   const double obsLat, const double obsLon)
+                           const double obsLat, const double obsLon)
 {
     double tc, dist;
     calcGreatArc(sunLat_, sunLon_, obsLat, obsLon, tc, dist);
@@ -194,7 +187,7 @@ Map::AddSpecularReflection(const unsigned char *specular,
     double cos_d2 = cos(dist/2);
     
     double mid_lat = asin(sin_lat1 * cos_d2 
-                         + cos_lat1 * sin_d2 * cos_tc);
+                          + cos_lat1 * sin_d2 * cos_tc);
     double dlon = atan2(sin_tc * sin_d2 * cos_lat1, 
                         cos_d2 - sin_lat1 * sin(mid_lat));
     double mid_lon = fmod(sunLon_ - dlon + M_PI, TWO_PI) - M_PI;
@@ -207,18 +200,18 @@ Map::AddSpecularReflection(const unsigned char *specular,
     double point[3];
     for (int j = 0; j < height_; j++)
     {
-	int ipos = 3 * j * width_;
-	const double lat = latArray_[j];
-	const double cos_lat = cos(lat);
-	const double sin_lat = sin(lat);
-	for (int i = 0; i < width_; i++)
-	{
-	    const double lon = lonArray_[i];
-	    const double cos_lon = cos(lon);
-	    const double sin_lon = sin(lon);
-	    point[0] = cos_lat * cos_lon;
-	    point[1] = cos_lat * sin_lon;
-	    point[2] = sin_lat;
+        int ipos = 3 * j * width_;
+        const double lat = latArray_[j];
+        const double cos_lat = cos(lat);
+        const double sin_lat = sin(lat);
+        for (int i = 0; i < width_; i++)
+        {
+            const double lon = lonArray_[i];
+            const double cos_lon = cos(lon);
+            const double sin_lon = sin(lon);
+            point[0] = cos_lat * cos_lon;
+            point[1] = cos_lat * sin_lon;
+            point[2] = sin_lat;
 
             double x = 0.96 * dot(point, midpoint);
             if (x > 0.8) 
@@ -233,7 +226,7 @@ Map::AddSpecularReflection(const unsigned char *specular,
                         (brightness + (1 - b255) * dayData_[ipos + k]);
             }
             ipos += 3;
-	}
+        }
     }   
 }
 
@@ -246,85 +239,85 @@ Map::OverlayClouds(const unsigned char *clouds)
     const double gamma = targetProperties_->CloudGamma();
     if (gamma != 1)
     {
-	unsigned char *map = new unsigned char[256];
-	if (gamma > 0)
-	{
-	    for (int i = 0; i < 256; i++)
-	    {
-		map[i] = ((unsigned char) 
-			  (pow(((double) i) / 255, 
-			       1.0/gamma) * 255));
-	    }
-	}
-	else
-	{
-	    memset(map, 0, 256);
-	}
+        unsigned char *map = new unsigned char[256];
+        if (gamma > 0)
+        {
+            for (int i = 0; i < 256; i++)
+            {
+                map[i] = ((unsigned char) 
+                          (pow(((double) i) / 255, 
+                               1.0/gamma) * 255));
+            }
+        }
+        else
+        {
+            memset(map, 0, 256);
+        }
 
-	for (int i = 0; i < 3 * area_; i++)
-	    new_clouds[i] = map[clouds[i]];
+        for (int i = 0; i < 3 * area_; i++)
+            new_clouds[i] = map[clouds[i]];
 
-	delete [] map;
+        delete [] map;
     }
 
     const double shade = targetProperties_->Shade();
     int ipos = 0;
     for (int i = 0; i < area_; i++)
     {
-	const unsigned char cloudVal = new_clouds[ipos];
-	if ((int) new_clouds[ipos] >= targetProperties_->CloudThreshold()) 
-	{
-	    const double opacity = ((double) cloudVal) / 255;
-	    for (int j = ipos; j < ipos + 3; j++)
-	    {
-		double color = (opacity * cloudVal 
-				+ (1-opacity) * dayData_[j]);
-		dayData_[j] = (unsigned char) color;
-		color = (opacity * shade * cloudVal
-			 + (1-opacity) * nightData_[j]);
-		nightData_[j] = (unsigned char) color;
-	    }
-	}
-	ipos += 3;
+        const unsigned char cloudVal = new_clouds[ipos];
+        if ((int) new_clouds[ipos] >= targetProperties_->CloudThreshold()) 
+        {
+            const double opacity = ((double) cloudVal) / 255;
+            for (int j = ipos; j < ipos + 3; j++)
+            {
+                double color = (opacity * cloudVal 
+                                + (1-opacity) * dayData_[j]);
+                dayData_[j] = (unsigned char) color;
+                color = (opacity * shade * cloudVal
+                         + (1-opacity) * nightData_[j]);
+                nightData_[j] = (unsigned char) color;
+            }
+        }
+        ipos += 3;
     }
     
     Options *options = Options::getInstance();
     if (options->MakeCloudMaps())
     {
-	string outputDir(options->TmpDir());
+        string outputDir(options->TmpDir());
 
-	string outputFilename = options->getOutputBase();
-	if (outputFilename.empty()) outputFilename.assign("clouds");
-	outputFilename += options->getOutputExtension();
+        string outputFilename = options->getOutputBase();
+        if (outputFilename.empty()) outputFilename.assign("clouds");
+        outputFilename += options->getOutputExtension();
 
-	string dayFile = outputDir + "day_" + outputFilename;
-	Image d(width_, height_, dayData_, NULL);
-	d.Quality(options->JPEGQuality());
-	if (!d.Write(dayFile.c_str()))
-	{
-	    stringstream errStr;
-	    errStr << "Can't create " << dayFile << "\n";
-	    xpExit(errStr.str(), __FILE__, __LINE__);
-	}
+        string dayFile = outputDir + "day_" + outputFilename;
+        Image d(width_, height_, dayData_, NULL);
+        d.Quality(options->JPEGQuality());
+        if (!d.Write(dayFile.c_str()))
+        {
+            stringstream errStr;
+            errStr << "Can't create " << dayFile << "\n";
+            xpExit(errStr.str(), __FILE__, __LINE__);
+        }
 
-	string nightFile = outputDir + "night_" + outputFilename;
-	Image n(width_, height_, nightData_, NULL);
-	n.Quality(options->JPEGQuality());
-	if (!n.Write(nightFile.c_str()))
-	{
-	    stringstream errStr;
-	    errStr << "Can't create " << nightFile << "\n";
-	    xpExit(errStr.str(), __FILE__, __LINE__);
-	}
+        string nightFile = outputDir + "night_" + outputFilename;
+        Image n(width_, height_, nightData_, NULL);
+        n.Quality(options->JPEGQuality());
+        if (!n.Write(nightFile.c_str()))
+        {
+            stringstream errStr;
+            errStr << "Can't create " << nightFile << "\n";
+            xpExit(errStr.str(), __FILE__, __LINE__);
+        }
 
-	if (options->Verbosity() > 0)
-	{
-	    stringstream msg;
-	    msg << "Wrote " << dayFile << " and " << nightFile 
-		<< ".\n";
-	    xpMsg(msg.str(), __FILE__, __LINE__);
-	}
-	exit(EXIT_SUCCESS);
+        if (options->Verbosity() > 0)
+        {
+            stringstream msg;
+            msg << "Wrote " << dayFile << " and " << nightFile 
+                << ".\n";
+            xpMsg(msg.str(), __FILE__, __LINE__);
+        }
+        exit(EXIT_SUCCESS);
     }
 
     delete [] new_clouds;
@@ -339,52 +332,55 @@ Map::AddShadows(map<double, Planet *> &planetsFromSunMap)
 
     Planet *Sun = planetsFromSunMap.begin()->second;
 
+    // The target body's angular radius as seen from the sun
     const double size = target_->Radius() / sun_dist;
+
+    // The Sun's angular radius as seen from the target body
     const double sun_size = Sun->Radius() / sun_dist;
 
     Options *options = Options::getInstance();
 
     for (map<double, Planet *>::iterator it0 = planetsFromSunMap.begin(); 
-	 it0 != planetsFromSunMap.end(); it0++)
+         it0 != planetsFromSunMap.end(); it0++)
     {
-	Planet *p = it0->second;
-	if (p->Index() == target_->Index() 
-	    || p->Index() == SUN) continue;
+        Planet *p = it0->second;
+        if (p->Index() == target_->Index() 
+            || p->Index() == SUN) continue;
 
-	double pX, pY, pZ;
-	p->getPosition(pX, pY, pZ);
+        double pX, pY, pZ;
+        p->getPosition(pX, pY, pZ);
 
-	const double p_sun_dist = it0->first;
+        const double p_sun_dist = it0->first;
 
-	// If this body is farther from the sun, than the target body
-	// we're finished since the map is stored in order of
-	// heliocentric distance
-	if (p_sun_dist > sun_dist) return;
+        // If this body is farther from the sun, than the target body
+        // we're finished since the map is stored in order of
+        // heliocentric distance
+        if (p_sun_dist > sun_dist) return;
 
-	// This planet's angular radius as seen from the sun
-	const double p_size = p->Radius() / p_sun_dist;
+        // This planet's angular radius as seen from the sun
+        const double p_size = p->Radius() / p_sun_dist;
 
-	// compute the angular separation of the two bodies as seen
-	// from the Sun
-	double t_vec[3] = { tX/sun_dist, tY/sun_dist, tZ/sun_dist };
-	double p_vec[3] = { pX/p_sun_dist, pY/p_sun_dist, pZ/p_sun_dist };
-	const double sep =  acos(dot(t_vec, p_vec));
+        // compute the angular separation of the two bodies as seen
+        // from the Sun
+        double t_vec[3] = { tX/sun_dist, tY/sun_dist, tZ/sun_dist };
+        double p_vec[3] = { pX/p_sun_dist, pY/p_sun_dist, pZ/p_sun_dist };
+        const double sep = acos(dot(t_vec, p_vec));
 
-	// If the separation is bigger than the sum of the apparent radii,
-	// there's no shadow
-	if (sep > (size + p_size)) continue;
+        // If the separation is bigger than the sum of the apparent radii,
+        // there's no shadow
+        if (sep > (size + p_size)) continue;
 
-	if (options->Verbosity() > 1)
-	{
-	    stringstream msg;
-	    msg << "separation between " << body_string[p->Index()] 
-		 << " and " << body_string[target_->Index()] << " is " 
-		<< sep/deg_to_rad << "\n";
-	    msg << "Adding shadow from " << body_string[p->Index()] << "\n";
-	    xpMsg(msg.str(), __FILE__, __LINE__);
-	}
+        if (options->Verbosity() > 1)
+        {
+            stringstream msg;
+            msg << "separation between " << body_string[p->Index()] 
+                << " and " << body_string[target_->Index()] << " is " 
+                << sep/deg_to_rad << "\n";
+            msg << "Adding shadow from " << body_string[p->Index()] << "\n";
+            xpMsg(msg.str(), __FILE__, __LINE__);
+        }
 
-	AddShadow(p, sun_size);
+        AddShadow(p, sun_size);
     }
 }
 
@@ -397,49 +393,49 @@ Map::AddShadow(Planet *p, const double sun_size)
 
     for (int j = 0; j < height_; j++)
     {
-	const double lat = latArray_[j];
-	for (int i = 0; i < width_; i++)
-	{
-	    const double lon = lonArray_[i];
+        const double lat = latArray_[j];
+        for (int i = 0; i < width_; i++)
+        {
+            const double lon = lonArray_[i];
 
-	    double X, Y, Z;
-	    target_->PlanetocentricToXYZ(X, Y, Z, lat, lon, 1);
+            double X, Y, Z;
+            target_->PlanetocentricToXYZ(X, Y, Z, lat, lon, 1);
 
-	    // angular size of the sun seen from this point
-	    const double sun_dist = sqrt(X*X + Y*Y + Z*Z);
+            // angular size of the sun seen from this point
+            const double sun_dist = sqrt(X*X + Y*Y + Z*Z);
 
-	    const double p_dist = sqrt((pX - X) * (pX - X)
-				       + (pY - Y) * (pY - Y)
-				       + (pZ - Z) * (pZ - Z));
+            const double p_dist = sqrt((pX - X) * (pX - X)
+                                       + (pY - Y) * (pY - Y)
+                                       + (pZ - Z) * (pZ - Z));
 
-	    // angular size of the shadowing body seen from this point
-	    const double p_size = p->Radius() / p_dist;
+            // angular size of the shadowing body seen from this point
+            const double p_size = p->Radius() / p_dist;
 
-	    // compute separation between shadowing body and the Sun
-	    // as seen from this spot on the planet's surface
-	    const double S[3] = { -X/sun_dist, -Y/sun_dist, -Z/sun_dist };
-	    const double P[3] = { (pX - X)/p_dist, (pY - Y)/p_dist, 
-				  (pZ - Z)/p_dist };
-	    const double sep = acos(dot(S, P));	
+            // compute separation between shadowing body and the Sun
+            // as seen from this spot on the planet's surface
+            const double S[3] = { -X/sun_dist, -Y/sun_dist, -Z/sun_dist };
+            const double P[3] = { (pX - X)/p_dist, (pY - Y)/p_dist, 
+                                  (pZ - Z)/p_dist };
+            const double sep = acos(dot(S, P)); 
 
-	    // If the separation is bigger than the sum of the
-	    // apparent radii, this point isn't in shadow
-	    if (sep > (sun_size + p_size)) continue;
+            // If the separation is bigger than the sum of the
+            // apparent radii, this point isn't in shadow
+            if (sep > (sun_size + p_size)) continue;
 
-	    // compute the covered fraction of the Sun's disk
-	    const double covered = Overlap(sep, sun_size, p_size);
-	    if (covered > 0)
-	    {
-		int ipos = 3 * (j * width_ + i);
-		for (int k = 0; k < 3; k++)
-		{
-		    dayData_[ipos] = (unsigned char) ((1 - covered)
-						      * dayData_[ipos]
-						      + covered 
-						      * nightData_[ipos++]);
-		}
-	    }
-	}
+            // compute the covered fraction of the Sun's disk
+            const double covered = Overlap(sep, sun_size, p_size);
+            if (covered > 0)
+            {
+                int ipos = 3 * (j * width_ + i);
+                for (int k = 0; k < 3; k++)
+                {
+                    dayData_[ipos] = (unsigned char) ((1 - covered)
+                                                      * dayData_[ipos]
+                                                      + covered 
+                                                      * nightData_[ipos++]);
+                }
+            }
+        }
     }
 }
 
@@ -450,7 +446,7 @@ Map::AddShadow(Planet *p, const double sun_size)
 // sectors covered by angles ASI and API.
 double
 Map::Overlap(const double elong, const double sun_radius, 
-	     const double p_radius)
+             const double p_radius)
 {
     // First consider special cases 
 
@@ -462,12 +458,12 @@ Map::Overlap(const double elong, const double sun_radius,
     // radii, so one circle is contained within the other
     if (elong < fabs(sun_radius - p_radius))
     {
-	// Sun is completely covered
-	if (sun_radius < p_radius) return(1);
+        // Sun is completely covered
+        if (sun_radius < p_radius) return(1);
 
-	// Annular eclipse
-	const double ratio = p_radius/sun_radius;
-	return(ratio*ratio);
+        // Annular eclipse
+        const double ratio = p_radius/sun_radius;
+        return(ratio*ratio);
     }
     
     const double d = elong;
@@ -494,7 +490,7 @@ Map::Overlap(const double elong, const double sun_radius,
     const double sect_API = API;
 
     double coverage = (r0sq * (sect_ASI - area_ASI) 
-		       + r1sq * (sect_API - area_API));
+                       + r1sq * (sect_API - area_API));
     coverage /= (M_PI * r0sq);
 
     return(coverage);
@@ -507,11 +503,11 @@ Map::Reduce(const int factor)
     if (factor < 1) return;
 
     Options *options = Options::getInstance();
-    if (options->Verbosity() > 1) 
+    if (options->Verbosity() > 1)
     {
-	stringstream msg;
-	msg << "Shrinking map by 2^" << factor << "\n";;
-	xpMsg(msg.str(), __FILE__, __LINE__);
+        stringstream msg;
+        msg << "Shrinking map by 2^" << factor << "\n";;
+        xpMsg(msg.str(), __FILE__, __LINE__);
     }
 
     int scale = 1;
@@ -524,9 +520,9 @@ Map::Reduce(const int factor)
 
     if (w < min_width) 
     {
-	w = min_width;
-	h = min_width/2;
-	scale = width_/w;
+        w = min_width;
+        h = min_width/2;
+        scale = width_/w;
     }
 
     const double scale2 = scale*scale;
@@ -542,19 +538,19 @@ Map::Reduce(const int factor)
     int ipos = 0;
     for (int j = 0; j < height_; j++)
     {
-	const int js = j / scale;
-	for (int i = 0; i < width_; i++)
-	{
-	    const int is = i/scale;
-	    for (int k = 0; k < 3; k++)
-		average[3*(js*w+is)+k] += (double) (mapData_[3*ipos+k]);
+        const int js = j / scale;
+        for (int i = 0; i < width_; i++)
+        {
+            const int is = i/scale;
+            for (int k = 0; k < 3; k++)
+                average[3*(js*w+is)+k] += (double) (mapData_[3*ipos+k]);
 
-	    ipos++;
-	}
+            ipos++;
+        }
     }
 
     for (int i = 0; i < 3*new_area; i++)
-	new_data[i] = (unsigned char) (average[i]/scale2);
+        new_data[i] = (unsigned char) (average[i]/scale2);
 
     delete [] average;
     delete [] mapData_;
@@ -578,11 +574,11 @@ Map::GetPixel(const double lat, double lon, unsigned char pixel[3]) const
     double x = (lon - startLon_)/delLon_;
     if (targetProperties_->MapBounds())
     {
-	if (x < 0 || x >= width_)
-	{
-	    memcpy(pixel, color_, 3);
-	    return;
-	}
+        if (x < 0 || x >= width_)
+        {
+            memcpy(pixel, color_, 3);
+            return;
+        }
     }
 
     if (x < -0.5) x = -0.5;
@@ -596,11 +592,11 @@ Map::GetPixel(const double lat, double lon, unsigned char pixel[3]) const
     double y = (startLat_ - lat)/delLat_;
     if (targetProperties_->MapBounds())
     {
-	if (y < 0 || y >= height_)
-	{
-	    memcpy(pixel, color_, 3);
-	    return;
-	}
+        if (y < 0 || y >= height_)
+        {
+            memcpy(pixel, color_, 3);
+            return;
+        }
     }
 
     if (y < -0.5) y = -0.5;
@@ -626,14 +622,14 @@ Map::GetPixel(const double lat, double lon, unsigned char pixel[3]) const
     memset(pixel, 0, 3);
     for (int i = 0; i < 4; i++)
     {
-	for (int j = 0; j < 3; j++)
-	    pixel[j] += (unsigned char) (weight[i] * pixels[i][j]);
+        for (int j = 0; j < 3; j++)
+            pixel[j] += (unsigned char) (weight[i] * pixels[i][j]);
     }
 }
 
 void
 Map::CopyBlock(unsigned char *dest, unsigned char *src,
-	       const int x1, const int y1, int x2, int y2)
+               const int x1, const int y1, int x2, int y2)
 {
     for (int j = y1; j < y2; j++)
     {
@@ -651,127 +647,187 @@ Map::CreateMap()
     sunloc[2] = sin(sunLat_);
 
     double point[3];
-    const double border = sin(6 * deg_to_rad);
+    const double border = sin(targetProperties_->Twilight() * deg_to_rad);
     
-    // break the image up into a 100x100 grid
-    const int sections = 100;
-
-    int jstep = height_/sections;
-    if (jstep == 0) jstep = 1;
-
-    int istep = width_/sections;
-    if (istep == 0) istep = 1; 
-
-    for (int j = 0; j < height_; j += jstep)
+    if (border == 0)
     {
-	int uly = j;
-	int lry = uly + jstep;
-	if (lry >= height_) lry = height_ - 1;
-	double lat = latArray_[(uly + lry)/2];
-	double cos_lat = cos(lat);
-	double sin_lat = sin(lat);
+        // number of rows at top and bottom that are in polar day/night
+        const int ipolar = abs(static_cast<int>(sunLat_/delLat_));
 
-	for (int i = 0; i < width_; i += istep)
-	{
-	    int ulx = i;
-	    int lrx = ulx + istep;
-	    if (lrx >= width_) lrx = width_ - 1;
-	    double cos_lon = cos(lonArray_[(ulx + lrx)/2]);
-	    double sin_lon = sin(lonArray_[(ulx + lrx)/2]);
-	    
-	    point[0] = cos_lat * cos_lon;
-	    point[1] = cos_lat * sin_lon;
-	    point[2] = sin_lat;
+        if (sunLat_ < 0) // North pole is dark
+            CopyBlock(mapData_, nightData_, 0, 0, width_, ipolar);
+        else             // South pole is dark
+            CopyBlock(mapData_, nightData_, 0, height_ - ipolar, 
+                      width_, height_);
 
-	    double x = dot(point, sunloc);
-	    if (x < -2*border)  // NIGHT
-	    {
-		CopyBlock(mapData_, nightData_, ulx, uly, lrx+1, lry+1);
-	    }
-	    else if (x < 2*border ) // TWILIGHT
-	    {
-		for (int jj = uly; jj <= lry; jj++)
-		{
-		    lat = latArray_[jj];
-		    cos_lat = cos(lat);
-		    sin_lat = sin(lat);
+        // subsolar longitude pixel column - this is where it's noon
+        int inoon = static_cast<int> (width_/2 
+                                      * (sunLon_ * target_->Flipped() 
+                                         / M_PI - 1));
+        while (inoon < 0) inoon += width_;
+        while (inoon >= width_) inoon -= width_;
 
-		    for (int ii = ulx; ii <= lrx; ii++)
-		    {
-			cos_lon = cos(lonArray_[ii]);
-			sin_lon = sin(lonArray_[ii]);
+        for (int i = ipolar; i < height_ - ipolar; i++)
+        {
+            double length_of_day;
 
-			point[0] = cos_lat * cos_lon;
-			point[1] = cos_lat * sin_lon;
-			point[2] = sin_lat;
+            /* compute length of daylight as a fraction of the day at
+               the current latitude.  Based on Chapter 42 of
+               Astronomical Formulae for Calculators by Meeus. */
 
-			double dayweight = ((border + dot(point, sunloc))
-					    / (2 * border));
-			int ipos = 3 * (jj * width_ + ii);
-			if (dayweight < 0)
-			{
-			    memcpy(mapData_ + ipos, nightData_ + ipos, 3);
-			}
-			else if (dayweight < 1) 
-			{
-			    dayweight = (1 - cos(dayweight * M_PI)) / 2;
-			    for (int k = 0; k < 3; k++)
-			    {
-				double color = (dayweight * dayData_[ipos] 
-						+ ((1 - dayweight) 
-						   * nightData_[ipos]));
-				mapData_[ipos++] = (unsigned char) color;
-			    }
-			}
-		    } // for ( ii = ... ) block
-		}     // for ( jj = ... ) block
-	    }         // end TWILIGHT block
-	}
+            double H0 = tan(latArray_[i]) * tan(sunLat_);
+            if (H0 > 1) 
+                length_of_day = 1;
+            else if (H0 < -1) 
+                length_of_day = 0;
+            else 
+                length_of_day = 1 - (acos(H0) / M_PI);
+
+            // idark = number of pixels that are in darkness at the
+            // current latitude
+            int idark = static_cast<int> (width_ * (1 - length_of_day));
+
+            // ilight = number of pixels from noon to the terminator
+            int ilight = (width_ - idark)/2;
+
+            // start at the evening terminator
+            int start_row = i * width_;
+            int ipos = inoon + ilight;
+
+            for (int j = 0; j < idark; j++)
+            {
+                if (ipos >= width_) ipos -= width_;
+                memcpy(mapData_ + 3 * (start_row + ipos),
+                       nightData_ + 3 * (start_row + ipos), 3);
+                ipos++;
+            }
+        }       
     }
+    else
+    {
+        // break the image up into a 100x100 grid
+        const int sections = 100;
 
+        int jstep = height_/sections;
+        if (jstep == 0) jstep = 1;
+
+        int istep = width_/sections;
+        if (istep == 0) istep = 1; 
+
+        for (int j = 0; j < height_; j += jstep)
+        {
+            int uly = j;
+            int lry = uly + jstep;
+            if (lry >= height_) lry = height_ - 1;
+            double lat = latArray_[(uly + lry)/2];
+            double cos_lat = cos(lat);
+            double sin_lat = sin(lat);
+
+            for (int i = 0; i < width_; i += istep)
+            {
+                int ulx = i;
+                int lrx = ulx + istep;
+                if (lrx >= width_) lrx = width_ - 1;
+                double cos_lon = cos(lonArray_[(ulx + lrx)/2]);
+                double sin_lon = sin(lonArray_[(ulx + lrx)/2]);
+            
+                point[0] = cos_lat * cos_lon;
+                point[1] = cos_lat * sin_lon;
+                point[2] = sin_lat;
+
+                double x = dot(point, sunloc);
+
+                if (x < -2*border)  // NIGHT
+                {
+                    CopyBlock(mapData_, nightData_, ulx, uly, lrx+1, lry+1);
+                }
+                else if (x < 2*border ) // TWILIGHT
+                {
+                    for (int jj = uly; jj <= lry; jj++)
+                    {
+                        lat = latArray_[jj];
+                        cos_lat = cos(lat);
+                        sin_lat = sin(lat);
+
+                        for (int ii = ulx; ii <= lrx; ii++)
+                        {
+                            cos_lon = cos(lonArray_[ii]);
+                            sin_lon = sin(lonArray_[ii]);
+
+                            point[0] = cos_lat * cos_lon;
+                            point[1] = cos_lat * sin_lon;
+                            point[2] = sin_lat;
+
+                            double dayweight = ((border + dot(point, sunloc))
+                                                / (2 * border));
+                            int ipos = 3 * (jj * width_ + ii);
+                            if (dayweight < 0)
+                            {
+                                memcpy(mapData_ + ipos, nightData_ + ipos, 3);
+                            }
+                            else if (dayweight < 1) 
+                            {
+                                dayweight = (1 - cos(dayweight * M_PI)) / 2;
+                                for (int k = 0; k < 3; k++)
+                                {
+                                    double color = (dayweight * dayData_[ipos] 
+                                                    + ((1 - dayweight) 
+                                                       * nightData_[ipos]));
+                                    mapData_[ipos++] = (unsigned char) color;
+                                }
+                            }
+                        } // for ( ii = ... ) block
+                    }     // for ( jj = ... ) block
+                }         // end TWILIGHT block
+            }
+        }
+    } // end (border > 0) block
+
+    // draw the shadow of Saturn's rings on the planet
     if (target_->Index() == SATURN)
     {
-	for (int j = 0; j < height_; j++)
-	{
-	    // If this point is on the same side of the rings as
-	    // the sun, there's no shadow.  
-	    if (sunLat_ * latArray_[j] > 0) continue;
+        for (int j = 0; j < height_; j++)
+        {
+            // If this point is on the same side of the rings as
+            // the sun, there's no shadow.  
+            if (sunLat_ * latArray_[j] > 0) continue;
 
-	    const double lat = latArray_[j];
-	    const double cos_lat = cos(lat);
-	    const double sin_lat = sin(lat);
+            const double lat = latArray_[j];
+            const double cos_lat = cos(lat);
+            const double sin_lat = sin(lat);
 
-	    for (int i = 0; i < width_; i++)
-	    {
-		const double lon = lonArray_[i];
-		const double cos_lon = cos(lon);
-		const double sin_lon = sin(lon);
+            for (int i = 0; i < width_; i++)
+            {
+                const double lon = lonArray_[i];
+                const double cos_lon = cos(lon);
+                const double sin_lon = sin(lon);
 
-		point[0] = cos_lat * cos_lon;
-		point[1] = cos_lat * sin_lon;
-		point[2] = sin_lat;
-		
-		// If it's night, skip this one
-		if (dot(point, sunloc) < -2*border) continue;
-		
-		const double ring_radius = ring_->getShadowRadius(lat, lon);
-		const double ring_radius2 = ring_->getShadowRadius(lat+delLat_, lon + delLon_);
+                point[0] = cos_lat * cos_lon;
+                point[1] = cos_lat * sin_lon;
+                point[2] = sin_lat;
+                
+                // If it's night, skip this one
+                if (dot(point, sunloc) < -2*border) continue;
+                
+                const double ring_radius = ring_->getShadowRadius(lat, lon);
+                const double ring_radius2 = ring_->getShadowRadius(lat+delLat_,
+                                                                   lon + delLon_);
 
-		const double dpp = 2*fabs(ring_radius2 - ring_radius);
-		ring_->setDistPerPixel(dpp);
+                const double dpp = 2*fabs(ring_radius2 - ring_radius);
+                ring_->setDistPerPixel(dpp);
 
-		double t = ring_->getTransparency(ring_radius);	
-		if (t > 0)
-		{
-		    int ipos = 3 * (j * width_ + i);
-		    for (int k = 0; k < 3; k++)
-		    {
-			double color = (t * mapData_[ipos] 
-					+ ((1 - t) * nightData_[ipos]));
-			mapData_[ipos++] = (unsigned char) color;
-		    }
-		}
-	    }
-	}
+                double t = ring_->getTransparency(ring_radius); 
+                if (t > 0)
+                {
+                    int ipos = 3 * (j * width_ + i);
+                    for (int k = 0; k < 3; k++)
+                    {
+                        double color = (t * mapData_[ipos] 
+                                        + ((1 - t) * nightData_[ipos]));
+                        mapData_[ipos++] = (unsigned char) color;
+                    }
+                }
+            }
+        }
     }
 }
