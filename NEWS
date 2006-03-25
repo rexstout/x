@@ -1,0 +1,84 @@
+Original version written by Frank Solensky <solenskyf@acm.org>,
+updates by Hari Nair <hari@alumni.caltech.edu>
+
+This file is aimed at those who are upgrading from earlier versions of
+xplanet.
+
+The first thing you should be aware of is that the default behaviour
+of xplanet is to change the display of the root window.  As a result,
+the "xplanetbg" program is no longer needed and should be removed.
+To get the same behavior as xplanetbg, run xplanet as a background
+process and ignore output ("xplanet [options] 2>/dev/null &")
+
+The command line interface has changed significantly as well.  The
+format of some options has been changed while other options may only
+be specified in the configuration file.  If an option isn't described
+in this file, it can be used as before.
+
+Input image dimensions should be powers of 2, where the height is half
+the width (e.g. 2048x1024).  Other image dimensions will work, but
+will be slower and may not look as good.  Input images are specified
+in the configuration file.
+
+Command line argument changes:
+
+Version 0.95                    Version 1.0
+------------                    -----------
+-center <x>,<y>                 -center <x><+y>
+-date "%d %b %Y %H:%M:%S" [specifying local time]
+                                -date %Y%b%d.%H%M%S [specifying GMT]
+-dayside                        -origin sun
+-earthside                      -origin earth
+-moonside                       -origin moon
+-nightside                      -origin -sun
+
+
+The following command line options should instead be set as parameters in
+the file specified with the '-config' option or the file "config/default"
+in the '-searchdir' directory.
+
+cloud_gamma <number>            cloud_gamma=<number>
+cloud_image <cloud_file>        cloud_map=<file>
+cloud_threshold <number>        cloud_threshold=<number>
+grid                            grid=true
+grid1 <number>                  grid1=<number>
+grid2 <number>                  grid2=<number>
+markers                         marker_file=<file>
+markerfile                      marker_file=<file>
+night_image <file>              night_map=<file>
+satfile <file>                  satellite_file=<file>
+shade <number>                  shade=<number>
+specular_file <file>            specular_map=<file>
+
+
+Finally, these options are not currently supported
+
+-animate
+-blend
+-cloud_shade <number>
+-cloud_ssec <file>
+-demfile <file>
+-demscale <demscale>
+-fontdir <dir>
+-fullscreen
+-fuzz <fuzz>
+-greatarcfile <file>
+-labelformat <string>
+-labelname
+-labelrot
+-mapdir <dir>
+-mapbounds <lat1,lon1,lat2,lon2>
+-nice <number>
+-notransparency
+-orbit <spec>
+-print_coords
+-root
+-sattrackid <id>
+-spacing <number>
+-start_cloud <file>
+-start_index <number>
+-stop_cloud <file>
+-sunrel <number,number>
+-swap
+-terminator <termtype>
+-truetype
