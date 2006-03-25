@@ -1,0 +1,24 @@
+Use gettext for date string
+
+Java gui
+
+pick up satellite locations from a PREDICT server
+
+use iconv library for marker files in different character sets
+
+label stars
+
+draw ellipsoidal planets
+
+---
+
+Colors aren't right for antialiased lines?
+
+make cygwin optional in configure
+
+Use pango for text rendering
+
+-dynamic_origin
+
+specify -origin and -range together
+
