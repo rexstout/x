@@ -180,13 +180,13 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         }
     }
 
-    time_t tv_sec = options->getTVSec();
+    time_t tv_sec = options->TVSec();
     string timeString;
     if (tv_sec == (time_t) (-1))
     {
         int year, month, day, hour, min;
         double sec;
-        double jd = options->getJulianDay();
+        double jd = options->JulianDay();
         fromJulian(jd, year, month, day, hour, min, sec);
 
         char timeBuffer[MAX_LINE_LENGTH];
@@ -333,7 +333,8 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         }
 
         labelLines.push_back(fovCString);
-        labelLines.push_back(distString);
+        if (options->getTarget() != ALONG_PATH) 
+            labelLines.push_back(distString);
 
         if (options->TargetMode() != LOOKAT 
             && target != SUN)

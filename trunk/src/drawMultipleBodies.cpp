@@ -11,6 +11,7 @@ using namespace std;
 #include "buildPlanetMap.h"
 #include "config.h"
 #include "createMap.h"
+#include "findBodyXYZ.h"
 #include "findFile.h"
 #include "keywords.h"
 #include "Map.h"
@@ -43,6 +44,7 @@ arrangeMarkers(multimap<double, Annotation *> &annotationMap,
 
 void
 drawMultipleBodies(DisplayBase *display, Planet *target, 
+                   const double upX, const double upY, const double upZ, 
                    map<double, Planet *> &planetsFromSunMap,
                    PlanetProperties *planetProperties[])
 {
@@ -85,10 +87,11 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
             {
                 char buffer[128];
                 snprintf(buffer, 128, 
-                         "target dist = %12.6f, in units of radius = %12.6f\n", 
+                         "target dist = %12.6f, in units of radius = %12.6f\n",
                          target_dist,
-                         target_dist / (planetProperties[target->Index()]->Magnify()
-                                        * target->Radius()));
+                         target_dist 
+                         / (planetProperties[target->Index()]->Magnify()
+                            * target->Radius()));
                 xpMsg(buffer, __FILE__, __LINE__);
             }
         }
@@ -117,7 +120,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         
         if (options->TargetMode() != LOOKAT)
         {
-            const double target_angular_radius = target->Radius() / target_dist;
+            const double target_angular_radius = target->Radius()/target_dist;
             double target_pixel_radius = (target_angular_radius 
                                           * pixels_per_radian);
             
@@ -148,58 +151,21 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         xpMsg(msg.str(), __FILE__, __LINE__);
     }
 
-    // Set the view matrix
-    double upX, upY, upZ;
-    switch (options->North())
+    // Put the primary in the center of the field of view when looking
+    // from above or below
+    if (options->OriginMode() == ABOVE
+        || options->OriginMode() == BELOW)
     {
-    default:
-        xpWarn("Unknown value for north, using body\n", __FILE__, __LINE__);
-    case BODY:
-        target->getBodyNorth(upX, upY, upZ);
-        break;
-    case GALACTIC:
-        target->getGalacticNorth(upX, upY, upZ);
-        break;
-    case ORBIT:
-    {
-        // if it's a moon, pretend its orbital north is the same as
-        // its primary, although in most cases it's the same as its
-        // primary's rotational north
-        if (target->Primary() == SUN)
-        {
-            target->getOrbitalNorth(upX, upY, upZ);
-        }
-        else
-        {
-            Planet *primary = findPlanetinMap(planetsFromSunMap, 
-                                              target->Primary());
-            primary->getOrbitalNorth(upX, upY, upZ);
-        }
-    }
-    break;
-    case TERRESTRIAL:
-        upX=0;
-        upY=0;
-        upZ=1;
-        break;
-    }
-
-    if (options->TargetMode() != LOOKAT)
-    {
-        // Put the primary in the center of the field of view when looking
-        // from above or below
-        if (options->OriginMode() == ABOVE
-            || options->OriginMode() == BELOW)
-        {
-            Planet *primary = findPlanetinMap(planetsFromSunMap, 
-                                              target->Primary());
-            primary->getPosition(tX, tY, tZ);
-        }
+        findBodyXYZ(options->JulianDay(), options->getPrimary(), 
+                    -1, tX, tY, tZ);
     }
 
     View *view = new View(oX, oY, oZ, tX, tY, tZ, 
-                          upX*1e6, upY*1e6, upZ*1e6, 
-                          dist_per_pixel, options->getRotate());
+                          upX * FAR_DISTANCE, 
+                          upY * FAR_DISTANCE, 
+                          upZ * FAR_DISTANCE, 
+                          dist_per_pixel, 
+                          options->Rotate());
 
     multimap<double, Annotation *> annotationMap;
     annotationMap.clear();
@@ -236,7 +202,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                 light_time /= 86400;
             }
 
-            addOrbits(options->getJulianDay() - light_time, 
+            addOrbits(options->JulianDay() - light_time, 
                       view, width, height, 
                       current_planet, 
                       currentProperties,
@@ -251,8 +217,8 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         // Get the pixel location of this body
         double X, Y, Z;
         view->XYZToPixel(pX, pY, pZ, X, Y, Z);
-        X += options->getCenterX();
-        Y += options->getCenterY();
+        X += options->CenterX();
+        Y += options->CenterY();
 
         // only annotate the image if it's big enough
         if (currentProperties->MinRadiusForMarkers() < pixel_radius)
@@ -273,20 +239,21 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
         // Even if the disk of the Sun or Saturn is off the
         // screen, we still want to draw the glare or the rings.
+        double multFactor = fabs(current_planet->Radius() / Z);
+        if (multFactor < 1) multFactor = 1;
         if (b == SUN) 
-            pixel_radius *= 28;
+            multFactor = 28;
         else if (b == SATURN) 
-            pixel_radius *= 2.32166;
+            multFactor = 5 * multFactor;
+
+        pixel_radius *= multFactor;
 
         // if it's behind us or off the screen, skip this one
-        if (Z < 0 
+        if (Z < -current_planet->Radius() * multFactor
             || X < -pixel_radius || X > width + pixel_radius 
             || Y < -pixel_radius || Y > height + pixel_radius) continue;
         
-        if (b == SUN) 
-            pixel_radius /= 28;
-        else if (b == SATURN) 
-            pixel_radius /= 2.32166;
+        pixel_radius /= multFactor;
         
         // Now calculate the sub-solar and sub-observer points
         double sun_lat, sun_lon;
@@ -319,10 +286,9 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     {
         ostringstream msg;
         char buffer[256];
-        snprintf(buffer, 256, "%10s%14s%14s%14s%14s%14s%14s%14s%14s\n", 
+        snprintf(buffer, 256, "%10s%10s%8s%8s%8s%8s%8s%8s%8s\n", 
                  "Name", "Dist", "X", "Y", "radius",
-                 "subsolar lat", "subsolar lon", 
-                 "observer lat", "observer lon");
+                 "sun lat", "sun lon","obs lat", "obs lon");
         msg << buffer;
         xpMsg(msg.str(), __FILE__, __LINE__);
     }
@@ -379,7 +345,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
             ostringstream msg;
             char buffer[256];
             snprintf(buffer, 256, 
-                     "%10s%14.4f%14.4f%14.4f%14.4f%14.4f%14.4f%14.4f%14.4f\n", 
+                     "%10s%10.4f%8.1f%8.1f%8.1f%8.2f%8.2f%8.2f%8.2f\n", 
                      currentProperties->Name().c_str(), 
                      dist_to_planet, pX, pY, pR, 
                      sLat/deg_to_rad, sLon/deg_to_rad, 

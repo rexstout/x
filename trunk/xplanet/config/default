@@ -13,6 +13,10 @@ cloud_gamma=1
 
 #cloud_map=
 
+cloud_ssec=false                # true if the cloud map is from the
+				# University of Wisconsin Space
+				# Science and Engineering Center 
+
 cloud_threshold=90
 
 color={255,255,255}             # fallback color in case an image map

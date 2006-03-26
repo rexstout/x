@@ -29,8 +29,8 @@ sphericalToPixel(const double lat, const double lon, const double rad,
 
         Options *options = Options::getInstance();
         view->XYZToPixel(X, Y, Z, X, Y, Z);
-        X += options->getCenterX();
-        Y += options->getCenterY();
+        X += options->CenterX();
+        Y += options->CenterY();
         
         // true if the point is in front of us
         returnVal = (Z > 0);

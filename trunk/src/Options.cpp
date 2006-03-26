@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include "keywords.h"
+#include "findBodyXYZ.h"
 #include "Options.h"
 #include "PlanetProperties.h"
 
@@ -37,6 +38,9 @@ extern "C" {
 
 extern void 
 parseColor(string color, unsigned char RGB[3]);
+
+extern void
+printVersion();
 
 Options* Options::instance_ = NULL;
 
@@ -54,7 +58,6 @@ Options::~Options()
 
 Options::Options() :
     background_(""),
-    base_(""),
     baseMag_(10.0),
     centerSelected_(false),
     configFile_(defaultConfigFile),
@@ -63,7 +66,6 @@ Options::Options() :
     drawLabel_(false),
     drawUTCLabel_(false),
     dynamicOrigin_(""),
-    extension_(defaultMapExt),
     font_(defaultFont),
     fontSize_(12),
     fork_(false), 
@@ -93,10 +95,16 @@ Options::Options() :
     originFile_(""),
     originID_(0),
     originMode_(LBR),
+    originSet_(false),
+    outputBase_(""),
+    outputExt_(defaultMapExt),
+    outputStartIndex_(0),
     oX_(0),
     oY_(0),
     oZ_(0),
     pango_(false),
+    pathRelativeTo_(SUN),
+    pathRelativeToID_(-1),
     post_command_(""),
     prev_command_(""),
     primary_(SUN),
@@ -108,16 +116,17 @@ Options::Options() :
     random_(false),
     rangeSpecified_(false), 
     range_(1000),
-    rotate(0),
-    rotate0(0),
+    rotate_(0),
+    rotate0_(0),
     saveDesktopFile_(false), 
     starFreq_(0.001),
     star_map(defaultStarMap),
     sunLat_(0),
     sunLon_(0),
     target_(EARTH),
-    targetMode_(BODY),
     targetID_(0),
+    targetMode_(BODY),
+    targetSet_(false),
     timewarp(1),
     tmpDir_(""),
     transparency_(false),
@@ -213,7 +222,9 @@ Options::parseArgs(int argc, char **argv)
             {"origin",         required_argument, NULL, ORIGIN},
             {"origin_file",    required_argument, NULL, ORIGINFILE},
             {"output",         required_argument, NULL, OUTPUT},
+            {"output_start_index",required_argument,NULL,OUTPUT_START_INDEX},
             {"pango",          no_argument,       NULL, PANGO},
+            {"path_relative_to",         required_argument, NULL, PATH_RELATIVE_TO},
             {"post_command",   required_argument, NULL, POST_COMMAND},
             {"prev_command",   required_argument, NULL, PREV_COMMAND},
             {"print_ephemeris",no_argument,       NULL, EPHEMERIS},
@@ -271,8 +282,8 @@ Options::parseArgs(int argc, char **argv)
             int x, y;
             int mask = XParseGeometry(optarg, &x, &y, &w, &h);
             centerSelected_ = ((mask & XValue) && (mask & YValue));
-            center_x = x;
-            center_y = y;
+            centerX_ = x;
+            centerY_ = y;
         }
         break;
         case COLOR:
@@ -342,9 +353,9 @@ Options::parseArgs(int argc, char **argv)
 #endif
         }
         break;
-	case FORK:
-	    fork_ = true;
-	    break;
+        case FORK:
+            fork_ = true;
+            break;
         case FOV:
             sscanf(optarg, "%lf", &fov_);
             if (fov_ <= 0) 
@@ -453,10 +464,12 @@ Options::parseArgs(int argc, char **argv)
             char *lowercase = optarg;
             char *ptr = optarg;
             while (*ptr) *ptr++ = tolower(*optarg++);
-            if (strncmp(lowercase, "orbit", 1) == 0)
-                north_ = ORBIT;
-            else if (strncmp(lowercase, "galactic", 1) == 0)
+            if (strncmp(lowercase, "galactic", 1) == 0)
                 north_ = GALACTIC;
+            else if (strncmp(lowercase, "orbit", 1) == 0)
+                north_ = ORBIT;
+            else if (strncmp(lowercase, "path", 1) == 0)
+                north_ = PATH;
             else if (strncmp(lowercase, "terrestrial", 1) == 0)
                 north_ = TERRESTRIAL;
             else 
@@ -526,8 +539,9 @@ Options::parseArgs(int argc, char **argv)
             case SAME_SYSTEM:
                 originMode_ = SYSTEM;
                 break;
+            case ALONG_PATH:
             case UNKNOWN_BODY:
-                xpWarn("Unknown origin specified, using SUN\n",
+                xpWarn("Invalid origin specified, using SUN\n",
                        __FILE__, __LINE__);
                 origin_ = SUN;
             default:
@@ -542,20 +556,25 @@ Options::parseArgs(int argc, char **argv)
             break;
         case TRANSPNG:
             transpng_ = true;
+            // fall through to OUTPUT block
         case OUTPUT:
-            base_ = optarg;
-            if (base_.find('.') == string::npos)
+            outputBase_ = optarg;
+            if (outputBase_.find('.') == string::npos)
             {
-                extension_ = defaultMapExt;
+                outputExt_ = defaultMapExt;
             }
             else
             {
-                extension_.assign(base_, base_.find('.'), base_.size());
-                base_.assign(base_, 0, base_.find('.'));
+                outputExt_.assign(outputBase_, outputBase_.rfind('.'), 
+                                  outputBase_.size());
+                outputBase_.assign(outputBase_, 0, outputBase_.rfind('.'));
             }
 
             displayMode_ = OUTPUT;
             geometrySelected_ = true;
+            break;
+        case OUTPUT_START_INDEX:
+            sscanf(optarg, "%d", &outputStartIndex_);
             break;
         case PANGO:
 #ifdef HAVE_LIBPANGOFT2 
@@ -570,6 +589,51 @@ Options::parseArgs(int argc, char **argv)
             }
 #endif
             break;
+        case PATH_RELATIVE_TO:
+            pathRelativeTo_ = Planet::parseBodyName(optarg);
+            switch (pathRelativeTo_)
+            {
+            case NAIF:
+                if (strlen(optarg) < 5)
+                {
+                    ostringstream errMsg;
+                    errMsg << "NAIF id must be specified "
+                           << "(e.g. naif-82 for Cassini)\n";
+                    xpWarn(errMsg.str(), __FILE__, __LINE__);
+                }
+                else
+                {
+                    sscanf(optarg+4, "%d", &pathRelativeToID_);
+                }
+                break;
+            case NORAD:
+                if (strlen(optarg) < 6)
+                {
+                    ostringstream errMsg;
+                    errMsg << "NORAD id must be specified "
+                           << "(e.g. NORAD20580 for Hubble)\n";
+                    xpWarn(errMsg.str(), __FILE__, __LINE__);
+                }
+                else
+                {
+                    sscanf(optarg+5, "%d", &pathRelativeToID_);
+                }
+                break;
+            case RANDOM_BODY:
+            case ABOVE_ORBIT:
+            case ALONG_PATH:
+            case BELOW_ORBIT:
+            case DEFAULT:
+            case MAJOR_PLANET:
+            case SAME_SYSTEM:
+            case UNKNOWN_BODY:
+                xpWarn("Unknown body specified for path, using SUN\n",
+                       __FILE__, __LINE__);
+                pathRelativeTo_ = SUN;
+            default:
+                break;
+            }
+            break;      
         case POST_COMMAND:
             post_command_.assign(optarg);
             break;
@@ -609,9 +673,9 @@ Options::parseArgs(int argc, char **argv)
             }
             break;
         case ROTATE:
-            sscanf(optarg, "%lf", &rotate0);
-            rotate0 = fmod(rotate0, 360.) * deg_to_rad;
-            rotate = rotate0;
+            sscanf(optarg, "%lf", &rotate0_);
+            rotate0_ = fmod(rotate0_, 360.) * deg_to_rad;
+            rotate_ = rotate0_;
             break;
         case SAVE_DESKTOP_FILE:
             saveDesktopFile_ = true;
@@ -661,6 +725,9 @@ Options::parseArgs(int argc, char **argv)
             target_ = Planet::parseBodyName(optarg);
             switch (target_)
             {
+            case ALONG_PATH:
+                targetMode_ = LOOKAT;
+                break;
             case MAJOR_PLANET:
                 targetMode_ = MAJOR;
                 break;
@@ -729,11 +796,7 @@ Options::parseArgs(int argc, char **argv)
             sscanf(optarg, "%d", &verbosity_);
             break;
         case VERSIONNUMBER:
-            cout << "Xplanet " << VERSION << endl
-                 << "Copyright (C) 2004 "
-                 << "Hari Nair <hari@alumni.caltech.edu>" << endl;
-            cout << "The latest version can be found at "
-                 << "http://xplanet.sourceforge.net\n";
+            printVersion();
             exit(EXIT_SUCCESS);
             break;
         case VROOT:
@@ -816,6 +879,8 @@ Options::parseArgs(int argc, char **argv)
     if (!originFile_.empty()
         || !dynamicOrigin_.empty()) originMode_ = LBR;
 
+    // A number of options are meaningless if we're not looking at a
+    // planetary body.
     if (targetMode_ == LOOKAT)
     {
         if (projectionMode_ != MULTIPLE)
@@ -832,7 +897,11 @@ Options::parseArgs(int argc, char **argv)
             fov_ = 45 * deg_to_rad;
             fovMode_ = FOV;
         }
-        north_ = TERRESTRIAL;
+
+        if (north_ == BODY || north_ == ORBIT)
+        {
+            north_ = TERRESTRIAL;
+        }
     }
 }
 
@@ -842,6 +911,14 @@ Options::getOrigin(double &X, double &Y, double &Z)
     X = oX_;
     Y = oY_;
     Z = oZ_;
+}
+
+void
+Options::setOrigin(const double X, const double Y, const double Z)
+{
+    oX_ = X;
+    oY_ = Y;
+    oZ_ = Z;
 }
 
 void
@@ -876,43 +953,20 @@ Options::setOrigin(PlanetProperties *planetProperties[])
             latitude_ = (random() % 2000)/1000.0 - 1;
             latitude_ = asin(latitude_);
 
-            rotate0 = random() % 360;
-            rotate0 *= deg_to_rad;
-            rotate = rotate0;
+            rotate0_ = random() % 360;
+            rotate0_ *= deg_to_rad;
+            rotate_ = rotate0_;
         }
         
-        if (origin_ == NAIF)
+        if (origin_ == NAIF || origin_ == NORAD)
         {
-#ifdef HAVE_CSPICE
-            Planet Sun(julianDay_, SUN);
-            Sun.calcHeliocentricEquatorial();
-            calculateSpicePosition(julianDay_, originID_, &Sun, 10, 
-                                   oX_, oY_, oZ_);
-#else
-            ostringstream errStr;
-            errStr << "Xplanet was compiled without SPICE support.\n";
-            xpWarn(errStr.str(), __FILE__, __LINE__);
-#endif
-        }
-        else if (origin_ == NORAD)
-        {
-            double lat, lon, rad;
-            if (calculateSatellitePosition(tv_sec, originID_, lat, lon, rad))
-            {
-                Planet earth(julianDay_, EARTH);
-                earth.calcHeliocentricEquatorial();
-                earth.PlanetographicToXYZ(oX_, oY_, oZ_, lat, lon, rad);
-            }
-            else
-            {
-                ostringstream errStr;
-                errStr << "Can't set origin to satellite # " << originID_
-                       << ".\n";
-                xpWarn(errStr.str(), __FILE__, __LINE__);
-            }
+            findBodyXYZ(julianDay_, origin_, originID_, oX_, oY_, oZ_);
         }
         else
         {
+            if (!targetSet_)
+                xpExit("Target body not set!\n", __FILE__, __LINE__);
+
             body referenceBody = target_;
             if (!originFile_.empty()
                 || !dynamicOrigin_.empty()) referenceBody = origin_;
@@ -938,6 +992,10 @@ Options::setOrigin(PlanetProperties *planetProperties[])
     case RANDOM:
     case SYSTEM:
     {
+        if (!targetSet_)
+            xpExit("Target body not set!\n", __FILE__, __LINE__);
+
+        // check to see that at least one body has random_origin=true
         bool no_random_origin = true;
         for (int i = 0; i < RANDOM_BODY; i++)
         {
@@ -1005,9 +1063,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
     // fall through
     case BODY:
     {
-        Planet p(julianDay_, origin_);
-        p.calcHeliocentricEquatorial(); 
-        p.getPosition(oX_, oY_, oZ_);
+        findBodyXYZ(julianDay_, origin_, originID_, oX_, oY_, oZ_);
 
         if (oppositeSide_)
         {
@@ -1020,33 +1076,27 @@ Options::setOrigin(PlanetProperties *planetProperties[])
     case ABOVE:
     case BELOW:
     {
-        const double delT = 0.1;
-
-        double tmX, tmY, tmZ;
-        Planet tm(julianDay_ - delT/2, target_);
-        tm.calcHeliocentricEquatorial(false); 
-        tm.getPosition(tmX, tmY, tmZ);
-
-        double tpX, tpY, tpZ;
-        Planet tp(julianDay_ + delT/2, target_);
-        tp.calcHeliocentricEquatorial(false); 
-        tp.getPosition(tpX, tpY, tpZ);
+        if (!targetSet_)
+            xpExit("Target body not set!\n", __FILE__, __LINE__);
 
         double pX, pY, pZ;
-        Planet primary(julianDay_, primary_);
-        primary.calcHeliocentricEquatorial(); 
-        primary.getPosition(pX, pY, pZ);
+        findBodyXYZ(julianDay_, primary_, -1, pX, pY, pZ);
+
+        double vX, vY, vZ;
+        findBodyVelocity(julianDay_, target_, targetID_, primary_, -1, 
+                         vX, vY, vZ);
 
         // cross product of position and velocity vectors points to the
         // orbital north pole
         double pos[3] = { tX_ - pX, tY_ - pY, tZ_ - pZ };
-        double vel[3] = { (tpX - tmX)/delT, (tpY - tmY)/delT, (tpZ - tmZ)/delT };
+        double vel[3] = { vX, vY, vZ };
 
         double north[3];
         cross(pos, vel, north);
 
         double mag = sqrt(dot(north, north));
-        double dist = 1e6 * primary.Radius();
+        Planet primary(julianDay_, primary_);
+        double dist = FAR_DISTANCE * primary.Radius();
         
         oX_ = dist * north[0]/mag + pX;
         oY_ = dist * north[1]/mag + pY;
@@ -1072,7 +1122,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
     break;
     }
 
-    if (rangeSpecified_)
+    if (rangeSpecified_ && targetMode_ != LOOKAT)
     {
         Planet p2(julianDay_, target_);
         p2.calcHeliocentricEquatorial(); 
@@ -1081,6 +1131,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
         p2.PlanetographicToXYZ(oX_, oY_, oZ_, latitude_, longitude_, 
                                range_);
     }
+    originSet_ = true;
 }
 
 void
@@ -1127,53 +1178,46 @@ Options::setTarget(PlanetProperties *planetProperties[])
     case BODY:
     {
         Planet t(julianDay_, target_);
-        t.calcHeliocentricEquatorial(); 
-        t.getPosition(tX_, tY_, tZ_);
-        
         primary_ = t.Primary();
     }
     break;
     case LOOKAT:
-        if (target_ == NAIF)
+        if (target_ == NAIF
+            || target_ == ALONG_PATH)
         {
-#ifdef HAVE_CSPICE
-            Planet Sun(julianDay_, SUN);
-            Sun.calcHeliocentricEquatorial();
-            calculateSpicePosition(julianDay_, targetID_, &Sun, 10, 
-                                   tX_, tY_, tZ_);
             primary_ = SUN;
-#else
-            ostringstream errStr;
-            errStr << "Xplanet was compiled without SPICE support.\n";
-            xpWarn(errStr.str(), __FILE__, __LINE__);
-#endif
         }
         else if (target_ == NORAD)
         {
-            double lat, lon, rad;
-            if (calculateSatellitePosition(tv_sec, targetID_, lat, lon, rad))
-            {
-                Planet earth(julianDay_, EARTH);
-                earth.calcHeliocentricEquatorial();
-                earth.PlanetographicToXYZ(tX_, tY_, tZ_, lat, lon, rad);
-            }
-            else
-            {
-                ostringstream errStr;
-                errStr << "Can't set origin to satellite # " << originID_
-                       << ".\n";
-                xpWarn(errStr.str(), __FILE__, __LINE__);
-            }
             primary_ = EARTH;
         }
         break;
+    default:
+        xpExit("Unknown target mode?\n", __FILE__, __LINE__);
     }
+
+    if (target_ == ALONG_PATH)
+    {
+        findBodyVelocity(julianDay_, origin_, originID_, 
+                         pathRelativeTo_, pathRelativeToID_, 
+                         tX_, tY_, tZ_);
+        
+        tX_ *= FAR_DISTANCE;
+        tY_ *= FAR_DISTANCE;
+        tZ_ *= FAR_DISTANCE;
+    }
+    else
+    {
+        findBodyXYZ(julianDay_, target_, targetID_, tX_, tY_, tZ_);
+    }
+
+    targetSet_ = true;
 }
 
 void
-Options::incrementTime(const time_t sec)
+Options::incrementTime(const double sec)
 {
-    julianDay_ += ((double) sec)/86400;
+    julianDay_ += sec/86400;
     tv_sec = get_tv_sec(julianDay_);
 }
 

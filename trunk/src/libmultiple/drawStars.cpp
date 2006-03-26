@@ -58,8 +58,8 @@ drawStars(DisplayBase *display, View *view)
 
         double X, Y, Z;
         view->XYZToPixel(sX, sY, sZ, X, Y, Z);
-        X += options->getCenterX();
-        Y += options->getCenterY();
+        X += options->CenterX();
+        Y += options->CenterY();
 
         if (Z < 0 
             || X < 0 || X >= width

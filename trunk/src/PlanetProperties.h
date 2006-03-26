@@ -92,6 +92,9 @@ class PlanetProperties
     void NightMap(const std::string &nightMap) { nightMap_ = nightMap; };
     const std::string & NightMap() const         { return(nightMap_); };
 
+    bool SSECMap() const { return(ssecMap_); };
+    void SSECMap(bool b) { ssecMap_ = b; };
+
     void SpecularMap(const std::string &specularMap) { specularMap_ = specularMap; };
     const std::string & SpecularMap() const      { return(specularMap_); };
     
@@ -164,6 +167,8 @@ class PlanetProperties
     bool randomTarget_;
 
     std::vector<std::string> satelliteFiles_;
+
+    bool ssecMap_;
 
     double shade_;
 

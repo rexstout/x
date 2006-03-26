@@ -43,8 +43,8 @@ drawSphere(const double pX, const double pY, const double pR,
     Options *options = Options::getInstance();
 
     // compute the value of the determinant at the center of the body
-    view->PixelToViewCoordinates(options->getCenterX() - pX, 
-                                 options->getCenterY() - pY, 
+    view->PixelToViewCoordinates(options->CenterX() - pX, 
+                                 options->CenterY() - pY, 
                                  p2X, p2Y, p2Z);
     
     const double centerA = 2 * (dot(p2X - p1X, p2Y - p1Y, p2Z - p1Z, 
@@ -57,8 +57,8 @@ drawSphere(const double pX, const double pY, const double pR,
     {
         for (int i = i0; i < i1; i++)
         {
-            const double dX = options->getCenterX() - i;
-            const double dY = options->getCenterY() - j;
+            const double dX = options->CenterX() - i;
+            const double dY = options->CenterY() - j;
 
             view->PixelToViewCoordinates(dX, dY, p2X, p2Y, p2Z);
 
@@ -72,13 +72,17 @@ drawSphere(const double pX, const double pY, const double pR,
 
             double u = -(b + sqrt(determinant));
             u /= a;
-                    
+
+            // if the intersection point is behind the observer, don't
+            // plot it
+            if (u < 0) continue;
+
             // coordinates of the intersection point
             double iX, iY, iZ;
             iX = p1X + u * (p2X - p1X);
             iY = p1Y + u * (p2Y - p1Y);
             iZ = p1Z + u * (p2Z - p1Z);
-                    
+
             view->RotateToXYZ(iX, iY, iZ, iX, iY, iZ);
             planet->XYZToPlanetographic(iX, iY, iZ, lat, lon);
 

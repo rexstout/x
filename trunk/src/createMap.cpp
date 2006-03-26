@@ -14,6 +14,10 @@ using namespace std;
 #include "libimage/Image.h"
 #include "libplanet/Planet.h"
 
+extern void
+loadSSEC(Image *&image, const unsigned char *&rgb, string &imageFile, 
+	 const int imageWidth, const int imageHeight);
+
 static void
 loadRGB(Image *&image, const unsigned char *&rgb, string &imageFile, 
         const string &name, const int imageWidth, const int imageHeight)
@@ -115,8 +119,17 @@ createMap(const double sLat, const double sLon,
         
         imageFile = planetProperties->CloudMap();
         if (!imageFile.empty())
+	  {
+	    if (planetProperties->SSECMap())
+	      {
+		loadSSEC(cloud, cloudRGB, imageFile, imageWidth, imageHeight);
+	      }
+	    else
+	      {
             loadRGB(cloud, cloudRGB, imageFile, "cloud", 
                     imageWidth, imageHeight);
+	      }
+	  }
         
         m = new Map(imageWidth, imageHeight, 
                     sLat, sLon, obsLat, obsLon, 

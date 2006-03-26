@@ -62,44 +62,37 @@ cleanUpEphemeris()
 
 void
 GetHeliocentricXYZ(const body index, const body primary, 
-                   const double julianDay, 
-                   const bool relativeToSun, 
+                   const double julianDay, const bool relativeToSun, 
                    double &X, double &Y, double &Z)
 {
+#ifdef HAVE_CSPICE
     Options *options = Options::getInstance();
-
-    Ephemeris *thisEphem = NULL;
-
     vector<int> spiceList = options->SpiceEphemeris();
     for (unsigned int i = 0; i < spiceList.size(); i++)
     {
         if (naif_id[index] == spiceList[i])
         {
-#ifdef HAVE_CSPICE
-            thisEphem = ephemSpice;
-#else
-            ostringstream errStr;
-            errStr << "Can't use SPICE ephemeris for " 
-                   << body_string[index] << ".\n";
-            xpWarn(errStr.str(), __FILE__, __LINE__);
-#endif
-            break;
+            ephemSpice->GetHeliocentricXYZ(index, julianDay, X, Y, Z);
+            if (!relativeToSun && primary != SUN)
+            {
+                double Prx, Pry, Prz;
+                GetHeliocentricXYZ(primary, SUN, julianDay,
+                                   true, Prx, Pry, Prz);
+                X -= Prx;
+                Y -= Pry;
+                Z -= Prz;
+            }
+            return;
         }
     }
+#endif
 
-    if (thisEphem == NULL)
-    {
-        if (ephemHigh != NULL)
-            thisEphem = ephemHigh;
-        else
-            thisEphem = ephemLow;
-    }
-    else // use SPICE ephemeris
-    {
-        thisEphem->GetHeliocentricXYZ(index, julianDay, X, Y, Z);
-        return;
-    }
-    
+    Ephemeris *thisEphem = NULL;
+    if (ephemHigh != NULL)
+        thisEphem = ephemHigh;
+    else
+        thisEphem = ephemLow;
+
     if (primary == SUN)
     {
         thisEphem->GetHeliocentricXYZ(index, julianDay, X, Y, Z);

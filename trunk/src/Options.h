@@ -24,60 +24,47 @@ class Options
     const std::string & Background() const { return(background_); };
     double BaseMagnitude() const { return(baseMag_); };
 
+    bool CenterSelected() const     { return(centerSelected_); };
+    void CenterX(const double x)    { centerX_ = x; };
+    void CenterY(const double y)    { centerY_ = y; };
+    double CenterX() const          { return(centerX_); };
+    double CenterY() const          { return(centerY_); };
     const std::string & ConfigFile() const { return(configFile_); };
     const unsigned char * Color() const { return(color_); };
 
-    int DisplayMode() const      { return(displayMode_); };
-
     const std::string & DateFormat() const { return(dateFormat_); };
+    int DisplayMode() const { return(displayMode_); };
     bool DrawLabel() const { return(drawLabel_); };
     bool DrawUTCLabel() const { return(drawUTCLabel_); };
     const std::string & DynamicOrigin() const { return(dynamicOrigin_); };
     
     double FieldOfView() const           { return(fov_); };
     void FieldOfView(const double f)     { fov_ = f; };
-
     const std::string & Font() const { return(font_); };
     int FontSize() const { return(fontSize_); };
-
     bool Fork() const { return(fork_); };
     int FOVMode() const          { return(fovMode_); };
 
-    void setCenterX(const double x)    { center_x = x; };
-    void setCenterY(const double y)    { center_y = y; };
-    bool CenterSelected() const     { return(centerSelected_); };
-    double getCenterX() const          { return(center_x); };
-    double getCenterY() const          { return(center_y); };
-
-    const std::string & getOutputBase() const      { return(base_); };
-    const std::string & getOutputExtension() const { return(extension_); };
-
     unsigned long Hibernate() const { return(hibernate_); };
-    unsigned long IdleWait() const { return(idleWait_); };
 
+    unsigned long IdleWait() const { return(idleWait_); };
     bool InterpolateOriginFile() const { return(interpolateOriginFile_); };
 
     const std::string & JPLFile() const { return(jplFile_); };
-
     int JPEGQuality() const { return(quality_); };
-    double getJulianDay() const     { return(julianDay_); };
+    double JulianDay() const { return(julianDay_); };
 
     int LabelMask() const { return(labelMask_); };
     int LabelX() const { return(labelX_); };
     int LabelY() const { return(labelY_); };
     const std::string & LabelString() const { return(labelString_); };
-
     double Latitude() const      { return(latitude_); };
     void Latitude(const double b) { latitude_ = b; };
-
-    double LogMagnitudeStep() const { return(logMagStep_); };
-
+    bool LightTime() const       { return(lightTime_); };
     void LocalTime(const double l) { localTime_ = l; };
-
+    double LogMagnitudeStep() const { return(logMagStep_); };
     double Longitude() const     { return(longitude_); };
     void Longitude(const double l) { longitude_ = l; };
-
-    bool LightTime() const       { return(lightTime_); };
 
     bool MakeCloudMaps() const { return(makeCloudMaps_); };
 
@@ -92,8 +79,14 @@ class Options
     int OriginMode() const;
     body getOrigin() const          { return(origin_); };
     const std::string & OriginFile() const { return(originFile_); };
+    int OriginID() const { return(originID_); };
+    const std::string & OutputBase() const      { return(outputBase_); };
+    const std::string & OutputExtension() const { return(outputExt_); };
+    int OutputStartIndex() const { return(outputStartIndex_); };
 
     bool Pango() const { return(pango_); };
+    body PathRelativeTo() const { return(pathRelativeTo_); };
+    int PathRelativeToID() const { return(pathRelativeToID_); };
     const std::string & PostCommand() const { return(post_command_); };
     const std::string & PrevCommand() const { return(prev_command_); };
     bool PrintEphemeris() const { return(printEphemeris_); };
@@ -103,11 +96,10 @@ class Options
 
     double Radius() const        { return(radius_); };
     void Radius(const double r)  { radius_ = r; };
-    double getRange() const         { return(range_); };
-    void setRange(const double r) { range_ = r; };
-
-    double getRotate() const        { return(rotate); };
-    void setRotate(const double r) { rotate = rotate0 + r; };
+    double Range() const         { return(range_); };
+    void Range(const double r) { range_ = r; };
+    double Rotate() const        { return(rotate_); };
+    void Rotate(const double r) { rotate_ = rotate0_ + r; };
 
     const std::vector<std::string> & getSearchDir() const { return(searchdir); };
     bool SaveDesktopFile() const { return(saveDesktopFile_); };
@@ -121,10 +113,11 @@ class Options
     double SunLon() const     { return(sunLon_); };
     void SunLon(const double l) { sunLon_ = l; };
 
+    int TargetID() const { return(targetID_); };
     int TargetMode() const { return(targetMode_); };
-
+    
     double getTimeWarp() const      { return(timewarp); };
-    time_t getTVSec() const         { return(tv_sec); };
+    time_t TVSec() const { return(tv_sec); };
 
     bool TransPNG() const { return(transpng_); };
     bool Transparency() const { return(transparency_); };
@@ -155,11 +148,12 @@ class Options
     void setTarget(PlanetProperties *planetProperties[]);
     void setOrigin(PlanetProperties *planetProperties[]);
     void getOrigin(double &X, double &Y, double &Z);
+    void setOrigin(const double X, const double Y, const double Z);
     body getTarget() const          { return(target_); };
     void getTarget(double &X, double &Y, double &Z);
     void setTarget(const double X, const double Y, const double Z);
     bool UseCurrentTime() const { return(useCurrentTime_); };
-    void incrementTime(const time_t tv_sec);
+    void incrementTime(const double sec);
     void setTime(const double jd);
 
  private:
@@ -169,10 +163,10 @@ class Options
     std::vector<std::string> arcFiles_;
 
     std::string background_;
-    std::string base_;
     double baseMag_;    // a star of this magnitude has a pixel
                         // brightness of 1
     bool centerSelected_;
+    double centerX_, centerY_;
     unsigned char color_[3];
     std::string configFile_;
 
@@ -181,8 +175,6 @@ class Options
     bool drawLabel_;
     bool drawUTCLabel_;
     std::string dynamicOrigin_;
-
-    std::string extension_;
 
     std::string font_;
     int fontSize_;
@@ -199,6 +191,7 @@ class Options
     bool interpolateOriginFile_;
 
     std::string jplFile_;
+    double julianDay_;
 
     int labelMask_;
     int labelX_;
@@ -224,10 +217,18 @@ class Options
     int originID_;                // for NAIF or NORAD bodies
     int originMode_;                     // BODY, LBR, RANDOM, MAJOR,
                                          // SYSTEM, ABOVE, BELOW
+    bool originSet_;        // True if origin position has been set
+
+    std::string outputBase_;
+    std::string outputExt_;
+    int outputStartIndex_;  // start numbering output files with this
+                            // index
     double oX_, oY_, oZ_;   // heliocentric rectangular coordinates of
                             // the observer
 
     bool pango_;
+    body pathRelativeTo_;
+    int pathRelativeToID_;
     std::string post_command_;    // command to run after xplanet renders
     std::string prev_command_;    // command to run before xplanet renders
     body primary_;
@@ -242,8 +243,8 @@ class Options
     bool random_;
     bool rangeSpecified_; // if the -range option is used
     double range_;        // distance from the body, in units of its radius
-    double rotate;       // rotate0 plus any increments
-    double rotate0;      // rotation angle specified on command line
+    double rotate_;       // rotate0 plus any increments
+    double rotate0_;      // rotation angle specified on command line
 
     bool saveDesktopFile_;
     std::vector<int> spiceEphemeris_;
@@ -254,9 +255,10 @@ class Options
                                 // be here, but it's a convenient way
                                 // to put them in the label
     body target_;
-    int targetMode_;     // BODY, RANDOM, MAJOR
-    int targetID_;                // for NAIF or NORAD bodies
-    double timewarp;     // multiplication factor for the passage of time
+    int targetID_;          // for NAIF or NORAD bodies
+    int targetMode_;        // BODY, RANDOM, MAJOR
+    bool targetSet_;        // True if target position has been set
+    double timewarp;        // multiplication factor for the passage of time
     std::string tmpDir_;
     bool transparency_;
     bool transpng_;
@@ -276,10 +278,6 @@ class Options
     std::string windowTitle_;
 
     unsigned long xid_;
-
-    double center_x, center_y;
-    double julianDay_;
-
 
     std::vector<std::string> searchdir; // check these directories for files
 

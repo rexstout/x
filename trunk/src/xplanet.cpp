@@ -12,6 +12,7 @@ using namespace std;
 #include "config.h"
 
 #include "buildPlanetMap.h"
+#include "findBodyXYZ.h"
 #include "keywords.h"
 #include "Options.h"
 #include "PlanetProperties.h"
@@ -26,11 +27,13 @@ using namespace std;
 
 extern void
 drawMultipleBodies(DisplayBase *display, Planet *target,
+                   const double upX, const double upY, const double upZ, 
                    map<double, Planet *> &planetsFromSunMap,
                    PlanetProperties *planetProperties[]);
 
 extern void
 drawProjection(DisplayBase *display, Planet *target,
+               const double upX, const double upY, const double upZ, 
                map<double, Planet *> &planetsFromSunMap,
                PlanetProperties *planetProperties);
 
@@ -131,6 +134,7 @@ main(int argc, char **argv)
         // Set the time for the next update
         timer->Update();
 
+        // Run any commands specified with -prev_command
         if (!options->PrevCommand().empty())
         {
             if (system(options->PrevCommand().c_str()) != 0)
@@ -141,6 +145,11 @@ main(int argc, char **argv)
                 xpWarn(errStr.str(), __FILE__, __LINE__);
             }
         }
+
+        // delete the markerbounds file, since we'll create a new one
+        string markerBounds(options->MarkerBounds());
+        if (!markerBounds.empty())
+            unlinkFile(markerBounds.c_str());
 
         // Set the time to the current time, if desired
         if (options->UseCurrentTime())
@@ -158,6 +167,7 @@ main(int argc, char **argv)
             options->setTime(julianDay);
         }
         
+        // if an origin file is specified, set observer position from it
         if (origin_file)
         {
             if (options->InterpolateOriginFile())
@@ -165,10 +175,10 @@ main(int argc, char **argv)
                 // interpolate positions in the origin file to the
                 // current time
                 double thisRad, thisLat, thisLon, thisLocalTime = -1;
-                interpolateOriginFile(options->getJulianDay(), 
+                interpolateOriginFile(options->JulianDay(), 
                                       originVector, thisRad, 
                                       thisLat, thisLon, thisLocalTime);
-                options->setRange(thisRad);
+                options->Range(thisRad);
                 options->Latitude(thisLat);
                 options->Longitude(thisLon);
                 options->LocalTime(thisLocalTime);
@@ -177,18 +187,20 @@ main(int argc, char **argv)
             {
                 // Use the next time and position in the origin file
                 options->setTime(iterOriginVector->time);
-                options->setRange(iterOriginVector->radius);
+                options->Range(iterOriginVector->radius);
                 options->Latitude(iterOriginVector->latitude);
                 options->Longitude(iterOriginVector->longitude);
                 options->LocalTime(iterOriginVector->localTime);
             }
         }
 
+        // if -dynamic_origin was specified, set observer position
+        // from it.
         if (!options->DynamicOrigin().empty())
         {
             LBRPoint originPoint;
             readDynamicOrigin(options->DynamicOrigin(), originPoint);
-            options->setRange(originPoint.radius);
+            options->Range(originPoint.radius);
             options->Latitude(originPoint.latitude);
             options->Longitude(originPoint.longitude);
             options->LocalTime(originPoint.localTime);
@@ -206,7 +218,7 @@ main(int argc, char **argv)
         // by heliocentric distance.  This makes calculating shadows
         // easier.
         map<double, Planet *> planetsFromSunMap;
-        buildPlanetMap(options->getJulianDay(), oX, oY, oZ, 
+        buildPlanetMap(options->JulianDay(), oX, oY, oZ, 
                        options->LightTime(), planetsFromSunMap);
 
         // Find the target body in the list
@@ -217,7 +229,8 @@ main(int argc, char **argv)
         // (e.g. the Cassini spacecraft)
         if (options->TargetMode() == LOOKAT)
         {
-            if (options->LightTime()) options->setTarget(planetProperties);
+            if (options->LightTime()) 
+                options->setTarget(planetProperties);
         }
         else
         {
@@ -245,22 +258,73 @@ main(int argc, char **argv)
             options->SunLon(sunLon);
         }
 
-        // delete the markerbounds file, since we'll create a new one
-        string markerBounds(options->MarkerBounds());
-        if (!markerBounds.empty())
-            unlinkFile(markerBounds.c_str());
+        // Set the "up" vector.  This points to the top of the screen.
+        double upX, upY, upZ;
+        switch (options->North())
+        {
+        default:
+            xpWarn("Unknown value for north, using body\n", 
+                   __FILE__, __LINE__);
+        case BODY:
+            target->getBodyNorth(upX, upY, upZ);
+            break;
+        case GALACTIC:
+            target->getGalacticNorth(upX, upY, upZ);
+            break;
+        case ORBIT:
+        {
+            // if it's a moon, pretend its orbital north is the same as
+            // its primary, although in most cases it's the same as its
+            // primary's rotational north
+            if (target->Primary() == SUN)
+            {
+                target->getOrbitalNorth(upX, upY, upZ);
+            }
+            else
+            {
+                Planet *primary = findPlanetinMap(planetsFromSunMap, 
+                                                  target->Primary());
+                primary->getOrbitalNorth(upX, upY, upZ);
+            }
+        }
+        break;
+        case PATH:
+        {
+            double vX, vY, vZ;
+            findBodyVelocity(options->JulianDay(), 
+                             options->getOrigin(), 
+                             options->OriginID(),
+                             options->PathRelativeTo(), 
+                             options->PathRelativeToID(), 
+                             vX, vY, vZ);
+            
+            upX = vX * FAR_DISTANCE;
+            upY = vY * FAR_DISTANCE;
+            upZ = vZ * FAR_DISTANCE;
+        }
+        break;
+        case TERRESTRIAL:
+            upX = 0;
+            upY = 0;
+            upZ = FAR_DISTANCE;
+            break;
+        }
 
         // Initialize display device
         DisplayBase *display = getDisplay(times_run);
 
         if (options->ProjectionMode() == MULTIPLE)
         {
-            drawMultipleBodies(display, target, planetsFromSunMap,
+            drawMultipleBodies(display, target, 
+                               upX, upY, upZ, 
+                               planetsFromSunMap,
                                planetProperties);
         }
         else
         {
-            drawProjection(display, target, planetsFromSunMap, 
+            drawProjection(display, target, 
+                           upX, upY, upZ, 
+                           planetsFromSunMap,
                            planetProperties[target->Index()]);
         }
 
@@ -296,8 +360,8 @@ main(int argc, char **argv)
         if (!options->UseCurrentTime())
         {
             // Set the time to the next update
-            options->incrementTime((time_t) (options->getTimeWarp() 
-                                             * options->getWait()));
+            options->incrementTime(options->getTimeWarp() 
+                                   * options->getWait());
         }
 
         // Sleep until the next update.  If Sleep() returns false,

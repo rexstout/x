@@ -26,55 +26,33 @@ arrangeMarkers(multimap<double, Annotation *> &annotationMap,
 
 void
 drawProjection(DisplayBase *display, Planet *target,
+               const double upX, const double upY, const double upZ, 
                map<double, Planet *> &planetsFromSunMap,
                PlanetProperties *planetProperties)
 {
     const int height = display->Height();
     const int width = display->Width();
 
+    // subsolar lat/lon
     double sLat, sLon;
     target->XYZToPlanetographic(0, 0, 0, sLat, sLon);
 
+    // lat/lon of the "up" vector
+    double nLat, nLon;
+    target->XYZToPlanetographic(upX * FAR_DISTANCE, 
+                                upY * FAR_DISTANCE, 
+                                upZ * FAR_DISTANCE, 
+                                nLat, nLon);
+
+    // Rotate the image so that the "up" vector points to the top of
+    // the screen
     Options *options = Options::getInstance();
 
-    double upX, upY, upZ;
-    switch (options->North())
-    {
-    default:
-        xpWarn("Unknown value for north, using body\n", 
-               __FILE__, __LINE__);
-    case BODY:
-        target->getBodyNorth(upX, upY, upZ);
-        break;
-    case GALACTIC:
-        target->getGalacticNorth(upX, upY, upZ);
-        break;
-    case ORBIT:
-    {
-        if (target->Primary() == SUN)
-            target->getOrbitalNorth(upX, upY, upZ);
-        else
-        {
-            const Planet *primary = findPlanetinMap(planetsFromSunMap, 
-                                                    target->Primary());
-            primary->getOrbitalNorth(upX, upY, upZ);
-        }
-    }
-    break;
-    case TERRESTRIAL:
-        upX=0;
-        upY=0;
-        upZ=1;
-        break;
-    }
-
-    double nLat, nLon;
-    target->XYZToPlanetographic(upX*1e6, upY*1e6, upZ*1e6, nLat, nLon);
     double tc, dist;
     calcGreatArc(options->Latitude(), 
                  options->Longitude() * target->Flipped(),
                  nLat, nLon * target->Flipped(), tc, dist);
-    options->setRotate(-tc);
+    options->Rotate(-tc);
 
     Ring *ring = NULL;
     if (target->Index() == SATURN)

@@ -31,7 +31,7 @@ using namespace std;
 */
 static void 
 getEquatorialPlane(Planet *p, View *view, double &A, double &B, 
-		   double &C, double &D)
+                   double &C, double &D)
 {
     double x1, x2, x3;
     double y1, y2, y3;
@@ -53,9 +53,9 @@ getEquatorialPlane(Planet *p, View *view, double &A, double &B,
 
 void
 drawRings(Planet *p, DisplayBase *display, View *view, Ring *ring, 
-	  const double X, const double Y, const double R, 
-	  const double obs_lat, const double obs_lon, 
-	  const bool lit_side, const bool draw_far_side)
+          const double X, const double Y, const double R, 
+          const double obs_lat, const double obs_lon, 
+          const bool lit_side, const bool draw_far_side)
 {
     double A, B, C, D;
     getEquatorialPlane(p, view, A, B, C, D);
@@ -96,57 +96,61 @@ drawRings(Planet *p, DisplayBase *display, View *view, Ring *ring,
 
     for (int j = j0; j < j1; j++)
     {
-	for (int i = i0; i < i1; i++)
-	{
-	    view->PixelToViewCoordinates(options->getCenterX() - i, 
-					 options->getCenterY() - j, 
-					 pX, pY, pZ);
+        for (int i = i0; i < i1; i++)
+        {
+            view->PixelToViewCoordinates(options->CenterX() - i, 
+                                         options->CenterY() - j, 
+                                         pX, pY, pZ);
 
-	    // Find the intersection of the line from the observer to
-	    // the point on the view plane passing through the ring
-	    // plane
-	    const double u = -D / (A * pX + B * pY + C * pZ);
+            // Find the intersection of the line from the observer to
+            // the point on the view plane passing through the ring
+            // plane
+            const double u = -D / (A * pX + B * pY + C * pZ);
 
-	    // The view coordinates of the point in the ring plane
-	    double rX, rY, rZ;
-	    rX = u * pX;
-	    rY = u * pY;
-	    rZ = u * pZ;
+            // if the intersection point is behind the observer, don't
+            // plot it
+            if (u < 0) continue;
 
-	    const double dist_to_point = sqrt(rX * rX + rY * rY + rZ * rZ);
-	    if ((draw_far_side && dist_to_point <= dist_to_planet) 
-		|| (!draw_far_side && dist_to_point > dist_to_planet)) 
-		continue;
-	    
-	    // convert to heliocentric XYZ
-	    view->RotateToXYZ(rX, rY, rZ, rX, rY, rZ);
+            // The view coordinates of the point in the ring plane
+            double rX, rY, rZ;
+            rX = u * pX;
+            rY = u * pY;
+            rZ = u * pZ;
 
-	    // find lat & lon of ring pixel
-	    double lat, lon = options->Longitude();
-	    double dist;
-	    p->XYZToPlanetographic(rX, rY, rZ, lat, lon, dist);
+            const double dist_to_point = sqrt(rX * rX + rY * rY + rZ * rZ);
+            if ((draw_far_side && dist_to_point <= dist_to_planet) 
+                || (!draw_far_side && dist_to_point > dist_to_planet)) 
+                continue;
+            
+            // convert to heliocentric XYZ
+            view->RotateToXYZ(rX, rY, rZ, rX, rY, rZ);
 
-	    double dpp = dist_per_pixel * fabs(cos(obs_lon - lon));
-	    dpp *= dist_to_point/dist_to_planet;
-	    if (dpp < min_dist_per_pixel) dpp = min_dist_per_pixel;
-	    ring->setDistPerPixel(dpp);
+            // find lat & lon of ring pixel
+            double lat, lon = options->Longitude();
+            double dist;
+            p->XYZToPlanetographic(rX, rY, rZ, lat, lon, dist);
 
-	    double t = ring->getTransparency(dist);
-	    
-	    if (t < 0) continue;
+            double dpp = dist_per_pixel * fabs(cos(obs_lon - lon));
+            dpp *= dist_to_point/dist_to_planet;
+            if (dpp < min_dist_per_pixel) dpp = min_dist_per_pixel;
+            ring->setDistPerPixel(dpp);
 
-	    double b;
-	    if (lit_side)
-		b = ring->getBrightness(lon, dist);
-	    else
-		b = ring->getBrightness(lon, dist, t);
+            double t = ring->getTransparency(dist);
+            
+            if (t < 0) continue;
 
-	    if (b < 0) continue;
+            double b;
+            if (lit_side)
+                b = ring->getBrightness(lon, dist);
+            else
+                b = ring->getBrightness(lon, dist, t);
 
-	    for (int k = 0; k < 3; k++) 
-		pixel[k] = (unsigned char) (b * ring_color[k]);
+            if (b < 0) continue;
 
-	    display->setPixel(i, j, pixel, 1 - t);
-	}
+            for (int k = 0; k < 3; k++) 
+                pixel[k] = (unsigned char) (b * ring_color[k]);
+
+            display->setPixel(i, j, pixel, 1 - t);
+        }
     }
 }

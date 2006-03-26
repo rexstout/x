@@ -15,9 +15,9 @@ Ring::Ring(const double inner_radius, const double outer_radius,
            const double sunlon, const double sunlat,
            const double shade, 
            Planet *p) : planet_(p), 
-			shade_(shade), 
-			sunLon_(sunlon), 
-			sunLat_(sunlat)
+                        shade_(shade), 
+                        sunLat_(sunlat),
+                        sunLon_(sunlon)
 {
     r_out = outer_radius/planet_radius;
     dr_b = (outer_radius - inner_radius) / (num_bright * planet_radius);
@@ -165,7 +165,7 @@ Ring::getValue(const double *array, const int size, const int window,
                const double dr, const double r, const double lon)
 {
     if (cos(lon-sunLon_) > -0.45) 
-	return(getValue(array, size, window, dr, r));
+        return(getValue(array, size, window, dr, r));
     
     int i = static_cast<int> ((r_out - r)/dr);
 
@@ -182,11 +182,11 @@ Ring::getValue(const double *array, const int size, const int window,
     const double sinLon = sin(lon);
     for (int j = j1; j < j2; j++) 
     {
-	const double x =  r0 * cosLon;
-	const double y = -r0 * sinLon;
-	const double z =  0;
+        const double x =  r0 * cosLon;
+        const double y = -r0 * sinLon;
+        const double z =  0;
 
-	if (planet_->IsInMyShadow(x, y, z))
+        if (planet_->IsInMyShadow(x, y, z))
             sum += (shade_ * array[j]);
         else
             sum += array[j];

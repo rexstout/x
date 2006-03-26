@@ -26,6 +26,11 @@ A file named cassini must exist (it can be empty) as well as a file
 named cassini.krn containing a list of kernel files to read, one per
 line.  You will have to figure out which kernel files you need.
 
+Kernel files are loaded in the order listed in the .krn file.  If a 
+particular body's ephemeris is in more than one kernel file, the
+last appropriate kernel file loaded will be used.  In general, put the
+most recent kernel files last in the .krn file.
+
 To display the Mars Global Surveyor orbiting around Mars, seen from
 the earth:
 
