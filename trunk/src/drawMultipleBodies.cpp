@@ -390,9 +390,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
         if (pR <= 1)
         {
-            display->setPixel(static_cast<int> (pX + 0.5), 
-                              static_cast<int> (pY + 0.5), 
-                              currentProperties->Color());
+            display->setPixel(pX, pY, currentProperties->Color());
             if (current_planet->Index() == SUN) 
                 drawSun(display, pX, pY, 1, currentProperties->Color());
 

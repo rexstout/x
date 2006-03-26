@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(xplanet, 1.0.8)
+AM_INIT_AUTOMAKE(xplanet, 1.1.0)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -109,11 +109,11 @@ AC_CONFIG_FILES([xpDefines.h				\
 		src/Makefile				\
 		src/libannotate/Makefile		\
 		src/libdisplay/Makefile			\
+		src/libephemeris/Makefile		\
+		src/libephemeris/libmoons/Makefile	\
 		src/libimage/Makefile			\
 		src/libmultiple/Makefile		\
 		src/libplanet/Makefile			\
-		src/libplanet/libephemeris/Makefile	\
-		src/libplanet/libmoons/Makefile		\
 		src/libprojection/Makefile		\
 		src/libsgp4sdp4/Makefile])
 		

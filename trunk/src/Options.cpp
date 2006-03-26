@@ -66,6 +66,7 @@ Options::Options() :
     extension_(defaultMapExt),
     font_(defaultFont),
     fontSize_(12),
+    fork_(false), 
     fov_(-1),
     fovMode_(RADIUS),
     geometryMask_(NoValue),
@@ -188,6 +189,7 @@ Options::parseArgs(int argc, char **argv)
             {"ephemeris_file", required_argument, NULL, JPL_FILE},
             {"font",           required_argument, NULL, FONT},
             {"fontsize",       required_argument, NULL, FONTSIZE},
+            {"fork",           no_argument,       NULL, FORK},
             {"fov",            required_argument, NULL, FOV},
             {"geometry",       required_argument, NULL, GEOMETRY},
             {"gmtlabel",       no_argument,       NULL, UTCLABEL},
@@ -340,6 +342,9 @@ Options::parseArgs(int argc, char **argv)
 #endif
         }
         break;
+	case FORK:
+	    fork_ = true;
+	    break;
         case FOV:
             sscanf(optarg, "%lf", &fov_);
             if (fov_ <= 0) 
@@ -581,7 +586,7 @@ Options::parseArgs(int argc, char **argv)
             break;
         case RADIUS:
             sscanf(optarg, "%lf", &radius_);
-            if (radius_ < 0)
+            if (radius_ <= 0)
                 xpExit("radius must be positive\n", __FILE__, __LINE__);
 
             radius_ /= 100;

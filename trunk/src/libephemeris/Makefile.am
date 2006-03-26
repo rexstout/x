@@ -1,3 +1,5 @@
+SUBDIRS = libmoons
+
 noinst_LIBRARIES = libephemeris.a
 
 AM_CPPFLAGS = -I@top_srcdir@/src
@@ -21,6 +23,8 @@ libephemeris_a_SOURCES = \
 			EphemerisHigh.h		\
 			EphemerisLow.cpp	\
 			EphemerisLow.h		\
+			ephemerisWrapper.h	\
+			ephemerisWrapper.cpp	\
 			jpl_int.h		\
 			jpleph.cpp		\
 			jpleph.h		\

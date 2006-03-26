@@ -94,6 +94,14 @@ name (e.g. "Arial").
 -fontsize size 
 Specify the point size.  The default is 12.
 
+-fork
+Detach from the controlling terminal.  This is useful on MS Windows to
+run xplanet from a batch file without having to keep a DOS window
+open.  Be careful when using this option; it's easy to have multiple
+processes running at the same time without knowing it - check the Task
+Manager.  On unix systems this is pretty much the same as running
+xplanet in the background.
+
 -fov
 Specify the field of view, in degrees.  This option and the -radius
 option are mutually exclusive.  This option has no effect if the

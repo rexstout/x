@@ -172,7 +172,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 xplanet_ARFLAGS = @xplanet_ARFLAGS@
 xplanet_LDFLAGS = @xplanet_LDFLAGS@
-SUBDIRS = libannotate libdisplay libimage libmultiple libplanet libprojection libsgp4sdp4
+SUBDIRS = libannotate libdisplay libephemeris libimage libmultiple libplanet libprojection libsgp4sdp4
 
 bin_PROGRAMS = xplanet
 
@@ -225,17 +225,19 @@ xplanet_SOURCES = \
 	$(parsegeom)
 
 
-xplanet_LDADD = libannotate/libannotate.a	\
-		libdisplay/libdisplay.a 	\
-		libdisplay/libtimer.a 		\
-		libimage/libimage.a 		\
-		libmultiple/libmultiple.a	\
-		libplanet/libplanet.a 		\
-		libplanet/libephemeris/libephemeris.a \
-		libplanet/libmoons/libmoons.a 	\
-		libprojection/libprojection.a 	\
-		libsgp4sdp4/libsgp4sdp4.a	\
-		@GRAPHICS_LIBS@ @CSPICE_LIBS@ @X_LIBS@ @XSS_LIBS@ @FREETYPE_LIBS@ @AQUA_LIBS@ @LIBICONV@ @LIBCHARSET@
+xplanet_LDADD = libannotate/libannotate.a		\
+		libdisplay/libdisplay.a 		\
+		libdisplay/libtimer.a 			\
+		libephemeris/libephemeris.a 		\
+		libephemeris/libmoons/libmoons.a	\
+		libimage/libimage.a 			\
+		libmultiple/libmultiple.a		\
+		libplanet/libplanet.a 			\
+		libprojection/libprojection.a 		\
+		libsgp4sdp4/libsgp4sdp4.a		\
+		@GRAPHICS_LIBS@ @CSPICE_LIBS@ @X_LIBS@ 	\
+		@XSS_LIBS@ @FREETYPE_LIBS@ @AQUA_LIBS@ 	\
+		@LIBICONV@ @LIBCHARSET@
 
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -266,11 +268,10 @@ am_xplanet_OBJECTS = Map.$(OBJEXT) Options.$(OBJEXT) \
 	xpUtil.$(OBJEXT) xplanet.$(OBJEXT) $(am__objects_1)
 xplanet_OBJECTS = $(am_xplanet_OBJECTS)
 xplanet_DEPENDENCIES = libannotate/libannotate.a libdisplay/libdisplay.a \
-	libdisplay/libtimer.a libimage/libimage.a \
+	libdisplay/libtimer.a libephemeris/libephemeris.a \
+	libephemeris/libmoons/libmoons.a libimage/libimage.a \
 	libmultiple/libmultiple.a libplanet/libplanet.a \
-	libplanet/libephemeris/libephemeris.a \
-	libplanet/libmoons/libmoons.a libprojection/libprojection.a \
-	libsgp4sdp4/libsgp4sdp4.a
+	libprojection/libprojection.a libsgp4sdp4/libsgp4sdp4.a
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
