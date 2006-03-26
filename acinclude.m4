@@ -14,13 +14,10 @@ if test "$have_localcharset_h" = 'yes'; then
   fi
 fi
 
-AM_CONDITIONAL(HAVE_LIBCHARSET, test "$have_locale_charset" = 'yes')
-
 AC_CHECK_HEADER(langinfo.h,have_langinfo_h='yes',have_langinfo_h='no')
 if test "$have_langinfo_h" = 'yes'; then
     AC_DEFINE(HAVE_LANGINFO_H,,Define if you have langinfo.h)
 fi
-AM_CONDITIONAL(HAVE_LANGINFO_H, test "$have_langinfo_h" = 'yes')
 ])
 
 AC_DEFUN(AC_FIND_CSPICE,
@@ -47,8 +44,6 @@ if test "$with_cspice" != 'no'; then
     AC_MSG_WARN(*** Xplanet will be built without SPICE support ***)
   fi
 fi
-
-AM_CONDITIONAL(HAVE_CSPICE, test "$have_cspice" = 'yes')
 ])
 
 AC_DEFUN(AC_FIND_FREETYPE,
@@ -70,8 +65,6 @@ if test "$with_freetype" != 'no'; then
     have_freetype='yes'
   fi
 fi
-
-AM_CONDITIONAL(HAVE_LIBFREETYPE, test "$have_freetype" = 'yes')
 ])
 
 AC_DEFUN(AC_FIND_PANGO,
@@ -94,8 +87,6 @@ if test "$with_pango" != 'no'; then
       fi
    fi
 fi
-
-AM_CONDITIONAL(HAVE_LIBPANGOFT2, test "$have_pangoft2" = 'yes')
 ])
 
 dnl Autoconf stuff to check for graphics libraries is adapted from 
@@ -239,12 +230,6 @@ if test "$with_tiff" != 'no'; then
     fi
 fi
 
-AM_CONDITIONAL(HAVE_LIBGIF, test "$have_gif" = 'yes')
-AM_CONDITIONAL(HAVE_LIBJPEG, test "$have_jpeg" = 'yes')
-AM_CONDITIONAL(HAVE_LIBPNG, test "$have_png" = 'yes')
-AM_CONDITIONAL(HAVE_LIBPNM, test "$have_pnm" = 'yes')
-AM_CONDITIONAL(HAVE_LIBTIFF, test "$have_tiff" = 'yes')
-
 AC_SUBST(GRAPHICS_LIBS)
 
 ])
@@ -273,9 +258,6 @@ dnl Locate X include files and libraries
      AC_MSG_WARN(*** Xplanet will be built without X11 support ***)
    fi
 fi
-
-AM_CONDITIONAL(HAVE_LIBX11, test "$have_libx11" = 'yes')
-
 ])
 
 AC_DEFUN(AC_FIND_XSS,
@@ -309,10 +291,17 @@ fi
 AC_DEFUN(AC_USE_MACAQUA,
 [
 AC_ARG_WITH(aqua,AC_HELP_STRING([--with-aqua],[For Mac OS X Aqua (NO)]))
+AC_ARG_WITH(quicktime,AC_HELP_STRING([--with-quicktime],[On Aqua, use Quicktime library to read/write image files (YES)]))
 
+have_quicktime='no'
 if test "$with_aqua" = yes; then
+  AQUA_LIBS=""
   AC_DEFINE(HAVE_AQUA,,Define for Mac OS X)
-  AQUA_LIBS="-framework Carbon -framework Cocoa -bind_at_load"
+  if test "$with_quicktime" != no; then
+    have_quicktime='yes'
+    AQUA_LIBS="-framework Quicktime"
+  fi
+  AQUA_LIBS="$AQUA_LIBS -framework IOKit -framework Carbon -framework Cocoa -bind_at_load"
   AC_SUBST(AQUA_LIBS)
 
   OBJC="gcc"
@@ -320,8 +309,6 @@ if test "$with_aqua" = yes; then
   AC_SUBST(OBJC)
   AC_SUBST(OBJCFLAGS)
 fi
-
-AM_CONDITIONAL(HAVE_AQUA, test "$with_aqua" = 'yes')
 ])
 
 dnl Everything after this is from libiconv's configure setup.

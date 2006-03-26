@@ -14,24 +14,41 @@ fileExists(string &filename)
 {
     bool returnVal = false;
 
-    stringstream msg;
+    ostringstream msg;
     msg << "Looking for " << filename << " ... ";
     ifstream f(filename.c_str());
     if (f.is_open())
     {
-	msg << "found\n";
-	f.close();
-	returnVal = true;
+        msg << "found\n";
+        f.close();
+        returnVal = true;
     }
     else
     {
-	msg << "not found\n";
-	returnVal = false;
+        msg << "not found\n";
+        returnVal = false;
     }
 
     Options *options = Options::getInstance();
     if (options->Verbosity() > 2)
-	xpMsg(msg.str(), __FILE__, __LINE__);
+    {
+        // only say we're looking for a file once
+        static vector<string> searchedFor;
+        bool firstTime = true;
+        for (int i = searchedFor.size()-1; i >= 0; i--)
+        {
+            if (searchedFor[i] == filename)
+            {
+                firstTime = false;
+                break;
+            }
+        }
+        if (firstTime)
+        {
+            searchedFor.push_back(filename);
+            xpMsg(msg.str(), __FILE__, __LINE__);
+        }
+    }
 
     return(returnVal);
 }
@@ -43,39 +60,38 @@ findFile(string &filename, const string &subdir)
     // to searchdir
     if (fileExists(filename)) return(true);
 
-    string newname;
-
     Options *options = Options::getInstance();
     vector<string> searchdir = options->getSearchDir();
 
+    string newname;
     for (int i = searchdir.size() - 1; i >= 0; i--)
     {
-	// Check in searchdir itself
-	newname = searchdir[i];
-	newname += separator;
-	newname += filename;
+        // Check in searchdir itself
+        newname = searchdir[i];
+        newname += separator;
+        newname += filename;
 
-	if (fileExists(newname))
-	{
-	    filename = newname;
-	    return(true);
-	}
+        if (fileExists(newname))
+        {
+            filename = newname;
+            return(true);
+        }
 
-	// Now look in searchdir + subdir
-	newname = searchdir[i];
-	newname += separator;
-	if (!subdir.empty())
-	{
-	    newname += subdir;
-	    newname += separator;
-	}
-	newname += filename;
+        // Now look in searchdir + subdir
+        newname = searchdir[i];
+        newname += separator;
+        if (!subdir.empty())
+        {
+            newname += subdir;
+            newname += separator;
+        }
+        newname += filename;
 
-	if (fileExists(newname))
-	{
-	    filename = newname;
-	    return(true);
-	}
+        if (fileExists(newname))
+        {
+            filename = newname;
+            return(true);
+        }
     }
 
     string errMsg("Can't find ");
@@ -83,10 +99,10 @@ findFile(string &filename, const string &subdir)
     errMsg += " in\n";
     for (int i = searchdir.size() - 1; i >= 0; i--)
     {
-	errMsg += searchdir[i];
-	errMsg += separator;
-	errMsg += subdir;
-	errMsg += "\n";
+        errMsg += searchdir[i];
+        errMsg += separator;
+        errMsg += subdir;
+        errMsg += "\n";
     }
     xpWarn(errMsg, __FILE__, __LINE__);
     return(false);

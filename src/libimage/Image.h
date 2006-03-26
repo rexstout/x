@@ -10,15 +10,15 @@ class Image
 
     ~Image();
 
-    const unsigned char * getPNGAlpha() const { return(png_alpha); };
-    const unsigned char * getRGBData() const { return(rgb_data); };
+    const unsigned char * getPNGAlpha() const { return(pngAlpha_); };
+    const unsigned char * getRGBData() const { return(rgbData_); };
 
     void getPixel(double px, double py, unsigned char *pixel);
     void getPixel(double px, double py, unsigned char *pixel, 
 		  unsigned char *alpha);
 
-    int Width() const  { return(width); };
-    int Height() const { return(height); };
+    int Width() const  { return(width_); };
+    int Height() const { return(height_); };
     void Quality(const int q) { quality_ = q; };
 
     bool Read(const char *filename);
@@ -28,9 +28,9 @@ class Image
     void Resize(const int w, const int h);
 
  private:
-    int width, height, area;
-    unsigned char *rgb_data;
-    unsigned char *png_alpha;
+    int width_, height_, area_;
+    unsigned char *rgbData_;
+    unsigned char *pngAlpha_;
 
     int quality_;
 };

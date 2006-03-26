@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(xplanet, 1.0.6)
+AM_INIT_AUTOMAKE(xplanet, 1.0.7)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -12,19 +12,12 @@ AM_CONDITIONAL([am__fastdepOBJC], false)
 AC_PATH_PROG(PERL, perl, no)
 AC_SUBST(PERL)
 
-AC_FIND_X11
-AC_FIND_XSS
-AC_FIND_GRAPHICS_LIBS
-AC_FIND_FREETYPE
-AC_FIND_PANGO
-AC_FIND_CSPICE
-AC_USE_MACAQUA
-
 AC_ARG_WITH(cygwin,AC_HELP_STRING([--with-cygwin],[check for Cygwin environment (YES)]))
 
 separator="/"
 use_ar='yes'
-
+have_aqua='no'
+have_cygwin='no'
 AC_CANONICAL_HOST
 case "$host" in
      sparc-sun-*)
@@ -51,27 +44,58 @@ case "$host" in
      fi
      ;;
      *-apple-darwin*)
+     have_aqua='yes'
      ;;
      i686-pc-linux-gnu)
      ;;
 esac
 
-AM_CONDITIONAL(HAVE_CYGWIN, test "$have_cygwin" = "yes")
-AM_CONDITIONAL(USE_AR, test $use_ar = 'yes')
+AC_FIND_X11
+AC_FIND_XSS
+AC_FIND_FREETYPE
+AC_FIND_PANGO
+AC_FIND_CSPICE
+
 AC_SUBST(xplanet_ARFLAGS)
 AC_SUBST(xplanet_LDFLAGS)
 AC_SUBST(separator)
 
+AC_USE_MACAQUA
+
+if test "$have_quicktime" != 'yes'; then
+AC_FIND_GRAPHICS_LIBS
+fi
+
+if test "$have_aqua" = no; then
 AM_ICONV
 if test "$am_cv_func_iconv" = yes; then
   proto_iconv="$am_cv_proto_iconv_arg1"
 else
   proto_iconv=""
 fi
+AC_FIND_LOCALE_CHARSET
+fi
+
+dnl AM_CONDITIONAL(HAVE_LIBCHARSET, test "$have_locale_charset" = 'yes')
+dnl AM_CONDITIONAL(HAVE_LANGINFO_H, test "$have_langinfo_h" = 'yes')
+AM_CONDITIONAL(HAVE_CSPICE, test "$have_cspice" = 'yes')
+AM_CONDITIONAL(HAVE_LIBFREETYPE, test "$have_freetype" = 'yes')
+AM_CONDITIONAL(HAVE_LIBPANGOFT2, test "$have_pangoft2" = 'yes')
+AM_CONDITIONAL(HAVE_LIBX11, test "$have_libx11" = 'yes')
+AM_CONDITIONAL(HAVE_AQUA, test "$with_aqua" = 'yes')
+AM_CONDITIONAL(HAVE_QUICKTIME, test "$have_quicktime" = 'yes')
+
+AM_CONDITIONAL(HAVE_LIBGIF, test "$have_gif" = 'yes')
+AM_CONDITIONAL(HAVE_LIBJPEG, test "$have_jpeg" = 'yes')
+AM_CONDITIONAL(HAVE_LIBPNG, test "$have_png" = 'yes')
+AM_CONDITIONAL(HAVE_LIBPNM, test "$have_pnm" = 'yes')
+AM_CONDITIONAL(HAVE_LIBTIFF, test "$have_tiff" = 'yes')
+
+AM_CONDITIONAL(HAVE_CYGWIN, test "$have_cygwin" = "yes")
+AM_CONDITIONAL(USE_AR, test $use_ar = 'yes')
+
 AC_DEFINE_UNQUOTED(ICONV_CONST, $proto_iconv,
   [Define as const if the declaration of iconv() needs const.])
-
-AC_FIND_LOCALE_CHARSET
 
 AC_ARG_WITH(map-extension, [  --with-map-extension=EXTENSION
                           use EXTENSION as default map extension [jpg]], mapext="$withval", mapext="jpg")

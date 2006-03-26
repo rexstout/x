@@ -13,8 +13,6 @@ class DisplayOutput : public DisplayBase
 
  private:
     int quality_;
-
-    const char * constructOutputFilename();
 };
 
 #endif

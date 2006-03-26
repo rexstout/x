@@ -72,10 +72,6 @@ HAVE_CSPICE_FALSE = @HAVE_CSPICE_FALSE@
 HAVE_CSPICE_TRUE = @HAVE_CSPICE_TRUE@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
-HAVE_LANGINFO_H_FALSE = @HAVE_LANGINFO_H_FALSE@
-HAVE_LANGINFO_H_TRUE = @HAVE_LANGINFO_H_TRUE@
-HAVE_LIBCHARSET_FALSE = @HAVE_LIBCHARSET_FALSE@
-HAVE_LIBCHARSET_TRUE = @HAVE_LIBCHARSET_TRUE@
 HAVE_LIBFREETYPE_FALSE = @HAVE_LIBFREETYPE_FALSE@
 HAVE_LIBFREETYPE_TRUE = @HAVE_LIBFREETYPE_TRUE@
 HAVE_LIBGIF_FALSE = @HAVE_LIBGIF_FALSE@
@@ -92,6 +88,8 @@ HAVE_LIBTIFF_FALSE = @HAVE_LIBTIFF_FALSE@
 HAVE_LIBTIFF_TRUE = @HAVE_LIBTIFF_TRUE@
 HAVE_LIBX11_FALSE = @HAVE_LIBX11_FALSE@
 HAVE_LIBX11_TRUE = @HAVE_LIBX11_TRUE@
+HAVE_QUICKTIME_FALSE = @HAVE_QUICKTIME_FALSE@
+HAVE_QUICKTIME_TRUE = @HAVE_QUICKTIME_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -175,6 +173,12 @@ target_alias = @target_alias@
 xplanet_ARFLAGS = @xplanet_ARFLAGS@
 xplanet_LDFLAGS = @xplanet_LDFLAGS@
 noinst_LIBRARIES = libimage.a
+@HAVE_QUICKTIME_FALSE@read = ReadImage.cpp 
+
+@HAVE_QUICKTIME_TRUE@read = ReadImageQT.cpp
+@HAVE_QUICKTIME_FALSE@write = WriteImage.cpp
+@HAVE_QUICKTIME_TRUE@write = WriteImageQT.cpp
+@HAVE_QUICKTIME_FALSE@bmp = bmp.c
 
 @HAVE_LIBGIF_TRUE@gif = gif.c
 
@@ -186,9 +190,16 @@ noinst_LIBRARIES = libimage.a
 
 @HAVE_LIBTIFF_TRUE@tiff = tiff.c
 
-EXTRA_libimage_a_SOURCES = gif.c jpeg.c png.c pnm.c tiff.c
+EXTRA_libimage_a_SOURCES = bmp.c gif.c jpeg.c png.c pnm.c tiff.c ReadImage.cpp ReadImageQT.cpp WriteImage.cpp WriteImageQT.cpp
 
-libimage_a_SOURCES = bmp.c Image.cpp Image.h $(gif) $(jpeg) $(png) $(pnm) $(tiff)
+AM_CPPFLAGS = -I@top_srcdir@/src
+
+@USE_AR_TRUE@libdisplay_a_AR = $(AR) cru
+@USE_AR_FALSE@libdisplay_a_AR = $(CXX) @xplanet_ARFLAGS@
+@USE_AR_TRUE@libtimer_a_AR = $(AR) cru
+@USE_AR_FALSE@libtimer_a_AR = $(CXX) @xplanet_ARFLAGS@
+
+libimage_a_SOURCES = Image.cpp Image.h $(read) $(write) $(bmp) $(gif) $(jpeg) $(png) $(pnm) $(tiff)
 subdir = src/libimage
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -198,22 +209,32 @@ LIBRARIES = $(noinst_LIBRARIES)
 
 libimage_a_AR = $(AR) cru
 libimage_a_LIBADD =
-am__libimage_a_SOURCES_DIST = bmp.c Image.cpp Image.h gif.c jpeg.c png.c \
-	pnm.c tiff.c
-@HAVE_LIBGIF_TRUE@am__objects_1 = gif.$(OBJEXT)
-@HAVE_LIBJPEG_TRUE@am__objects_2 = jpeg.$(OBJEXT)
-@HAVE_LIBPNG_TRUE@am__objects_3 = png.$(OBJEXT)
-@HAVE_LIBPNM_TRUE@am__objects_4 = pnm.$(OBJEXT)
-@HAVE_LIBTIFF_TRUE@am__objects_5 = tiff.$(OBJEXT)
-am_libimage_a_OBJECTS = bmp.$(OBJEXT) Image.$(OBJEXT) $(am__objects_1) \
+am__libimage_a_SOURCES_DIST = Image.cpp Image.h ReadImage.cpp \
+	ReadImageQT.cpp WriteImage.cpp WriteImageQT.cpp bmp.c gif.c \
+	jpeg.c png.c pnm.c tiff.c
+@HAVE_QUICKTIME_TRUE@am__objects_1 = ReadImageQT.$(OBJEXT)
+@HAVE_QUICKTIME_FALSE@am__objects_1 = ReadImage.$(OBJEXT)
+@HAVE_QUICKTIME_TRUE@am__objects_2 = WriteImageQT.$(OBJEXT)
+@HAVE_QUICKTIME_FALSE@am__objects_2 = WriteImage.$(OBJEXT)
+@HAVE_QUICKTIME_FALSE@am__objects_3 = bmp.$(OBJEXT)
+@HAVE_LIBGIF_TRUE@am__objects_4 = gif.$(OBJEXT)
+@HAVE_LIBJPEG_TRUE@am__objects_5 = jpeg.$(OBJEXT)
+@HAVE_LIBPNG_TRUE@am__objects_6 = png.$(OBJEXT)
+@HAVE_LIBPNM_TRUE@am__objects_7 = pnm.$(OBJEXT)
+@HAVE_LIBTIFF_TRUE@am__objects_8 = tiff.$(OBJEXT)
+am_libimage_a_OBJECTS = Image.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
-	$(am__objects_5)
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8)
 libimage_a_OBJECTS = $(am_libimage_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Image.Po ./$(DEPDIR)/bmp.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Image.Po ./$(DEPDIR)/ReadImage.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/ReadImageQT.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WriteImage.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WriteImageQT.Po ./$(DEPDIR)/bmp.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/gif.Po ./$(DEPDIR)/jpeg.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/png.Po ./$(DEPDIR)/pnm.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/tiff.Po
@@ -257,6 +278,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Image.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReadImage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReadImageQT.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WriteImage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WriteImageQT.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gif.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpeg.Po@am__quote@

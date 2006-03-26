@@ -1,3 +1,4 @@
+#include <clocale>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
