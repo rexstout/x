@@ -7,3 +7,5 @@ pick up satellite locations from a PREDICT server
 use iconv library for marker files in different character sets
 
 use arbitrary "lookAt" position
+
+use OS X native font and graphics file libraries

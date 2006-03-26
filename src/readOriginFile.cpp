@@ -10,22 +10,22 @@ using namespace std;
 
 static double
 interpolateCircular(double x0, double x1, 
-		    const double xMax, const double interpFactor)
+                    const double xMax, const double interpFactor)
 {
     const double larger = (x0 > x1 ? x0 : x1);
     const double smaller = (x0 < x1 ? x0 : x1);
 
     if ((larger - smaller) > (smaller - larger + xMax))
     {
-	if (x0 < x1)
-	    x0 += xMax;
-	else
-	    x1 += xMax;
+        if (x0 < x1)
+            x0 += xMax;
+        else
+            x1 += xMax;
     }
 
     double returnVal = interpFactor * (x1 - x0) + x0;
     if (returnVal > xMax)
-	returnVal -= xMax;
+        returnVal -= xMax;
 
     return(returnVal);
 }
@@ -39,6 +39,8 @@ readOriginFile(string filename, vector<LBRPoint> &originVector)
         errStr << "Can't open origin file " << filename << "\n";
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
+
+    checkLocale(LC_NUMERIC, "C");
 
     ifstream infile(filename.c_str());
     char line[256];
@@ -69,6 +71,7 @@ readOriginFile(string filename, vector<LBRPoint> &originVector)
 
         originVector.push_back(p);
     }
+    checkLocale(LC_NUMERIC, "");
     infile.close();
 }
 
@@ -82,6 +85,7 @@ readDynamicOrigin(string filename, LBRPoint &originPoint)
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
 
+    checkLocale(LC_NUMERIC, "C");
     ifstream infile(filename.c_str());
     char line[256];
     while(infile.getline(line, 256))
@@ -101,6 +105,7 @@ readDynamicOrigin(string filename, LBRPoint &originPoint)
         originPoint.longitude = lon;
         originPoint.localTime = localTime;
     }
+    checkLocale(LC_NUMERIC, "");
     infile.close();
 }
 
@@ -147,13 +152,13 @@ interpolateOriginFile(const double julianDay,
                           - originVector[i-1].latitude)
                        + originVector[i-1].latitude);
                 lon = interpolateCircular(originVector[i-1].longitude,
-					  originVector[i].longitude,
-					  TWO_PI,
-					  interpFactor);
+                                          originVector[i].longitude,
+                                          TWO_PI,
+                                          interpFactor);
                 localTime = interpolateCircular(originVector[i-1].localTime,
-						originVector[i].localTime,
-						24,
-						interpFactor);
+                                                originVector[i].localTime,
+                                                24,
+                                                interpFactor);
 
                 break;
             }

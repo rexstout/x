@@ -144,7 +144,7 @@ Text::Align(const int align)
         yOffset_ = (iconHeight_ + textHeight_)/2 + 2;
         break;
     case CENTER:
-        xOffset_ = 0;
+        xOffset_ = -(iconWidth_ + textWidth_)/2;
         yOffset_ = 0;
         break;
     default:

@@ -45,7 +45,9 @@ drawStars(DisplayBase *display, View *view)
         if (line[0] == '#') continue;
 
         double Vmag, RA, Dec;
+        checkLocale(LC_NUMERIC, "C");
         if (sscanf(line, "%lf %lf %lf", &Dec, &RA, &Vmag) < 3) continue;
+        checkLocale(LC_NUMERIC, "");
 
         RA *= deg_to_rad;
         Dec *= deg_to_rad;

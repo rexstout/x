@@ -1,5 +1,6 @@
 #include <clocale>
 #include <cstdio>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <vector>
@@ -38,7 +39,25 @@ readConfigFile(string configFile, PlanetProperties *planetProperties[]);
 int
 main(int argc, char **argv)
 {
-    setlocale(LC_ALL, "");
+    if (setlocale(LC_ALL, "") == NULL)
+    {
+        ostringstream errMsg;
+        errMsg << "Warning: setlocale(LC_ALL, \"\") failed! "
+               << "Check your LANG environment variable "
+               << "(currently ";
+        char *lang = getenv("LANG");
+        if (lang == NULL)
+        {
+            errMsg << "NULL";
+        }
+        else
+        {
+            errMsg << "\"" << lang << "\"";
+        }
+        errMsg << "). Setting to \"C\".\n";
+        setlocale(LC_ALL, "C");
+        cerr << errMsg.str();
+    }
 
     Options *options = Options::getInstance();
     options->parseArgs(argc, argv);
@@ -47,15 +66,15 @@ main(int argc, char **argv)
     for (int i = 0; i < RANDOM_BODY; i++)
         planetProperties[i] = new PlanetProperties((body) i);
 
-    // Load up the drawing info for each planet
+    // Load the drawing info for each planet
     readConfigFile(options->ConfigFile(), planetProperties);
 
 #ifdef HAVE_CSPICE
-    // Load up any SPICE kernels
+    // Load any SPICE kernels
     loadSpiceKernels();
 #endif
 
-    // Load up artificial satellite orbital elements
+    // Load artificial satellite orbital elements
     if (!planetProperties[EARTH]->SatelliteFiles().empty())
         loadSatelliteVector(planetProperties[EARTH]);
 
@@ -165,7 +184,7 @@ main(int argc, char **argv)
         Planet *target = findPlanetinMap(planetsFromSunMap, target_body);
 
         // LOOKAT mode is where the target isn't a planetary body.
-        // The Cassini spacecraft, for example.
+        // (e.g. the Cassini spacecraft)
         if (options->TargetMode() == LOOKAT)
         {
             if (options->LightTime()) options->setTarget(planetProperties);

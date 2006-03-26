@@ -43,9 +43,6 @@ extern double toJulian(int year, int month, int day,
 
 extern double delT(const double jd);
 
-extern double poly(const double a1, const double a2, const double a3, 
-                   const double a4, const double t);
-
 extern void rotateX(double &X, double &Y, double &Z, const double theta);
 
 extern void rotateZ(double &X, double &Y, double &Z, const double theta);
@@ -74,5 +71,11 @@ extern void xpWarn(const std::string &message, const char *file,
 
 extern void xpMsg(const std::string &message, const char *file, 
                   const int line);
+
+extern void
+strftimeUTF8(std::string &timeString);
+
+extern char *
+checkLocale(const int category, const char *locale);
 
 #endif

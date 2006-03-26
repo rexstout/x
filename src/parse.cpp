@@ -13,7 +13,7 @@ parseColor(string color, unsigned char RGB[3]);
 bool
 isDelimiter(char c)
 {
-    return(c == ' ' || c == '\t' || c == ',');
+    return(c == ' ' || c == '\t');
 }
 
 bool
@@ -159,6 +159,8 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = GRID_COLOR;
     else if (getValue(line, i, "image=", returnString))
         returnVal = IMAGE;
+    else if (getValue(line, i, "lang=", returnString))
+        returnVal = LANGUAGE;
     else if (getValue(line, i, "magnify=", returnString))
         returnVal = MAGNIFY;
     else if (getValue(line, i, "mapbounds={", '}', returnString))

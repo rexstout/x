@@ -1,3 +1,15 @@
+Version 1.0.5 (released 23 Mar 2004)
+
+	* Improved locale support. The date string is now converted to
+	UTF-8 using iconv() after being created by strftime() in the
+	default encoding.  Added the "lang" keyword to marker files.
+
+	* Floating point numbers in all input files must be in the "C"
+	locale format, meaning that the decimal separator must be the '.'
+	character and not the ','.
+
+	* Fixed align=center option in marker files.
+	
 Version 1.0.4 (released 05 Mar 2004)
 
 	* Added support for SPICE kernels for spacecraft ephemerides.

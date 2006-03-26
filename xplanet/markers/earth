@@ -1,11 +1,26 @@
 # Longitudes and latitudes are from
 # http://www.getty.edu/research/tools/vocabulary/tgn/index.html
 #
-# The format string is read by strftime.  A description can be found at 
-# http://www.gnu.org/manual/glibc-2.2.3/html_node/libc_427.html
+# The text string is read by strftime() if it contains time formatting
+# codes.  A description of strftime() can be found at
+# http://www.opengroup.org/onlinepubs/007904975/functions/strftime.html
+#
+# The text strings must be encoded in UTF-8.  If there is time
+# formatting information in the string and the timezone is defined,
+# the formatting codes are run through strftime() and then converted
+# to UTF-8 using iconv().  The locale is taken from the environment.
+# The "lang" keyword may also be used to specify an alternate locale.
+# Valid locales can be listed on most systems using 'locale -a'.
+#
+# For example, the text string below will display the date and time
+# for Montreal in Japanese, provided your system supports the
+# ja_JP.eucJP locale.
+#
+# 45.50  -73.60 "Montréal %c" lang=ja_JP.eucJP timezone=America/Montreal
 #
 # Although I've provided timezone values for all of the cities below,
-# they may not work on all operating systems.  
+# they may not work on all operating systems.  The timezone is only
+# used if there are time formatting codes in the text string.
 #
 # Windows users will have to use the POSIX definition style
 # std offset dst [offset],start[/time],end[/time]
@@ -16,8 +31,10 @@
 # New Zealand would use
 # timezone=NZST-12NZDT,M10.1.0/2,M3.3.0/3
 #
-# A good description of the syntax can be found at 
-# http://www.gnu.org/manual/glibc-2.2.3/html_node/libc_431.html
+# The syntax is described at
+# http://www.opengroup.org/onlinepubs/007904975/functions/tzset.html
+# and
+# http://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html
 
 -25.07 -130.08 "Adamstown"                      timezone=Pacific/Pitcairn       # Pitcairn Island (UK)
  61.22 -149.90 "Anchorage"                      timezone=America/Anchorage      # USA
@@ -73,13 +90,13 @@
  14.62  120.97 "Manila"                         timezone=Asia/Manila            # Philippines
  19.40  -99.15 "Mexico City"                    timezone=America/Mexico_City    # Mexico
  25.20  -99.83 "Monterrey"                      timezone=America/Monterrey      # Mexico
- 45.50  -73.60 "Montréal"                       timezone=America/Montreal      # Canada
+ 45.50  -73.60 "Montréal"                      timezone=America/Montreal       # Canada
  55.75   37.70 "Moscow"                         timezone=Europe/Moscow          # Russia
   2.03   45.35 "Muqdisho"                       timezone=Africa/Mogadishu       # Somalia
  20.98  -89.65 "Mérida"                         timezone=America/Merida        # Mexico
  12.17   14.98 "NDjamena"                       timezone=Africa/Ndjamena        # Chad
  -1.28   36.83 "Nairobi"                        timezone=Africa/Nairobi         # Kenya
- 40.70  -74.00 "New York %H:%M %Z"              timezone=America/New_York       # USA
+ 40.70  -74.00 "New York"			timezone=America/New_York       # USA
  13.53    2.08 "Niamey"                         timezone=Africa/Niamey          # Niger
  18.15  -15.97 "Nouakchott"                     timezone=Africa/Nouakchott      # Mauritania
 -17.53 -149.57 "Papeete"                        timezone=Pacific/Tahiti         # French Polynesia

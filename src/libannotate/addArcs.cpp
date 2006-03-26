@@ -68,6 +68,7 @@ readArcFile(const char *line, Planet *planet,
         }
         break;
         case LATLON:
+            checkLocale(LC_NUMERIC, "C");
             if (j < 4)
             {
                 sscanf(returnString, "%lf", &coords[j]);
@@ -100,8 +101,10 @@ readArcFile(const char *line, Planet *planet,
             {
                 syntaxError = true;
             }
+            checkLocale(LC_NUMERIC, "");
             break;
         case RADIUS:
+            checkLocale(LC_NUMERIC, "C");
             if (k < 2)
             {
                 sscanf(returnString, "%lf", &radius[k]);
@@ -117,16 +120,18 @@ readArcFile(const char *line, Planet *planet,
                     k++;
                 }
             }
+            checkLocale(LC_NUMERIC, "");
             break;
         case SPACING:
+            checkLocale(LC_NUMERIC, "C");
             sscanf(returnString, "%lf", &spacing);
             if (spacing < 0) 
             {
-                xpWarn("spacing must be positive\n",
-                       __FILE__, __LINE__);
+                xpWarn("spacing must be positive\n", __FILE__, __LINE__);
                 spacing = 0.1;
                 syntaxError = true;
             }
+            checkLocale(LC_NUMERIC, "");
             break;
         case UNKNOWN:
             syntaxError = true;

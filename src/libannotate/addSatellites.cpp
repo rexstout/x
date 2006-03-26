@@ -148,12 +148,14 @@ readSatelliteFile(const char *line, Planet *planet,
             break;
         case CIRCLE:
         {
+	    checkLocale(LC_NUMERIC, "C");
             double angle;
             sscanf(returnString, "%lf", &angle);
             if (angle < 0) angle *= -1;
             if (angle > 90) angle = 90;
             angle = 90 - angle;
             altcirc.push_back(angle * deg_to_rad);
+	    checkLocale(LC_NUMERIC, "");
         }
         break;
         case COLOR:
@@ -214,6 +216,7 @@ readSatelliteFile(const char *line, Planet *planet,
             name.assign(returnString);
             break;
         case SPACING:
+	    checkLocale(LC_NUMERIC, "C");
             sscanf(returnString, "%lf", &spacing);
             if (spacing < 0) 
             {
@@ -221,6 +224,7 @@ readSatelliteFile(const char *line, Planet *planet,
                 spacing = 0.1;
                 syntaxError = true;
             }
+	    checkLocale(LC_NUMERIC, "");
             break;
         case TRAIL:
         {
