@@ -25,9 +25,6 @@ calculateSpicePosition(double jd, const int naifInt,
     SpiceInt naifId = static_cast<SpiceInt> (naifInt);
     SpiceInt relativeTo = static_cast<SpiceInt> (relativeInt);
     
-    Options *options = Options::getInstance();
-    if (options->UniversalTime()) jd += delT(jd) / 86400;
-
     // seconds past J2000
     const SpiceDouble et = ((jd - 2451545.0) * 86400);
     SpiceDouble pos[3];
@@ -48,6 +45,7 @@ calculateSpicePosition(double jd, const int naifInt,
     Y += pos[1];
     Z += pos[2];
 
+    Options *options = Options::getInstance();
     if (options->LightTime())
     {
         // Rectangular coordinates of the observer
@@ -318,7 +316,7 @@ readSpiceFile(const char *line,
 
     if (relative == NULL) return;
     
-    const double jd = options->getJulianDay();
+    const double jd = options->JulianDay();
     double X, Y, Z;
     if (calculateSpicePosition(jd, naifInt, relative, relativeInt, X, Y, Z))
     {
@@ -344,8 +342,8 @@ readSpiceFile(const char *line,
     {
         double pX, pY, pZ;
         view->XYZToPixel(X, Y, Z, pX, pY, pZ);
-        pX += options->getCenterX();
-        pY += options->getCenterY();
+        pX += options->CenterX();
+        pY += options->CenterY();
 
         plotThis = (pZ > 0);
 
@@ -367,8 +365,8 @@ readSpiceFile(const char *line,
           double rX, rY, rZ;
           planet->getPosition(rX, rY, rZ);
           view->XYZToPixel(rX, rY, rZ, rX, rY, rZ);
-          rX += options->getCenterX();
-          rY += options->getCenterY();
+          rX += options->CenterX();
+          rY += options->CenterY();
           
             double pixelDist = sqrt((rX - pX)*(rX - pX) 
                                     + (rY - pY)*(rY - pY));
@@ -456,12 +454,12 @@ readSpiceFile(const char *line,
             if (view != NULL)
             {
                 view->XYZToPixel(X0, Y0, Z0, X0, Y0, Z0);
-                X0 += options->getCenterX();
-                Y0 += options->getCenterY();
+                X0 += options->CenterX();
+                Y0 += options->CenterY();
                 
                 view->XYZToPixel(X1, Y1, Z1, X1, Y1, Z1);
-                X1 += options->getCenterX();
-                Y1 += options->getCenterY();
+                X1 += options->CenterX();
+                Y1 += options->CenterY();
             }
             else
             {

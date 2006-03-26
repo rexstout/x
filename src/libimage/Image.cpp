@@ -61,6 +61,47 @@ Image::Write(const char *filename)
                       quality_));
 }
 
+bool
+Image::Crop(const int x0, const int y0, const int x1, const int y1)
+{
+    if (x1 <= x0 || y1 <= y0) return(false);
+
+    const int w = x1 - x0;
+    const int h = y1 - y0;
+    const int new_area = w * h;
+
+    unsigned char *new_rgb = (unsigned char *) malloc(3 * new_area);
+    memset(new_rgb, 0, 3 * new_area);
+
+    unsigned char *new_alpha = NULL;
+    if (pngAlpha_ != NULL)
+    {
+        new_alpha = (unsigned char *) malloc(new_area);
+        memset(new_alpha, 0, new_area);
+    }
+
+    int ipos = 0;
+    for (int j = 0; j < h; j++)
+    {
+        for (int i = 0; i < w; i++)
+        {
+            memcpy(new_rgb + ipos,
+                   rgbData_ + 3 * ((j + y0) * width_ + (i + x0)), 3);
+            ipos += 3;
+        }
+    }
+    free(rgbData_);
+    free(pngAlpha_);
+
+    width_    = w;
+    height_   = h;
+    area_     = new_area;
+    rgbData_  = new_rgb;
+    pngAlpha_ = new_alpha;
+
+    return(true);
+}
+
 void
 Image::Reduce(const int factor)
 {
@@ -106,7 +147,7 @@ Image::Reduce(const int factor)
 
     width_    = w;
     height_   = h;
-    area_     = w * h;
+    area_     = new_area;
     rgbData_  = new_rgb;
     pngAlpha_ = new_alpha;
 }

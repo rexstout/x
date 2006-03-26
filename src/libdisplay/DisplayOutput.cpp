@@ -24,14 +24,14 @@ DisplayOutput::DisplayOutput(const int tr) : DisplayBase(tr)
     if (!options->CenterSelected())
     {
         if (width_ % 2 == 0)
-            options->setCenterX(width_/2 - 0.5);
+            options->CenterX(width_/2 - 0.5);
         else
-            options->setCenterX(width_/2);
+            options->CenterX(width_/2);
 
         if (height_ % 2 == 0)
-            options->setCenterY(height_/2 - 0.5);
+            options->CenterY(height_/2 - 0.5);
         else
-            options->setCenterY(height_/2);
+            options->CenterY(height_/2);
     }
 
     allocateRGBData();
@@ -47,15 +47,17 @@ DisplayOutput::renderImage(PlanetProperties *planetProperties[])
     drawLabel(planetProperties);
 
     Options *options = Options::getInstance();
-    string outputFilename = options->getOutputBase();
-    if (options->NumTimes() > 1)
+    string outputFilename = options->OutputBase();
+    int startIndex = options->OutputStartIndex();
+    int stopIndex = options->NumTimes() + startIndex;
+    if (stopIndex > 1)
     {
-        const int digits = (int) (log10((double) options->NumTimes()) + 1);
+        const int digits = (int) (log10((double) stopIndex) + 1);
         char buffer[64];
-        snprintf(buffer, 64, "%.*d", digits, times_run);
+        snprintf(buffer, 64, "%.*d", digits, times_run + startIndex);
         outputFilename += buffer;
     }
-    outputFilename += options->getOutputExtension();
+    outputFilename += options->OutputExtension();
 
     Image i(width_, height_, rgb_data, alpha);
     i.Quality(quality_);

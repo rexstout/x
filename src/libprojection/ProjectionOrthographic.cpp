@@ -14,7 +14,7 @@ ProjectionOrthographic::ProjectionOrthographic(const int f, const int w, const i
     Options *options = Options::getInstance();
 
     radius_ = options->Radius() * height_;
-    setRange(options->getRange());
+    setRange(options->Range());
 
     buildPhotoTable();
 }

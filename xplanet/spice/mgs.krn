@@ -1,5 +1,8 @@
 # These kernel files are from
 # ftp://naif.jpl.nasa.gov/pub/naif/MGS/kernels/spk/
+#
+# Add more recent kernel files at the bottom.
+#
 
 # Phobos and Deimos
 mar033_2000-2025.bsp                  # 2000 JAN 01 to 2025 JAN 01

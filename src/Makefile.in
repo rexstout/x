@@ -203,6 +203,8 @@ xplanet_SOURCES = \
 	createMap.cpp		\
 	drawMultipleBodies.cpp	\
 	drawProjection.cpp	\
+	findBodyXYZ.h		\
+	findBodyXYZ.cpp		\
 	findFile.h		\
 	findFile.cpp		\
 	getopt.c		\
@@ -212,10 +214,12 @@ xplanet_SOURCES = \
 	parse.h			\
 	parse.cpp  		\
 	parseColor.cpp		\
+	printVersion.cpp	\
 	readConfig.cpp		\
 	readOriginFile.h	\
 	readOriginFile.cpp	\
 	satrings.h		\
+	ssec.cpp		\
 	sphericalToPixel.h	\
 	sphericalToPixel.cpp	\
 	xpGetopt.h		\
@@ -251,10 +255,11 @@ am__xplanet_SOURCES_DIST = Map.cpp Map.h Options.cpp Options.h \
 	PlanetProperties.h PlanetProperties.cpp Ring.cpp Ring.h \
 	Satellite.h Satellite.cpp View.cpp View.h body.h \
 	buildPlanetMap.h buildPlanetMap.cpp createMap.h createMap.cpp \
-	drawMultipleBodies.cpp drawProjection.cpp findFile.h \
-	findFile.cpp getopt.c getopt.h getopt1.c keywords.h parse.h \
-	parse.cpp parseColor.cpp readConfig.cpp readOriginFile.h \
-	readOriginFile.cpp satrings.h sphericalToPixel.h \
+	drawMultipleBodies.cpp drawProjection.cpp findBodyXYZ.h \
+	findBodyXYZ.cpp findFile.h findFile.cpp getopt.c getopt.h \
+	getopt1.c keywords.h parse.h parse.cpp parseColor.cpp \
+	printVersion.cpp readConfig.cpp readOriginFile.h \
+	readOriginFile.cpp satrings.h ssec.cpp sphericalToPixel.h \
 	sphericalToPixel.cpp xpGetopt.h xpUtil.cpp xpUtil.h xplanet.cpp \
 	ParseGeom.c ParseGeom.h
 @HAVE_LIBX11_FALSE@am__objects_1 = ParseGeom.$(OBJEXT)
@@ -262,10 +267,12 @@ am_xplanet_OBJECTS = Map.$(OBJEXT) Options.$(OBJEXT) \
 	PlanetProperties.$(OBJEXT) Ring.$(OBJEXT) Satellite.$(OBJEXT) \
 	View.$(OBJEXT) buildPlanetMap.$(OBJEXT) createMap.$(OBJEXT) \
 	drawMultipleBodies.$(OBJEXT) drawProjection.$(OBJEXT) \
-	findFile.$(OBJEXT) getopt.$(OBJEXT) getopt1.$(OBJEXT) \
-	parse.$(OBJEXT) parseColor.$(OBJEXT) readConfig.$(OBJEXT) \
-	readOriginFile.$(OBJEXT) sphericalToPixel.$(OBJEXT) \
-	xpUtil.$(OBJEXT) xplanet.$(OBJEXT) $(am__objects_1)
+	findBodyXYZ.$(OBJEXT) findFile.$(OBJEXT) getopt.$(OBJEXT) \
+	getopt1.$(OBJEXT) parse.$(OBJEXT) parseColor.$(OBJEXT) \
+	printVersion.$(OBJEXT) readConfig.$(OBJEXT) \
+	readOriginFile.$(OBJEXT) ssec.$(OBJEXT) \
+	sphericalToPixel.$(OBJEXT) xpUtil.$(OBJEXT) xplanet.$(OBJEXT) \
+	$(am__objects_1)
 xplanet_OBJECTS = $(am_xplanet_OBJECTS)
 xplanet_DEPENDENCIES = libannotate/libannotate.a libdisplay/libdisplay.a \
 	libdisplay/libtimer.a libephemeris/libephemeris.a \
@@ -284,11 +291,13 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/createMap.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/drawMultipleBodies.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/drawProjection.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/findFile.Po ./$(DEPDIR)/getopt.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/getopt1.Po ./$(DEPDIR)/parse.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/parseColor.Po ./$(DEPDIR)/readConfig.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/findBodyXYZ.Po ./$(DEPDIR)/findFile.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/getopt.Po ./$(DEPDIR)/getopt1.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/parse.Po ./$(DEPDIR)/parseColor.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/printVersion.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/readConfig.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/readOriginFile.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/sphericalToPixel.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sphericalToPixel.Po ./$(DEPDIR)/ssec.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/xpUtil.Po ./$(DEPDIR)/xplanet.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -364,14 +373,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/createMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawMultipleBodies.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawProjection.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findBodyXYZ.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findFile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parseColor.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printVersion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readConfig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readOriginFile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphericalToPixel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpUtil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xplanet.Po@am__quote@
 

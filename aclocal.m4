@@ -313,6 +313,7 @@ if test "$with_aqua" = yes; then
   if test "$with_quicktime" != no; then
     have_quicktime='yes'
     AQUA_LIBS="-framework Quicktime"
+    AC_DEFINE(HAVE_QUICKTIME,,Define if you have Quicktime)
   fi
   AQUA_LIBS="$AQUA_LIBS -framework IOKit -framework Carbon -framework Cocoa -bind_at_load"
   AC_SUBST(AQUA_LIBS)

@@ -28,6 +28,7 @@ PlanetProperties::PlanetProperties(const body index)
       nightMap_(""), 
       randomOrigin_(true),
       randomTarget_(true),
+      ssecMap_(false),
       shade_(0.3),
       specularMap_(""),
       startOrbit_(-0.5), stopOrbit_(0.5),
@@ -86,6 +87,7 @@ PlanetProperties::operator= (const PlanetProperties &p)
 
     cloudGamma_ = p.cloudGamma_;
     cloudMap_ = p.cloudMap_;
+    cloudThreshold_ = p.cloudThreshold_;
 
     delOrbit_ = p.delOrbit_;
     drawOrbit_ = p.drawOrbit_;
@@ -112,10 +114,12 @@ PlanetProperties::operator= (const PlanetProperties &p)
     randomOrigin_ = p.randomOrigin_;
     randomTarget_ = p.randomTarget_;
     
+    ssecMap_ = p.ssecMap_;
     shade_ = p.shade_;
-
     startOrbit_ = p.startOrbit_;
     stopOrbit_ = p.stopOrbit_;
 
+    twilight_ = p.twilight_;
+    
     return(*this);
 }

@@ -130,6 +130,8 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = CLOUD_GAMMA;
     else if (getValue(line, i, "cloud_map=", returnString))
         returnVal = CLOUD_MAP;
+    else if (getValue(line, i, "cloud_ssec=", returnString))
+        returnVal = CLOUD_SSEC;
     else if (getValue(line, i, "cloud_threshold=", returnString))
         returnVal = CLOUD_THRESHOLD;
     else if (getValue(line, i, "color={", '}', returnString))

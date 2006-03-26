@@ -52,14 +52,14 @@ DisplayMacAqua::DisplayMacAqua(const int tr) : DisplayBase(tr)
     if (!options->CenterSelected())
     {
         if (width_ % 2 == 0)
-            options->setCenterX(width_/2 - 0.5);
+            options->CenterX(width_/2 - 0.5);
         else
-            options->setCenterX(width_/2);
+            options->CenterX(width_/2);
 
         if (height_ % 2 == 0)
-            options->setCenterY(height_/2 - 0.5);
+            options->CenterY(height_/2 - 0.5);
         else
-            options->setCenterY(height_/2);
+            options->CenterY(height_/2);
     }
 
     allocateRGBData();

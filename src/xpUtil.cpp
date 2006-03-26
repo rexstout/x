@@ -36,6 +36,14 @@ xpExit(const string &message, const char *file, const int line)
 {
     cerr << "Error: " << message;
     cerr << "Exiting from " << file << " at line " << line << endl;
+
+#if 0
+    // force a segfault
+    const char *const ptr = NULL;
+    cout << ptr[5000] << endl;
+    cout.flush();
+#endif
+
     exit(EXIT_FAILURE);
 }
 
@@ -172,13 +180,11 @@ invertMatrix(double in[3][3], double out[3][3])
 void
 RADecToXYZ(double RA, double Dec, double &X, double &Y, double &Z)
 {
-    double dist = 1e6;
-    
     RA *= 15;
     
-    X = dist * cos(Dec) * cos(RA);
-    Y = dist * cos(Dec) * sin(RA);
-    Z = dist * sin(Dec);
+    X = FAR_DISTANCE * cos(Dec) * cos(RA);
+    Y = FAR_DISTANCE * cos(Dec) * sin(RA);
+    Z = FAR_DISTANCE * sin(Dec);
 }
 
 void
@@ -466,12 +472,12 @@ convertEncoding(const bool toNative, ICONV_CONST char *inBuf, char *outBuf)
     memcpy(outBuf, inBuf, MAX_LINE_LENGTH);
 #else
 #ifdef HAVE_LIBCHARSET
-    const char *fromCode = (toNative ? "UTF-8" : locale_charset());
-    const char *toCode =   (toNative ? locale_charset() : "UTF-8");
+    const char *encoding = locale_charset();
 #else
-    const char *fromCode = (toNative ? "UTF-8" : nl_langinfo(CODESET));
-    const char *toCode =   (toNative ? nl_langinfo(CODESET) : "UTF-8");
+    const char *encoding = nl_langinfo(CODESET);
 #endif
+    const char *fromCode = (toNative ? "UTF-8" : encoding);
+    const char *toCode =   (toNative ? encoding : "UTF-8");
     iconv_t conv = iconv_open(toCode, fromCode);
     if (conv != (iconv_t) -1)
     {
@@ -539,7 +545,7 @@ strftimeUTF8(string &timeString)
     // Run it through strftime()
     char buffer_native[MAX_LINE_LENGTH];
     Options *options = Options::getInstance();
-    time_t tv_sec = options->getTVSec();
+    time_t tv_sec = options->TVSec();
     strftime(buffer_native, MAX_LINE_LENGTH, 
              buffer_native_format, 
              localtime((time_t *) &tv_sec));

@@ -10,20 +10,20 @@ ProjectionBase::ProjectionBase(const int flipped, const int w, const int h)
     Options *options = Options::getInstance();
     centerLat_ = options->Latitude();
     centerLon_ = options->Longitude() * flipped_;
-    const double rotAngle = options->getRotate();
+    const double rotAngle = options->Rotate();
     
-    centerX_ = options->getCenterX();
-    centerY_ = options->getCenterY();
+    centerX_ = options->CenterX();
+    centerY_ = options->CenterY();
     radius_ = options->Radius();
 
     rotate_ = (centerLat_ != 0 || centerLon_ != 0 || rotAngle != 0);
 
     if (rotate_)
     {
-	SetXYZRotationMatrix(rotAngle, centerLat_, -centerLon_);
-	
-	// set rotation matrix for grid and markers
-	SetZYXRotationMatrix(-rotAngle, -centerLat_, centerLon_);
+        SetXYZRotationMatrix(rotAngle, centerLat_, -centerLon_);
+        
+        // set rotation matrix for grid and markers
+        SetZYXRotationMatrix(-rotAngle, -centerLat_, centerLon_);
     }
 
     // limb darkening_, gets overridden in ORTHOGRAPHIC mode
@@ -42,8 +42,8 @@ ProjectionBase::~ProjectionBase()
 */
 void
 ProjectionBase::SetXYZRotationMatrix(const double angle_x, 
-				     const double angle_y, 
-				     const double angle_z)
+                                     const double angle_y, 
+                                     const double angle_z)
 {
     if (angle_x == 0 && angle_y == 0 && angle_z == 0) 
     {
@@ -79,8 +79,8 @@ ProjectionBase::SetXYZRotationMatrix(const double angle_x,
 */
 void
 ProjectionBase::SetZYXRotationMatrix(const double angle_x, 
-				     const double angle_y,
-				     const double angle_z)
+                                     const double angle_y,
+                                     const double angle_z)
 {
     if (angle_x == 0 && angle_y == 0 && angle_z == 0) 
     {
@@ -116,14 +116,14 @@ ProjectionBase::RotateXYZ(double &lat, double &lon) const
     const double Z0 = sin(lat);
 
     const double X1 = (rotXYZ_[0][0] * X0 
-		       + rotXYZ_[0][1] * Y0 
-		       + rotXYZ_[0][2] * Z0);
+                       + rotXYZ_[0][1] * Y0 
+                       + rotXYZ_[0][2] * Z0);
     const double Y1 = (rotXYZ_[1][0] * X0 
-		       + rotXYZ_[1][1] * Y0
-		       + rotXYZ_[1][2] * Z0);
+                       + rotXYZ_[1][1] * Y0
+                       + rotXYZ_[1][2] * Z0);
     const double Z1 = (rotXYZ_[2][0] * X0
-		       + rotXYZ_[2][1] * Y0
-		       + rotXYZ_[2][2] * Z0);
+                       + rotXYZ_[2][1] * Y0
+                       + rotXYZ_[2][2] * Z0);
 
     lat = asin(Z1);
     lon = atan2(Y1, X1);
@@ -137,14 +137,14 @@ ProjectionBase::RotateZYX(double &lat, double &lon) const
     const double Z0 = sin(lat);
 
     const double X1 = (rotZYX_[0][0] * X0 
-		       + rotZYX_[0][1] * Y0 
-		       + rotZYX_[0][2] * Z0);
+                       + rotZYX_[0][1] * Y0 
+                       + rotZYX_[0][2] * Z0);
     const double Y1 = (rotZYX_[1][0] * X0 
-		       + rotZYX_[1][1] * Y0 
-		       + rotZYX_[1][2] * Z0);
+                       + rotZYX_[1][1] * Y0 
+                       + rotZYX_[1][2] * Z0);
     const double Z1 = (rotZYX_[2][0] * X0 
-		       + rotZYX_[2][1] * Y0 
-		       + rotZYX_[2][2] * Z0);
+                       + rotZYX_[2][1] * Y0 
+                       + rotZYX_[2][2] * Z0);
 
     lat = asin(Z1);
     lon = atan2(Y1, X1);

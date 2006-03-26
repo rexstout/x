@@ -13,6 +13,7 @@
 const double deg_to_rad = M_PI/180.;
 const double TWO_PI = 2 * M_PI;
 const double AU_to_km = 149597870.66;
+const double FAR_DISTANCE = 1e6;
 
 const int MAX_LINE_LENGTH = 512;
 

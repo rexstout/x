@@ -286,9 +286,9 @@ Map::OverlayClouds(const unsigned char *clouds)
     {
         string outputDir(options->TmpDir());
 
-        string outputFilename = options->getOutputBase();
+        string outputFilename = options->OutputBase();
         if (outputFilename.empty()) outputFilename.assign("clouds");
-        outputFilename += options->getOutputExtension();
+        outputFilename += options->OutputExtension();
 
         string dayFile = outputDir + "day_" + outputFilename;
         Image d(width_, height_, dayData_, NULL);

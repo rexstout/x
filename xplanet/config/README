@@ -33,6 +33,15 @@ cloud_map
 Specify an image to overlay on the planet map.  The default is no
 cloud map.
 
+cloud_ssec
+If true, assume the cloud map is an image downloaded from the Space
+Science and Engineering Center (SSEC) at the University of Wisconsin.
+The latest image (updated every three hours) can be obtained from
+http://www.ssec.wisc.edu/data/comp/latest_moll.gif. This image is a
+640x350 pixel Mollweide composite image with ugly pink coastlines.
+Xplanet will reproject and resize the image as well as remove and fill
+in the coastlines.
+
 cloud_threshold
 Cloud pixel values below threshold will be ignored.  The value for
 threshold should be between 0 and 255.  The default is 90.

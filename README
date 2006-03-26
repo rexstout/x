@@ -23,17 +23,23 @@ for body are sun, mercury, venus, earth, moon, mars, phobos, deimos,
 jupiter, io, europa, ganymede, callisto, saturn, mimas, enceladus,
 tethys, dione, rhea, titan, hyperion, iapetus, phoebe, uranus,
 miranda, ariel, umbriel, titania, oberon, neptune, triton, nereid,
-pluto, charon, random, and major.  The field of view can also be
-centered on a satellite location using "naif" or "norad", along with
-the satellite id.  For example, "-body naif-82" will center the field
-of view on NAIF ID -82, which is the Cassini orbiter.  Xplanet must be
-compiled with SPICE support and the required kernels must be present.
-See the README in the spice subdirectory for more details.  Using
-"-body norad20580" will center the field of view on NORAD ID 20580,
-which is the Hubble Space Telescope.  The appropriate TLE files must
-be present in this case.  See the README in the satellites
-subdirectory for more information.  Earth is the default body.  This
-option is the same as -target.
+pluto, charon, random, and major.
+
+The field of view can also be centered on a satellite location using
+"naif" or "norad", along with the satellite id.  For example, "-body
+naif-82" will center the field of view on NAIF ID -82, which is the
+Cassini orbiter.  Xplanet must be compiled with SPICE support and the
+required kernels must be present.  See the README in the spice
+subdirectory for more details.  Using "-body norad20580" will center
+the field of view on NORAD ID 20580, which is the Hubble Space
+Telescope.  The appropriate TLE files must be present in this case.
+See the README in the satellites subdirectory for more information.
+
+Using "path" will center the field of view on the direction of motion
+of the origin.  This direction is relative to the direction of motion
+of the body specified by -path_relative_to.
+
+Earth is the default body.  This option is the same as -target.
 
 -center +x+y
 Place the center of the rendered body at pixel coordinates (x, y).
@@ -68,13 +74,12 @@ of the file must be of the form
 YYYYMMDD.HHMMSS range lat lon [localtime]
 For example,
 19951207.120000     10.328   -3.018   97.709    9.595
-The specified time is ignored and the current time is used.  The
-localtime is only there for consistency with the origin_file option.
-The range is in planetary radii, and lat and lon are in degrees.  As
-with origin_file, localtime (in hours) is optional, but if present, it
-will be used in place of the longitude.  Only the last line of the
-file is used.  This file may be updated between renderings using a
-script executed with the -prev_command or -post_command options.
+The specified time is ignored and the current time is used.  The range
+is in planetary radii, and lat and lon are in degrees.  As with
+origin_file, localtime (in hours) is optional, but if present, it will
+be used in place of the longitude.  Only the last line of the file is
+used.  This file may be updated between renderings using a script
+executed with the -prev_command or -post_command options.
 
 -ephemeris_file filename
 Specify a JPL digital ephemeris file (DE200, DE405, or DE406) to use
@@ -193,7 +198,8 @@ declination, right ascension, string, as in the example below:
 
 For additional options which may be specified, see the marker_file
 entry in README.config.  This option has no effect if -projection is
-specified.
+specified.  This option is not meant for city markers; for that use
+the marker_file option in the configuration file.
 
 -markerbounds filename
 Write coordinates of the bounding box for each marker to filename.
@@ -206,10 +212,16 @@ where the coordinates are for the upper left and lower right corners
 of the box.  This file gets rewritten every time xplanet renders its
 image.
 
--north north_type
-This option rotates the image so that the top corresponds to north in
-the given coordinate system: "body", "galactic", "orbit", or
-"terrestrial".  The default value is "body".
+-north north_type 
+This option rotates the image so that the top points to north_type.
+Valid values for north_type are:
+
+body:     body's north pole
+galactic: galactic north pole
+orbit:    body's orbital north pole (perpendicular to the orbit plane)
+path:     origin's velocity vector  (also see -path_relative_to option)
+
+The default value is "body".
 
 -num_times num_times
 Run num_times before exiting.  The default is to run indefinitely.
@@ -255,7 +267,11 @@ Output to a file instead of rendering to a window.  The file format is
 taken from the extension. Currently .gif, .jpg, .ppm, .png, and .tiff
 images can be created, if xplanet has been compiled with the
 appropriate libraries.  The image size defaults to 512 by 512 pixels
-but this may be changed by the -geometry flag.
+but this may be changed by the -geometry flag.  If used with the
+-num_times option, each output file will be numbered sequentially.
+
+-output_start_index index
+Start numbering output files at index.  The default is 0.
 
 -pango
 Use the Pango (http://www.pango.org) library for rendering
@@ -264,6 +280,11 @@ and will eventually support output in all the worlds major languages.
 If xplanet has not been compiled with this library this option will be
 ignored.  There appear to be memory leaks in the pango library, so I
 don't recommend letting xplanet run indefinitely with this option.
+
+-path_relative_to body
+Only used with -north path or -target path.  The origin's velocity
+vector is calculated relative to the specified body.  By default, this
+is the Sun.
 
 -post_command command
 -prev_command command
@@ -400,7 +421,8 @@ level	   output
 The default value is 0.
 
 -version
-Display current version information.
+Display current version information, along with a list of compile-time
+options that xplanet supports.
 
 -vroot
 Render the image to the virtual root window.  Some window managers use

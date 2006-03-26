@@ -74,6 +74,8 @@ Planet::parseBodyName(char *name)
         return_body = NORAD;
     else if (strncmp(lowercase, body_string[OBERON], 1) == 0)
         return_body = OBERON;
+    else if (strncmp(lowercase, "path", 2) == 0)
+        return_body = ALONG_PATH;
     else if (strncmp(lowercase, body_string[PHOBOS], 4) == 0)
         return_body = PHOBOS;
     else if (strncmp(lowercase, body_string[PHOEBE], 4) == 0)
@@ -124,6 +126,10 @@ Planet::Planet(const double jd, const body this_body)
       period_(0),
       needShadowCoeffs_(true)
 {
+    Options *options = Options::getInstance();
+    if (options->UniversalTime())
+        julianDay_ += delT(julianDay_) / 86400;
+
     d2000_ = (julianDay_ - 2451545.0);
     T2000_ = d2000_ / 36525;
 
@@ -824,9 +830,6 @@ Planet::Planet(const double jd, const body this_body)
 
     radiusPol_ = radiusEq_ * (1 - flattening_);
     omf2_ = (1 - flattening_) * (1 - flattening_);
-
-    Options *options = Options::getInstance();
-    if (options->UniversalTime()) julianDay_ += delT(jd) / 86400;
 }
 
 Planet::~Planet()

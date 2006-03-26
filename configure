@@ -1575,7 +1575,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=xplanet
- VERSION=1.1.0
+ VERSION=1.1.1
 
 
 cat >>confdefs.h <<_ACEOF
@@ -5980,6 +5980,11 @@ _ACEOF
   if test "$with_quicktime" != no; then
     have_quicktime='yes'
     AQUA_LIBS="-framework Quicktime"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_QUICKTIME
+_ACEOF
+
   fi
   AQUA_LIBS="$AQUA_LIBS -framework IOKit -framework Carbon -framework Cocoa -bind_at_load"
 

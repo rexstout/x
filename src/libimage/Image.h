@@ -24,6 +24,7 @@ class Image
     bool Read(const char *filename);
     bool Write(const char *filename);
 
+    bool Crop(const int x0, const int y0, const int x1, const int y1);
     void Reduce(const int factor);
     void Resize(const int w, const int h);
 

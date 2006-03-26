@@ -31,6 +31,8 @@ xplanet_SOURCES = \
 	createMap.cpp		\
 	drawMultipleBodies.cpp	\
 	drawProjection.cpp	\
+	findBodyXYZ.h		\
+	findBodyXYZ.cpp		\
 	findFile.h		\
 	findFile.cpp		\
 	getopt.c		\
@@ -40,10 +42,12 @@ xplanet_SOURCES = \
 	parse.h			\
 	parse.cpp  		\
 	parseColor.cpp		\
+	printVersion.cpp	\
 	readConfig.cpp		\
 	readOriginFile.h	\
 	readOriginFile.cpp	\
 	satrings.h		\
+	ssec.cpp		\
 	sphericalToPixel.h	\
 	sphericalToPixel.cpp	\
 	xpGetopt.h		\
