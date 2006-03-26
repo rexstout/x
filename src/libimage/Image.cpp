@@ -7,8 +7,6 @@ using namespace std;
 
 #include "Image.h"
 
-#include "config.h"
-
 extern bool 
 ReadImage(const char *filename, int &width, int &height, 
           unsigned char *&rgb_data, unsigned char *&png_alpha);
@@ -51,14 +49,17 @@ Image::~Image()
 bool
 Image::Read(const char *filename)
 {
-    return(ReadImage(filename, width_, height_, rgbData_, pngAlpha_));
+    bool success = ReadImage(filename, width_, height_, rgbData_, pngAlpha_);
+    area_ = width_ * height_;
+    return(success);
 }
 
 bool
 Image::Write(const char *filename)
 {
-    return(WriteImage(filename, width_, height_, rgbData_, pngAlpha_, 
-                      quality_));
+    bool success = WriteImage(filename, width_, height_, rgbData_, pngAlpha_, 
+                              quality_);
+    return(success);
 }
 
 bool
@@ -186,6 +187,48 @@ Image::Resize(const int w, const int h)
     width_    = w;
     height_   = h;
     area_     = w * h;
+    rgbData_  = new_rgb;
+    pngAlpha_ = new_alpha;
+}
+
+// Slide the whole image to the right (for positive x) or to the left
+// (for negative x).  The original pixel 0 column will be in the pixel
+// x column after this routine is called.
+void
+Image::Shift(const int x)
+{
+    unsigned char *new_rgb = (unsigned char *) malloc(3 * area_);
+    unsigned char *new_alpha = NULL;
+    if (pngAlpha_ != NULL)
+        new_alpha = (unsigned char *) malloc(area_);
+
+    int shift = x;
+    while (shift < 0)
+        shift += width_;
+    while (shift >= width_)
+        shift -= width_;
+
+    int ipos = 0;
+    for (int j = 0; j < height_; j++)
+    {
+        for (int i = 0; i < width_; i++)
+        {
+            int ii = i + shift;
+            if (ii < 0) ii += width_;
+            if (ii >= width_) ii -= width_;
+
+            int iipos = j * width_ + ii;
+            memcpy(new_rgb + 3*ipos, rgbData_ + 3*iipos, 3);
+
+            if (pngAlpha_ != NULL)
+                new_alpha[ipos] = pngAlpha_[iipos];
+
+            ipos++;
+        }
+    }
+    free(rgbData_);
+    free(pngAlpha_);
+
     rgbData_  = new_rgb;
     pngAlpha_ = new_alpha;
 }

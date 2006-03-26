@@ -6,17 +6,16 @@
 				# bodies unless overridden below.   
 
 arc_color=white
-
 #arc_file=
 
+#bump_map=
+bump_scale=1
+
 cloud_gamma=1
-
 #cloud_map=
-
 cloud_ssec=false                # true if the cloud map is from the
 				# University of Wisconsin Space
 				# Science and Engineering Center 
-
 cloud_threshold=90
 
 color={255,255,255}             # fallback color in case an image map
@@ -26,9 +25,7 @@ draw_orbit=false                # if true, draw this body's orbit
                                 # about its primary
 
 grid=false
-
 grid1=6
-
 grid2=15
 
 #image=
@@ -37,9 +34,7 @@ magnify=1                       # draw the body as if its radius were
 				# magnified by this factor 
 
 marker_color=red
-
 #marker_file=
-
 #marker_font=
 
 max_radius_for_label=3          # don't draw a label if the body's
@@ -85,6 +80,8 @@ twilight=6                      # blend the day and night images for
 color={255,255,166}
 
 max_radius_for_label=0          # never draw a label for the sun
+
+shade=100			# No night side!
 
 [mercury]
 "Mercury"

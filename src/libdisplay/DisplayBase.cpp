@@ -88,7 +88,7 @@ DisplayBase::drawLabelLine(int &currentX, int &currentY, const string &text)
     Options *options = Options::getInstance();
     if (options->LabelMask() & XNegative) 
     {
-        currentX = (options->LabelX() + width_ - textWidth);
+        currentX = (options->LabelX() + width_ - 2 - textWidth);
     }
 
     DrawOutlinedText(currentX, currentY, text, options->Color());

@@ -7,6 +7,11 @@ dec1 ra1 dec2 ra2
 where declination is in degrees and right ascension is in hours.  This
 option has no effect if -projection is specified.
 
+-arc_spacing spacing
+When drawing an arc, draw line segments that are spacing degrees
+apart.  The default is 0.1 degrees.  Line segments shorter than
+spacing will not be drawn.
+
 -background background_file
 Use background_file as the background image, with the planet to be
 superimposed upon it.  This option is only meaningful with the
@@ -121,8 +126,20 @@ away from the right side and 10 pixels below the top of the root
 window).  The root window outside of the image will be black.  This
 option may be used with -window or -output.
 
+-glare radius 
+Draw a glare around the sun with with a radius of the specified value
+larger than the sun.  The default value is 28.
+
 -gmtlabel
 Same as the -label option, but show GMT instead of local time.
+
+-grs_longitude lon
+The longitude of Jupiter's Great Red Spot (GRS).  A typical value is
+94 degrees.  If this option is specified, longitudes on Jupiter will
+be calculated in System II coordinates.  By default, longitudes are
+calculated in System III coordinates.  When using this option, use an
+image map for Jupiter where the center of the GRS is at the pixel 0
+column, or the left side of the image.
 
 -hibernate seconds
 After the screen has been idle for the specified number of seconds,
@@ -298,10 +315,11 @@ Print the heliocentric rectangular equatorial coordinates (J2000) for
 each body xplanet knows about, and then exit.
 
 -projection projection_type
-The projection type may be one of ancient, azimuthal, hemisphere,
-lambert, mercator, mollweide, peters, orthographic, or rectangular.
-The default is no projection.  Multiple bodies will not be shown if
-this options is specified, although shadows will still be drawn.
+The projection type may be one of ancient, azimuthal, bonne, gnomonic,
+hemisphere, lambert, mercator, mollweide, orthographic, peters,
+polyconic, rectangular, or tsc.  The default is no projection.
+Multiple bodies will not be shown if this option is specified,
+although shadows will still be drawn.
 
 -proj_param value
 Pass additional parameters for some projections.  The only projections

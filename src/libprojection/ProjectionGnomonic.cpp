@@ -8,6 +8,7 @@
 */
 
 #include <cmath>
+#include <cstdio>
 #include <sstream>
 using namespace std;
 
@@ -18,10 +19,23 @@ using namespace std;
 ProjectionGnomonic::ProjectionGnomonic(const int f, const int w, const int h) 
     : ProjectionBase(f, w, h) 
 {
+    init(f, w, h, Options::getInstance());
+}
+
+ProjectionGnomonic::ProjectionGnomonic(const int f, const int w, const int h,
+                                       const Options* o) 
+    : ProjectionBase(f, w, h, o) 
+{
+    init(f, w, h, o);
+}
+
+void ProjectionGnomonic::init(const int f, const int w, const int h,
+                              const Options* options) 
+{
     isWrapAround_ = false;
 
     double lat1 = 45 * deg_to_rad;
-    Options *options = Options::getInstance();
+
     vector<double> projParams = options->ProjectionParameters();
     if (!projParams.empty())
     {

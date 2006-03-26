@@ -465,6 +465,16 @@ precessB1950J2000(double &X, double &Y, double &Z)
     Z = newZ;
 }
 
+// Return the shading function.  For Lambertian shading, the input
+// value X is the cosine of the sun-surface-observer angle, and the
+// return value is just X.  Using the sqrt of X brightens the image a
+// bit.
+double
+photoFunction(const double x)
+{
+    return(sqrt(x));
+}
+
 static void
 convertEncoding(const bool toNative, ICONV_CONST char *inBuf, char *outBuf)
 {

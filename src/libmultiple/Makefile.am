@@ -15,4 +15,4 @@ libmultiple_a_SOURCES = 	\
 	drawEllipsoid.cpp	\
 	drawRings.cpp 		\
 	drawStars.cpp 		\
-	drawSun.cpp
+	drawSunGlare.cpp

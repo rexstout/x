@@ -22,6 +22,7 @@ class Map
         const double sunLat, const double sunLon, 
         const double obsLat, const double obsLon,
         const unsigned char *day, const unsigned char *night, 
+        const unsigned char *bump, 
         const unsigned char *specular, const unsigned char *clouds, 
         Planet *t, PlanetProperties *tp, Ring *r, 
         std::map<double, Planet *> &planetsFromSunMap);
@@ -52,6 +53,11 @@ class Map
     double *latArray_;
     double *lonArray_;
 
+    double *cosLatArray_;
+    double *cosLonArray_;
+    double *sinLatArray_;
+    double *sinLonArray_;
+
     double delLon_, delLat_;
     double mapHeight_, mapWidth_;
     double startLon_, startLat_;
@@ -65,6 +71,7 @@ class Map
 
     void SetUpMap();
 
+    void AddBumpMap(const unsigned char *bump);
     void AddSpecularReflection(const unsigned char *specular,
                                const double obsLat, const double obsLon);
     void OverlayClouds(const unsigned char *clouds);

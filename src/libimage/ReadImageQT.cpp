@@ -5,7 +5,6 @@ using namespace std;
 
 #include <QuickTime/QuickTime.h>
 
-#include "config.h"
 #include "xpUtil.h"
 
 // This code is based on the QTtoCG example at
@@ -31,7 +30,7 @@ readBitmapInfo(GraphicsImportComponent gi, BitmapInfo *bi)
                                                                &imageDescH);
     if( noErr != result || imageDescH == NULL ) 
     {
-        xpWarn("Error while retrieving image description", 
+        xpWarn("Error while retrieving image description\n", 
                __FILE__, __LINE__);
         return(false);
     }
@@ -50,8 +49,11 @@ readBitmapInfo(GraphicsImportComponent gi, BitmapInfo *bi)
     bi->cs = NULL;
     bi->prof = NULL;
 
+// skip the profile
+#if 0
     Handle profile = NULL;
     GraphicsImportGetColorSyncProfile(gi, &profile);
+
     if( NULL != profile ) 
     {
         CMError err;
@@ -84,16 +86,19 @@ readBitmapInfo(GraphicsImportComponent gi, BitmapInfo *bi)
                 
         if( bi->cs == NULL ) 
         {
-            xpWarn("Error creating cg colorspace from csync profile", 
+            xpWarn("Error creating cg colorspace from csync profile\n", 
                    __FILE__, __LINE__);
             return(false);
         }
         xpMsg("Embedded profile found in image\n", __FILE__, __LINE__);
         DisposeHandle(profile);
     }  
-        
+#endif
+
     if( imageDescH != NULL)
         DisposeHandle((Handle)imageDescH);
+
+    return(true);
 }
 
 static bool
@@ -133,7 +138,9 @@ getBitmapData(GraphicsImportComponent gi, BitmapInfo *bi)
         return(false);
     }
         
-    DisposeGWorld(gWorld);  
+    DisposeGWorld(gWorld);
+
+    return(true);
 }
 
 bool 

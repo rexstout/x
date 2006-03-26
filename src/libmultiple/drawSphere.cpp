@@ -88,12 +88,16 @@ drawSphere(const double pX, const double pY, const double pR,
 
             map->GetPixel(lat, lon, color);
 
-            double darkening = ndot(X - iX, Y - iY, Z - iZ, 
-                                    X - oX, Y - oY, Z - oZ);
-            if (darkening < 0) 
-                darkening = 0;
-            else
-                darkening = sqrt(darkening);
+            double darkening = 1;
+            if (planet->Index() != SUN)
+            {
+                darkening = ndot(X - iX, Y - iY, Z - iZ, 
+                                 X - oX, Y - oY, Z - oZ);
+                if (darkening < 0) 
+                    darkening = 0;
+                else
+                    darkening = photoFunction(darkening);
+            }
 
             for (int k = 0; k < 3; k++) 
                 color[k] = static_cast<unsigned char> (color[k] 

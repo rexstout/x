@@ -65,6 +65,8 @@ extern double kepler(const double e, double M);
 
 extern void precessB1950J2000(double &X, double &Y, double &Z);
 
+extern double photoFunction(const double x);
+
 extern void xpExit(const std::string &message, const char *file, 
                    const int line);
 

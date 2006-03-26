@@ -40,7 +40,7 @@ drawSphere(const double pX, const double pY, const double pR,
 	   const double planetRadius);
 
 extern void
-drawSun(DisplayBase *display, const double X, const double Y, 
+drawSunGlare(DisplayBase *display, const double X, const double Y, 
 	const double R, const unsigned char *color);
 
 extern void

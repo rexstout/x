@@ -16,6 +16,8 @@ Map::Map(const int w, const int h)
     : width_(w), height_(h), area_(w*h), 
       mapData_(NULL), nightData_(NULL),
       latArray_(NULL), lonArray_(NULL),
+      cosLatArray_(NULL), cosLonArray_(NULL), 
+      sinLatArray_(NULL), sinLonArray_(NULL), 
       target_(NULL), targetProperties_(NULL), 
       ring_(NULL), sunLat_(0), sunLon_(0)
 {
@@ -26,11 +28,15 @@ Map::Map(const int w, const int h,
          const double sunLat, const double sunLon, 
          Planet *t, PlanetProperties *tp, Ring *r, 
          map<double, Planet *> &planetsFromSunMap) 
-    : width_(w), height_(h), area_(w*h), 
-      latArray_(NULL), lonArray_(NULL), 
-      target_(t), targetProperties_(tp), 
+    : width_(w), height_(h), area_(w*h),
+      latArray_(NULL), lonArray_(NULL),
+      cosLatArray_(NULL), cosLonArray_(NULL), 
+      sinLatArray_(NULL), sinLonArray_(NULL), 
+      target_(t), targetProperties_(tp),
       ring_(r), sunLat_(sunLat), sunLon_(sunLon)
 {
+    SetUpMap();
+
     memcpy(color_, tp->Color(), 3);
 
     dayData_ = new unsigned char [3*area_];
@@ -51,8 +57,6 @@ Map::Map(const int w, const int h,
             nightData_[i] = (unsigned char) (shade * nightData_[i]);
     }
 
-    SetUpMap();
-
     AddShadows(planetsFromSunMap);
 
     mapData_ = new unsigned char [3*area_];
@@ -68,17 +72,29 @@ Map::Map(const int w, const int h,
          const double sunLat, const double sunLon, 
          const double obsLat, const double obsLon, 
          const unsigned char *day, const unsigned char *night,
+         const unsigned char *bump,
          const unsigned char *specular, const unsigned char *clouds, 
          Planet *t, PlanetProperties *tp, Ring *r, 
          map<double, Planet *> &planetsFromSunMap)
     : width_(w), height_(h), area_(w*h), 
       latArray_(NULL), lonArray_(NULL), 
+      cosLatArray_(NULL), cosLonArray_(NULL), 
+      sinLatArray_(NULL), sinLonArray_(NULL), 
       target_(t), targetProperties_(tp),
       ring_(r), sunLat_(sunLat), sunLon_(sunLon)
 {
+    SetUpMap();
+
     memcpy(color_, tp->Color(), 3);
 
-    dayData_ = new unsigned char [3*area_];
+    try 
+    {
+        dayData_ = new unsigned char [3*area_];
+    }
+    catch (bad_alloc &e)
+    {
+        xpExit("Can't allocate memory for day map\n", __FILE__, __LINE__);
+    }
     memcpy(dayData_, day, 3 * area_);
 
     nightData_ = new unsigned char [3*area_];
@@ -108,7 +124,7 @@ Map::Map(const int w, const int h,
         }
     }
 
-    SetUpMap();
+    if (bump != NULL) AddBumpMap(bump);
 
     if (specular != NULL) AddSpecularReflection(specular, obsLat, obsLon);
 
@@ -129,6 +145,10 @@ Map::~Map()
 {
     delete [] latArray_;
     delete [] lonArray_;
+    delete [] cosLatArray_;
+    delete [] cosLonArray_;
+    delete [] sinLatArray_;
+    delete [] sinLonArray_;
     delete [] mapData_;
 }
 
@@ -163,13 +183,126 @@ Map::SetUpMap()
 
     delete [] lonArray_;
     lonArray_ = new double[width_];
+    delete [] cosLonArray_;
+    cosLonArray_ = new double[width_];
+    delete [] sinLonArray_;
+    sinLonArray_ = new double[width_];
     for (int i = 0; i < width_; i++) 
+    {
         lonArray_[i] = (i + 0.5) * delLon_ + startLon_;
+        cosLonArray_[i] = cos(lonArray_[i]);
+        sinLonArray_[i] = sin(lonArray_[i]);
+    }
     
     delete [] latArray_;
     latArray_ = new double[height_];
+    delete [] cosLatArray_;
+    cosLatArray_ = new double[height_];
+    delete [] sinLatArray_;
+    sinLatArray_ = new double[height_];
     for (int i = 0; i < height_; i++)
+    {
         latArray_[i] = startLat_ - (i + 0.5) * delLat_;
+        cosLatArray_[i] = cos(latArray_[i]);
+        sinLatArray_[i] = sin(latArray_[i]);
+    }
+}
+
+void
+Map::AddBumpMap(const unsigned char *bump)
+{
+    double scale = 0.1 * targetProperties_->BumpScale() / 255.;
+
+    double *height =  new double[area_];
+    for (int i = 0; i < area_; i++) 
+        height[i] = bump[3*i] * scale;
+
+    // Sun's direction
+    double sunloc[3];
+    sunloc[0] = cos(sunLat_) * cos(sunLon_);
+    sunloc[1] = cos(sunLat_) * sin(sunLon_);
+    sunloc[2] = sin(sunLat_);
+
+    int ipos = width_;
+    for (int j = 1; j < height_ - 1; j++)
+    {
+        for (int i = 0; i < width_; i++)
+        {
+            double hplat = 1 + height[ipos - width_];
+            double hmlat = 1 + height[ipos + width_];
+            
+            double hplon = 1 + height[ipos + 1];
+            double hmlon = 1 + height[ipos - 1];
+            
+            double x1 = hplat * cosLatArray_[j-1] * cosLonArray_[i];
+            double y1 = hplat * cosLatArray_[j-1] * sinLonArray_[i];
+            double z1 = hplat * sinLatArray_[j-1];
+                
+            double x0 = hmlat * cosLatArray_[j+1] * cosLonArray_[i];
+            double y0 = hmlat * cosLatArray_[j+1] * sinLonArray_[i];
+            double z0 = hmlat * sinLatArray_[j+1];
+
+            double dhdlatf[3]; // Finite difference dh/dlat in XYZ
+            dhdlatf[0] = x1 - x0;
+            dhdlatf[1] = y1 - y0;
+            dhdlatf[2] = z1 - z0;
+
+            int ii = (i + 1) % width_;
+            x1 = hplon * cosLatArray_[j] * cosLonArray_[ii];
+            y1 = hplon * cosLatArray_[j] * sinLonArray_[ii];
+            z1 = hplon * sinLatArray_[j];
+                
+            ii = (i - 1 + width_) % width_;
+            x0 = hmlon * cosLatArray_[j] * cosLonArray_[ii];
+            y0 = hmlon * cosLatArray_[j] * sinLonArray_[ii];
+            z0 = hmlon * sinLatArray_[j];
+
+            double dhdlonf[3]; // Finite difference dh/dlon in XYZ
+            dhdlonf[0] = x1 - x0;
+            dhdlonf[1] = y1 - y0;
+            dhdlonf[2] = z1 - z0;
+            dhdlonf[0] *= target_->Flipped();
+            dhdlonf[1] *= target_->Flipped();
+
+            // Find the normal to the topography
+            double normt[3];
+            cross(dhdlonf, dhdlatf, normt);
+
+            // normalize it
+            double len = sqrt(dot(normt, normt));
+            if (len > 0)
+                for (int k = 0; k < 3; k++)
+                    normt[k] /= len;
+            
+            // Find the shading due to topography and the curvature of
+            // the planet
+            double shadt = 0.5 * (1 + ndot(sunloc, normt));
+
+            // This is the normal at the surface of a sphere
+            double normal[3];
+            normal[0] = cosLatArray_[j] * cosLonArray_[i];
+            normal[1] = cosLatArray_[j] * sinLonArray_[i];
+            normal[2] = sinLatArray_[j];
+
+            // Find the shading due to the curvature of the planet
+            double shadn = 0.5 * (1 + ndot(sunloc, normal));
+
+            // This should be the shading due to topography
+            double shading = shadt/shadn;
+
+            if (shading < 0) shading = 0;
+            else if (shading > 1) shading = 1;
+
+            unsigned char *day = dayData_ + 3*ipos;
+            unsigned char *night = nightData_ + 3*ipos;
+            for (int k = 0; k < 3; k++) 
+                day[k] = static_cast<unsigned char>((day[k]-night[k]) 
+                                                    * shading + night[k]);
+
+            ipos++;
+        }
+    }
+    delete [] height;
 }
 
 void
@@ -198,20 +331,14 @@ Map::AddSpecularReflection(const unsigned char *specular,
     midpoint[2] = sin(mid_lat);
     
     double point[3];
+    int ipos = 0;
     for (int j = 0; j < height_; j++)
     {
-        int ipos = 3 * j * width_;
-        const double lat = latArray_[j];
-        const double cos_lat = cos(lat);
-        const double sin_lat = sin(lat);
         for (int i = 0; i < width_; i++)
         {
-            const double lon = lonArray_[i];
-            const double cos_lon = cos(lon);
-            const double sin_lon = sin(lon);
-            point[0] = cos_lat * cos_lon;
-            point[1] = cos_lat * sin_lon;
-            point[2] = sin_lat;
+            point[0] = cosLatArray_[j] * cosLonArray_[i];
+            point[1] = cosLatArray_[j] * sinLonArray_[i];
+            point[2] = sinLatArray_[j];
 
             double x = 0.96 * dot(point, midpoint);
             if (x > 0.8) 
@@ -810,17 +937,16 @@ Map::CreateMap()
             int uly = j;
             int lry = uly + jstep;
             if (lry >= height_) lry = height_ - 1;
-            double lat = latArray_[(uly + lry)/2];
-            double cos_lat = cos(lat);
-            double sin_lat = sin(lat);
+            double cos_lat = cosLatArray_[(uly + lry)/2];
+            double sin_lat = sinLatArray_[(uly + lry)/2];
 
             for (int i = 0; i < width_; i += istep)
             {
                 int ulx = i;
                 int lrx = ulx + istep;
                 if (lrx >= width_) lrx = width_ - 1;
-                double cos_lon = cos(lonArray_[(ulx + lrx)/2]);
-                double sin_lon = sin(lonArray_[(ulx + lrx)/2]);
+                double cos_lon = cosLonArray_[(ulx + lrx)/2];
+                double sin_lon = sinLonArray_[(ulx + lrx)/2];
             
                 point[0] = cos_lat * cos_lon;
                 point[1] = cos_lat * sin_lon;
@@ -836,18 +962,11 @@ Map::CreateMap()
                 {
                     for (int jj = uly; jj <= lry; jj++)
                     {
-                        lat = latArray_[jj];
-                        cos_lat = cos(lat);
-                        sin_lat = sin(lat);
-
                         for (int ii = ulx; ii <= lrx; ii++)
                         {
-                            cos_lon = cos(lonArray_[ii]);
-                            sin_lon = sin(lonArray_[ii]);
-
-                            point[0] = cos_lat * cos_lon;
-                            point[1] = cos_lat * sin_lon;
-                            point[2] = sin_lat;
+                            point[0] = cosLatArray_[jj] * cosLonArray_[ii];
+                            point[1] = cosLatArray_[jj] * sinLonArray_[ii];
+                            point[2] = sinLatArray_[jj];
 
                             double dayweight = ((border + dot(point, sunloc))
                                                 / (2 * border));
@@ -884,24 +1003,18 @@ Map::CreateMap()
             if (sunLat_ * latArray_[j] > 0) continue;
 
             const double lat = latArray_[j];
-            const double cos_lat = cos(lat);
-            const double sin_lat = sin(lat);
-
             for (int i = 0; i < width_; i++)
             {
                 const double lon = lonArray_[i];
-                const double cos_lon = cos(lon);
-                const double sin_lon = sin(lon);
-
-                point[0] = cos_lat * cos_lon;
-                point[1] = cos_lat * sin_lon;
-                point[2] = sin_lat;
+                point[0] = cosLatArray_[j] * cosLonArray_[i];
+                point[1] = cosLatArray_[j] * sinLonArray_[i];
+                point[2] = sinLatArray_[j];
                 
                 // If it's night, skip this one
                 if (dot(point, sunloc) < -2*border) continue;
                 
                 const double ring_radius = ring_->getShadowRadius(lat, lon);
-                const double ring_radius2 = ring_->getShadowRadius(lat+delLat_,
+                const double ring_radius2 = ring_->getShadowRadius(lat + delLat_,
                                                                    lon + delLon_);
 
                 const double dpp = 2*fabs(ring_radius2 - ring_radius);

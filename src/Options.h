@@ -20,6 +20,8 @@ class Options
     void parseArgs(int argc, char **argv);
 
     const std::vector<std::string> & ArcFiles() const { return(arcFiles_); };
+    void ArcSpacing(const double a) { arcSpacing_ = a; };
+    double ArcSpacing() const       { return(arcSpacing_); };
 
     const std::string & Background() const { return(background_); };
     double BaseMagnitude() const { return(baseMag_); };
@@ -44,6 +46,10 @@ class Options
     int FontSize() const { return(fontSize_); };
     bool Fork() const { return(fork_); };
     int FOVMode() const          { return(fovMode_); };
+
+    double Glare() const { return(glare_); };
+    double GRSLon() const { return(grsLon_); };
+    bool GRSSet() const { return(grsSet_); };
 
     unsigned long Hibernate() const { return(hibernate_); };
 
@@ -94,6 +100,7 @@ class Options
     void Projection(const int p)     { projection_ = p; };
     int ProjectionMode() const       { return(projectionMode_); };
     const std::vector<double> & ProjectionParameters() const { return(projectionParameters_); };
+    void AddProjectionParameter(double p) { projectionParameters_.push_back(p); };
 
     double Radius() const        { return(radius_); };
     void Radius(const double r)  { radius_ = r; };
@@ -162,6 +169,7 @@ class Options
     static Options *instance_;
 
     std::vector<std::string> arcFiles_;
+    double arcSpacing_;
 
     std::string background_;
     double baseMag_;    // a star of this magnitude has a pixel
@@ -185,6 +193,9 @@ class Options
 
     int geometryMask_;
     bool geometrySelected_;
+    double glare_;
+    double grsLon_;
+    bool grsSet_;
 
     unsigned long hibernate_;
 

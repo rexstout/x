@@ -42,7 +42,7 @@ readArcFile(const char *line, Planet *planet,
 
     double coords[4];
     double radius[2] = { -1, -1 };
-    double spacing = 0.1;
+    double spacing = options->ArcSpacing();
     bool syntaxError = false;
 
     while (static_cast<unsigned int> (i) < strlen(line))

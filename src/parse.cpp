@@ -124,6 +124,10 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = CIRCLE;
     else if (getValue(line, i, "circle=", returnString))
         returnVal = CIRCLE;
+    else if (getValue(line, i, "bump_map=", returnString))
+        returnVal = BUMP_MAP;
+    else if (getValue(line, i, "bump_scale=", returnString))
+        returnVal = BUMP_SCALE;
     else if (getValue(line, i, "cloud_gamma=", returnString))
         returnVal = CLOUD_GAMMA;
     else if (getValue(line, i, "cloud_map=", returnString))

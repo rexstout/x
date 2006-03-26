@@ -10,6 +10,8 @@ using namespace std;
 
 PlanetProperties::PlanetProperties(const body index)
     : index_(index), 
+      bumpMap_(""),
+      bumpScale_(1),
       cloudGamma_(1),
       cloudMap_(""), 
       cloudThreshold_(90), 
@@ -56,11 +58,12 @@ PlanetProperties::PlanetProperties(const body index)
         name_[0] = toupper(name_[0]);
     }
 
-    if (index == SUN)
-        color_[2] = 166;
-
     if (index == EARTH)
         nightMap_ = "night" + defaultMapExt;
+
+    // Everything besides the name and day and night maps gets set to
+    // default values from the config file in readConfig.cpp, so
+    // there's no point in setting them here.
 }
 
 PlanetProperties::~PlanetProperties()
@@ -85,6 +88,9 @@ PlanetProperties::operator= (const PlanetProperties &p)
 
     for (unsigned int i = 0; i < p.satelliteFiles_.size(); i++)
         satelliteFiles_.push_back(p.satelliteFiles_[i]);
+
+    bumpMap_ = p.bumpMap_;
+    bumpScale_ = p.bumpScale_;
 
     cloudGamma_ = p.cloudGamma_;
     cloudMap_ = p.cloudMap_;

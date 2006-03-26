@@ -136,15 +136,15 @@ Text::Align(const int align)
         yOffset_ = 0;
         break;
     case ABOVE:
-        xOffset_ = -(iconWidth_ + textWidth_)/2;
+        xOffset_ = -textWidth_/2;
         yOffset_ = -(iconHeight_ + textHeight_)/2 - 2;
         break;
     case BELOW:
-        xOffset_ = -(iconWidth_ + textWidth_)/2;
+        xOffset_ = -textWidth_/2;
         yOffset_ = (iconHeight_ + textHeight_)/2 + 2;
         break;
     case CENTER:
-        xOffset_ = -(iconWidth_ + textWidth_)/2;
+        xOffset_ = -textWidth_/2;
         yOffset_ = 0;
         break;
     default:
@@ -227,4 +227,3 @@ Text::Draw(DisplayBase *display)
     if (fontSize_ > 0)
         display->FontSize(saveFontSize);
 }
-

@@ -1,3 +1,35 @@
+Version 1.2.0 (released 16 Jun 2005)
+
+	* Added the -grs_longitude option, to specify the longitude of
+	Jupiter's Great Red Spot, in System II coordinates.  This assumes
+	the Jupiter image has the center of the Great Red Spot at pixel 0
+	(at the left side of the image) in order to draw it at the right
+	position.
+
+	* Added the Icosagnomonic projection, contributed by Ian Turner.
+	
+	* Fixed a bug where output filenames had an extra digit in some
+	cases. 
+
+	* Added the bump_map and bump_scale options in the configuration
+	file. 
+
+	* Added the -glare option to set the size of the sun's glare.
+
+	* An image map may be specified for the sun in the configuration
+	file now.  A shade value is now required for the sun (should be
+	100, otherwise the sun will have a night side!)
+	
+	* Added the -arc_spacing option to set the default angular
+	distance between great arc points.  It used to be 0.1 degree, so
+	arcs smaller than this wouldn't get drawn.
+
+        * Fixed a bug where markers were not aligned properly when using
+	align = "above" or "below".
+
+	* Added warnings if options are specified in the [default] section
+	of the configuration file that probably shouldn't be there.
+
 Version 1.1.2 (released 5 Dec 2004)
 
         * Saturn's rings are now drawn properly when using "magnify" in

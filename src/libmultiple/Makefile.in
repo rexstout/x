@@ -53,7 +53,7 @@ ARFLAGS = cru
 libmultiple_a_LIBADD =
 am_libmultiple_a_OBJECTS = addOrbits.$(OBJEXT) drawSphere.$(OBJEXT) \
 	drawEllipsoid.$(OBJEXT) drawRings.$(OBJEXT) \
-	drawStars.$(OBJEXT) drawSun.$(OBJEXT)
+	drawStars.$(OBJEXT) drawSunGlare.$(OBJEXT)
 libmultiple_a_OBJECTS = $(am_libmultiple_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -222,7 +222,7 @@ libmultiple_a_SOURCES = \
 	drawEllipsoid.cpp	\
 	drawRings.cpp 		\
 	drawStars.cpp 		\
-	drawSun.cpp
+	drawSunGlare.cpp
 
 all: all-am
 
@@ -276,7 +276,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawRings.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawSphere.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawStars.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawSun.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawSunGlare.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

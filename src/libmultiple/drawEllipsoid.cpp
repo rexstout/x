@@ -89,7 +89,7 @@ drawEllipsoid(const double pX, const double pY, const double pR,
 
             // if the intersection point is behind the observer, don't
             // plot it
-	    if (u < 0) continue;
+            if (u < 0) continue;
 
             // coordinates of the intersection point
             double iX, iY, iZ;
@@ -108,7 +108,7 @@ drawEllipsoid(const double pX, const double pY, const double pR,
             if (darkening < 0) 
                 darkening = 0;
             else
-                darkening = sqrt(darkening);
+                darkening = photoFunction(darkening);
 
             for (int k = 0; k < 3; k++) 
                 color[k] = static_cast<unsigned char> (color[k] 

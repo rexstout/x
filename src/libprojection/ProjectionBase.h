@@ -1,10 +1,14 @@
 #ifndef PROJECTIONBASE_H
 #define PROJECTIONBASE_H
 
+class Options;
+
 class ProjectionBase
 {
  public:
     ProjectionBase(const int flipped, const int w, const int h);
+    ProjectionBase(const int flipped, const int w, const int h,
+		   const Options* o);
 
     virtual ~ProjectionBase();
 
@@ -52,6 +56,7 @@ class ProjectionBase
     double getPhotoFunction(const double x) const;
 
  private:
+    void init(const int flipped, const int w, const int h, const Options* options);
 	
 };
 
