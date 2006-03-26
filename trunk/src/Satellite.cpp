@@ -1,3 +1,4 @@
+#include <clocale>
 #include <cstring>
 #include <iostream>
 using namespace std;

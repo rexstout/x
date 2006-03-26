@@ -71,7 +71,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_CSPICE
     // Load any SPICE kernels
-    loadSpiceKernels();
+    processSpiceKernels(true);
 #endif
 
     // Load artificial satellite orbital elements
@@ -274,6 +274,11 @@ main(int argc, char **argv)
         // then quit.
         if (!timer->Sleep()) break;
     }
+
+#ifdef HAVE_CSPICE
+    // unload any SPICE kernels
+    processSpiceKernels(false);
+#endif
 
     delete timer;
 

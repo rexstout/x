@@ -2,7 +2,7 @@ noinst_LIBRARIES = libdisplay.a libtimer.a
 
 if HAVE_AQUA
   displayaqua = DisplayMacAqua.cpp DisplayMacAqua.h DesktopPicture.m
-
+  timeraqua = TimerMacAqua.cpp TimerMacAqua.h
 %.o: %.m
 	$(OBJC) $(OBJCFLAGS) -c $<
 endif
@@ -24,7 +24,7 @@ if HAVE_LIBX11
   timerx11   = TimerX11.h TimerX11.cpp
 endif
 
-EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h TextRendererFT2.cpp TextRendererFT2.h TextRendererPangoFT2.cpp TextRendererPangoFT2.h DisplayX11.cpp DisplayX11.h vroot.h TimerX11.h TimerX11.cpp
+EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h TextRendererFT2.cpp TextRendererFT2.h TextRendererPangoFT2.cpp TextRendererPangoFT2.h DisplayX11.cpp DisplayX11.h vroot.h TimerMacAqua.cpp TimerMacAqua.h TimerX11.cpp TimerX11.h
 
 AM_CPPFLAGS = @X_CFLAGS@ @FREETYPE_CFLAGS@ -I@top_srcdir@/src
 
@@ -57,4 +57,5 @@ libtimer_a_SOURCES = \
 	libtimer.h		\
 	Timer.h			\
 	Timer.cpp		\
+	$(timeraqua)		\
 	$(timerx11)

@@ -15,7 +15,7 @@ using namespace std;
 Timer::Timer(const int w, const unsigned long h, const unsigned long i) 
     : wait_(w), hibernate_(h), idlewait_(i)
 {
-}
+}                       
 
 Timer::~Timer()
 {
@@ -28,27 +28,39 @@ Timer::Update()
     nextUpdate_ = currentTime_.tv_sec + wait_;
 }
 
+// Sleep for sleep_time seconds.
+bool
+Timer::SleepForTime(time_t sleep_time)
+{
+    if (sleep_time <= 0) 
+        return(true);
+
+    gettimeofday(&currentTime_, NULL);
+    nextUpdate_ = sleep_time + currentTime_.tv_sec;
+    
+    if (static_cast<int> (sleep_time) != 1)
+    {
+        Options *options = Options::getInstance();
+        if (options->Verbosity() > 0)
+        {
+            ostringstream msg;
+            msg << "sleeping for " << static_cast<int> (sleep_time) 
+                << " seconds until " << ctime((time_t *) &nextUpdate_);
+            xpMsg(msg.str(), __FILE__, __LINE__);
+        }
+    }
+    sleep(sleep_time);
+    
+    return(true);
+}
+
 // returns false if the program should exit after this sleep
 bool
 Timer::Sleep()
 {
-    bool returnVal = true;
-
     // Sleep until the next update
     gettimeofday(&currentTime_, NULL);
-    time_t sleep_time = nextUpdate_ - currentTime_.tv_sec;
-    if (sleep_time > 0) 
-    {
-	Options *options = Options::getInstance();
-	if (options->Verbosity() > 0)
-	{
-	    stringstream msg;
-	    msg << "sleeping for " << static_cast<int> (sleep_time) 
-		 << " seconds until " << ctime((time_t *) &nextUpdate_);
-	    xpMsg(msg.str(), __FILE__, __LINE__);
-	}
-	sleep(sleep_time);
-    }
+    SleepForTime(nextUpdate_ - currentTime_.tv_sec);
 
-    return(returnVal);
+    return(true);
 }

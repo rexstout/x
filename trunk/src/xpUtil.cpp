@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <clocale>
 #include <cmath>
 #include <cstdio>

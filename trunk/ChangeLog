@@ -1,3 +1,14 @@
+Version 1.0.7 (released 04 May 2004)
+
+	* The native Quicktime library can be used when reading/writing
+	image files on Mac OS X.
+
+	* The -hibernate and -idlewait options now work on Mac OS X.
+
+	* Fixed a segfault when writing image files.
+
+	* Minor updates to allow compilation with gcc 3.4.0.
+
 Version 1.0.6 (released 21 Apr 2004)
 
 	* Fixed a bug where markers on the far side of a planet were being

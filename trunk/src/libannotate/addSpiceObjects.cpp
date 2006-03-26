@@ -232,7 +232,7 @@ readSpiceFile(const char *line,
             break;
         case TRAIL:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             if (!sscanf(returnString, "%lf,%lf,%lf", &trailStart, &trailEnd,
                         &trailInterval) == 3)
             {
@@ -244,7 +244,7 @@ readSpiceFile(const char *line,
             {
                 if (trailInterval < 1e-4) trailInterval = 1e-4;
             }
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case TRANSPARENT:
@@ -495,7 +495,7 @@ readSpiceFile(const char *line,
 }
     
 void
-loadSpiceKernels()
+processSpiceKernels(const bool load)
 {
     // Set the SPICELIB error response action to "RETURN":
     erract_c (  "SET", 200, "RETURN"  );
@@ -531,7 +531,12 @@ loadSpiceKernels()
 
                 string spiceFile(&line[ii]);
                 if (findFile(spiceFile, "spice"))
-                    furnsh_c(spiceFile.c_str());
+                {
+                    if (load)
+                        furnsh_c(spiceFile.c_str());
+                    else
+                        unload_c(spiceFile.c_str());
+                }
             }
 
             inFile.close();
@@ -540,7 +545,7 @@ loadSpiceKernels()
         else
         {
             ostringstream errStr;
-            errStr << "Can't load spice kernel file " << kernelFile << endl;
+            errStr << "Can't find spice kernel file " << kernelFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }
     }

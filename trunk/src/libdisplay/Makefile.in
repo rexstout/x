@@ -72,10 +72,6 @@ HAVE_CSPICE_FALSE = @HAVE_CSPICE_FALSE@
 HAVE_CSPICE_TRUE = @HAVE_CSPICE_TRUE@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
-HAVE_LANGINFO_H_FALSE = @HAVE_LANGINFO_H_FALSE@
-HAVE_LANGINFO_H_TRUE = @HAVE_LANGINFO_H_TRUE@
-HAVE_LIBCHARSET_FALSE = @HAVE_LIBCHARSET_FALSE@
-HAVE_LIBCHARSET_TRUE = @HAVE_LIBCHARSET_TRUE@
 HAVE_LIBFREETYPE_FALSE = @HAVE_LIBFREETYPE_FALSE@
 HAVE_LIBFREETYPE_TRUE = @HAVE_LIBFREETYPE_TRUE@
 HAVE_LIBGIF_FALSE = @HAVE_LIBGIF_FALSE@
@@ -92,6 +88,8 @@ HAVE_LIBTIFF_FALSE = @HAVE_LIBTIFF_FALSE@
 HAVE_LIBTIFF_TRUE = @HAVE_LIBTIFF_TRUE@
 HAVE_LIBX11_FALSE = @HAVE_LIBX11_FALSE@
 HAVE_LIBX11_TRUE = @HAVE_LIBX11_TRUE@
+HAVE_QUICKTIME_FALSE = @HAVE_QUICKTIME_FALSE@
+HAVE_QUICKTIME_TRUE = @HAVE_QUICKTIME_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -177,6 +175,7 @@ xplanet_LDFLAGS = @xplanet_LDFLAGS@
 noinst_LIBRARIES = libdisplay.a libtimer.a
 
 @HAVE_AQUA_TRUE@displayaqua = DisplayMacAqua.cpp DisplayMacAqua.h DesktopPicture.m
+@HAVE_AQUA_TRUE@timeraqua = TimerMacAqua.cpp TimerMacAqua.h
 
 @HAVE_CYGWIN_TRUE@displaymswin = DisplayMSWin.cpp DisplayMSWin.h
 
@@ -187,7 +186,7 @@ noinst_LIBRARIES = libdisplay.a libtimer.a
 @HAVE_LIBX11_TRUE@displayx11 = DisplayX11.cpp DisplayX11.h vroot.h 
 @HAVE_LIBX11_TRUE@timerx11 = TimerX11.h TimerX11.cpp
 
-EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h TextRendererFT2.cpp TextRendererFT2.h TextRendererPangoFT2.cpp TextRendererPangoFT2.h DisplayX11.cpp DisplayX11.h vroot.h TimerX11.h TimerX11.cpp
+EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h TextRendererFT2.cpp TextRendererFT2.h TextRendererPangoFT2.cpp TextRendererPangoFT2.h DisplayX11.cpp DisplayX11.h vroot.h TimerMacAqua.cpp TimerMacAqua.h TimerX11.cpp TimerX11.h
 
 AM_CPPFLAGS = @X_CFLAGS@ @FREETYPE_CFLAGS@ -I@top_srcdir@/src
 
@@ -218,6 +217,7 @@ libtimer_a_SOURCES = \
 	libtimer.h		\
 	Timer.h			\
 	Timer.cpp		\
+	$(timeraqua)		\
 	$(timerx11)
 
 subdir = src/libdisplay
@@ -248,10 +248,11 @@ am_libdisplay_a_OBJECTS = DisplayBase.$(OBJEXT) DisplayOutput.$(OBJEXT) \
 libdisplay_a_OBJECTS = $(am_libdisplay_a_OBJECTS)
 libtimer_a_LIBADD =
 am__libtimer_a_SOURCES_DIST = getTimer.cpp libtimer.h Timer.h Timer.cpp \
-	TimerX11.h TimerX11.cpp
-@HAVE_LIBX11_TRUE@am__objects_6 = TimerX11.$(OBJEXT)
+	TimerMacAqua.cpp TimerMacAqua.h TimerX11.h TimerX11.cpp
+@HAVE_AQUA_TRUE@am__objects_6 = TimerMacAqua.$(OBJEXT)
+@HAVE_LIBX11_TRUE@am__objects_7 = TimerX11.$(OBJEXT)
 am_libtimer_a_OBJECTS = getTimer.$(OBJEXT) Timer.$(OBJEXT) \
-	$(am__objects_6)
+	$(am__objects_6) $(am__objects_7)
 libtimer_a_OBJECTS = $(am_libtimer_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
@@ -266,8 +267,8 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/TextRenderer.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/TextRendererFT2.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/TextRendererPangoFT2.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timer.Po ./$(DEPDIR)/TimerX11.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/getDisplay.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timer.Po ./$(DEPDIR)/TimerMacAqua.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/TimerX11.Po ./$(DEPDIR)/getDisplay.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/getTextRenderer.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/getTimer.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -328,6 +329,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TextRendererFT2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TextRendererPangoFT2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimerMacAqua.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimerX11.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getDisplay.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getTextRenderer.Po@am__quote@
@@ -548,7 +550,6 @@ uninstall-am: uninstall-info-am
 	installdirs maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
 	ps ps-am tags uninstall uninstall-am uninstall-info-am
-
 
 @HAVE_AQUA_TRUE@%.o: %.m
 @HAVE_AQUA_TRUE@	$(OBJC) $(OBJCFLAGS) -c $<

@@ -48,9 +48,26 @@ TimerX11::~TimerX11()
 // Sleep for sleep_time seconds.  Also check if this is a window
 // that's been closed, in which case the program should quit.
 bool
-TimerX11::Sleep(time_t sleep_time)
+TimerX11::SleepForTime(time_t sleep_time)
 {
+    if (sleep_time <= 0) 
+        return(true);
+
+    gettimeofday(&currentTime_, NULL);
+    nextUpdate_ = sleep_time + currentTime_.tv_sec;
+        
     Options *options = Options::getInstance();
+    if (static_cast<int> (sleep_time) != 1)
+    {
+        if (options->Verbosity() > 0)
+        {
+            ostringstream msg;
+            msg << "sleeping for " << static_cast<int> (sleep_time) 
+                << " seconds until " << ctime((time_t *) &nextUpdate_);
+            xpMsg(msg.str(), __FILE__, __LINE__);
+        }
+    }
+
     if (options->DisplayMode() == WINDOW)
     {
         Window window = DisplayX11::WindowID();
@@ -69,8 +86,7 @@ TimerX11::Sleep(time_t sleep_time)
             if (XCheckTypedWindowEvent(display_, window, 
                                        ClientMessage, &event) == True) 
             {
-                if ((unsigned int) event.xclient.data.l[0] 
-                    == wmDeleteWindow)
+                if ((unsigned int) event.xclient.data.l[0] == wmDeleteWindow)
                     return(false);
             }
             else if (XCheckTypedWindowEvent(display_, window,
@@ -92,6 +108,7 @@ TimerX11::Sleep(time_t sleep_time)
     {
         sleep(sleep_time);
     }
+
     return(true);
 }
 
@@ -102,46 +119,66 @@ TimerX11::Sleep()
 {
     // Sleep until the next update
     gettimeofday(&currentTime_, NULL);
-    time_t sleep_time = nextUpdate_ - currentTime_.tv_sec;
-    if (sleep_time > 0) 
+    if (!SleepForTime(nextUpdate_ - currentTime_.tv_sec)) 
+        return(false);
+
+#ifdef HAVE_XSS
+    // If the display has not been idle for idlewait_
+    // milliseconds, keep sleeping.  Check every second until the
+    // display has been idle for long enough.
+    if (idlewait_ > 0) 
     {
+        unsigned long idle = GetSystemIdleTime();
         Options *options = Options::getInstance();
         if (options->Verbosity() > 0)
         {
             ostringstream msg;
-            msg << "sleeping for " << static_cast<int> (sleep_time) 
-                << " seconds until "
-                <<  ctime((time_t *) &nextUpdate_);
+            msg << "Idle time is " << idle/1000 << " second";
+            if (idle/1000 != 1) msg << "s";
+            msg << endl;
             xpMsg(msg.str(), __FILE__, __LINE__);
         }
-        if (!Sleep(sleep_time)) return(false);
-    }
-
-#ifdef HAVE_XSS
-    if (screenSaverInfo_ != NULL)
-    {
-        if (idlewait_ > 0) 
+        while (idle < idlewait_) 
         {
-            XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
-            while (screenSaverInfo_->idle < idlewait_) 
-            {
-                if (!Sleep((idlewait_ - screenSaverInfo_->idle) / 1000))
-                    return(false);
-                XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
-            }
+            gettimeofday(&currentTime_, NULL);
+            if (!SleepForTime((idlewait_ - idle) / 1000))
+                return(false);
+            idle = GetSystemIdleTime();
         }
+    }
+    
+    // If the display has been idle for longer than hibernate_
+    // milliseconds, keep sleeping.  Check every second until
+    // something happens.
+    if (hibernate_ > 0)
+    {
+        unsigned long idle = GetSystemIdleTime();
+        Options *options = Options::getInstance();
+        if (options->Verbosity() > 0 && idle > hibernate_)
+            xpMsg("Hibernating ...\n", __FILE__, __LINE__);
 
-        if (hibernate_ > 0)
+        while (idle > hibernate_) 
         {
-            XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
-            while (screenSaverInfo_->idle > hibernate_) 
-            {
-                if (!Sleep(1)) return(false);
-                XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
-            }
+            if (!SleepForTime(1)) 
+                return(false);
+            idle = GetSystemIdleTime();
         }
     }
 #endif
-
     return(true);
+}
+
+// return the system idle time in milliseconds
+unsigned long
+TimerX11::GetSystemIdleTime()
+{
+    unsigned long idle = 0;
+#ifdef HAVE_XSS
+    if (screenSaverInfo_ != NULL)
+    {
+        XScreenSaverQueryInfo(display_, root_, screenSaverInfo_);
+        idle = screenSaverInfo_->idle;
+    }
+#endif
+    return(idle);
 }

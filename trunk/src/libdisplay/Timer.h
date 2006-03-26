@@ -11,6 +11,7 @@ class Timer
     virtual ~Timer();
 
     void Update();
+
     virtual bool Sleep();
 
  protected:
@@ -20,6 +21,8 @@ class Timer
 
     struct timeval currentTime_;
     time_t nextUpdate_;
+
+    virtual bool SleepForTime(time_t sleep);
 };
 
 #endif

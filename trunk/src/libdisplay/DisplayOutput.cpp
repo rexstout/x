@@ -46,40 +46,30 @@ DisplayOutput::renderImage(PlanetProperties *planetProperties[])
 {
     drawLabel(planetProperties);
 
-    const char * const outputFilename = constructOutputFilename();
+    Options *options = Options::getInstance();
+    string outputFilename = options->getOutputBase();
+    if (options->NumTimes() > 1)
+    {
+        const int digits = (int) (log10((double) options->NumTimes()) + 1);
+        char buffer[64];
+        snprintf(buffer, 64, "%.*d", digits, times_run);
+        outputFilename += buffer;
+    }
+    outputFilename += options->getOutputExtension();
 
     Image i(width_, height_, rgb_data, alpha);
     i.Quality(quality_);
-    if (!i.Write(outputFilename))
+    if (!i.Write(outputFilename.c_str()))
     {
         ostringstream errStr;
         errStr << "Can't create " << outputFilename << ".\n";
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
 
-    Options *options = Options::getInstance();
     if (options->Verbosity() > 1)
     {
         ostringstream msg;
         msg << "Created image file " << outputFilename << "\n";
         xpMsg(msg.str(), __FILE__, __LINE__);
     }
-}
-
-const char *
-DisplayOutput::constructOutputFilename()
-{
-    Options *options = Options::getInstance();
-
-    string output_filename = options->getOutputBase();
-    if (options->NumTimes() > 1)
-    {
-        const int digits = (int) (log10((double) options->NumTimes()) + 1);
-        char buffer[64];
-        snprintf(buffer, 64, "%.*d", digits, times_run);
-        output_filename += buffer;
-    }
-    output_filename += options->getOutputExtension();
-
-    return(output_filename.c_str());
 }

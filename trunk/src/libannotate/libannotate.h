@@ -58,7 +58,7 @@ addSpiceObjects(map<double, Planet *> &planetsFromSunMap,
                 multimap<double, Annotation *> &annotationMap);
 
 extern void
-loadSpiceKernels();
+processSpiceKernels(const bool load);
 
 extern bool
 calculateSpicePosition(double jd, 

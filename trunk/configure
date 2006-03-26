@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB am__fastdepOBJC_TRUE am__fastdepOBJC_FALSE PERL CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_LIBX11_TRUE HAVE_LIBX11_FALSE EGREP XSS_LIBS HAVE_LIBGIF_TRUE HAVE_LIBGIF_FALSE HAVE_LIBJPEG_TRUE HAVE_LIBJPEG_FALSE HAVE_LIBPNG_TRUE HAVE_LIBPNG_FALSE HAVE_LIBPNM_TRUE HAVE_LIBPNM_FALSE HAVE_LIBTIFF_TRUE HAVE_LIBTIFF_FALSE GRAPHICS_LIBS FREETYPE_CONFIG FREETYPE_CFLAGS FREETYPE_LIBS HAVE_LIBFREETYPE_TRUE HAVE_LIBFREETYPE_FALSE PKG_CONFIG PANGOFT2_CFLAGS PANGOFT2_LIBS HAVE_LIBPANGOFT2_TRUE HAVE_LIBPANGOFT2_FALSE CSPICE_LIBS HAVE_CSPICE_TRUE HAVE_CSPICE_FALSE AQUA_LIBS OBJC OBJCFLAGS HAVE_AQUA_TRUE HAVE_AQUA_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE USE_AR_TRUE USE_AR_FALSE xplanet_ARFLAGS xplanet_LDFLAGS separator LIBICONV LTLIBICONV LIBCHARSET HAVE_LIBCHARSET_TRUE HAVE_LIBCHARSET_FALSE HAVE_LANGINFO_H_TRUE HAVE_LANGINFO_H_FALSE mapext LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB am__fastdepOBJC_TRUE am__fastdepOBJC_FALSE PERL build build_cpu build_vendor build_os host host_cpu host_vendor host_os CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP XSS_LIBS FREETYPE_CONFIG FREETYPE_CFLAGS FREETYPE_LIBS PKG_CONFIG PANGOFT2_CFLAGS PANGOFT2_LIBS CSPICE_LIBS xplanet_ARFLAGS xplanet_LDFLAGS separator AQUA_LIBS OBJC OBJCFLAGS GRAPHICS_LIBS LIBICONV LTLIBICONV LIBCHARSET HAVE_CSPICE_TRUE HAVE_CSPICE_FALSE HAVE_LIBFREETYPE_TRUE HAVE_LIBFREETYPE_FALSE HAVE_LIBPANGOFT2_TRUE HAVE_LIBPANGOFT2_FALSE HAVE_LIBX11_TRUE HAVE_LIBX11_FALSE HAVE_AQUA_TRUE HAVE_AQUA_FALSE HAVE_QUICKTIME_TRUE HAVE_QUICKTIME_FALSE HAVE_LIBGIF_TRUE HAVE_LIBGIF_FALSE HAVE_LIBJPEG_TRUE HAVE_LIBJPEG_FALSE HAVE_LIBPNG_TRUE HAVE_LIBPNG_FALSE HAVE_LIBPNM_TRUE HAVE_LIBPNM_FALSE HAVE_LIBTIFF_TRUE HAVE_LIBTIFF_FALSE HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE USE_AR_TRUE USE_AR_FALSE mapext LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -866,18 +866,20 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-cygwin           check for Cygwin environment (YES)
   --with-x                use the X Window System
   --with-xscreensaver     compile with X screensaver extension (YES)
+  --with-freetype         Enable Freetype support for TrueType fonts (YES)
+  --with-pango            Enable Pango (YES)
+  --with-cspice           Use JPL's SPICE toolkit (YES)
+  --with-aqua             For Mac OS X Aqua (NO)
+  --with-quicktime        On Aqua, use Quicktime library to read/write image
+                          files (YES)
   --with-gif              Enable GIF support (YES)
   --with-jpeg             Enable JPEG support (YES)
   --with-png              Enable PNG support (YES)
   --with-pnm              Enable PNM support (YES)
   --with-tiff             Enable TIFF support (YES)
-  --with-freetype         Enable Freetype support for TrueType fonts (YES)
-  --with-pango            Enable Pango (YES)
-  --with-cspice           Use JPL's SPICE toolkit (YES)
-  --with-aqua             For Mac OS X Aqua (NO)
-  --with-cygwin           check for Cygwin environment (YES)
   --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
   --without-libiconv-prefix     don't search for libiconv in includedir and libdir
   --with-map-extension=EXTENSION
@@ -1573,7 +1575,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=xplanet
- VERSION=1.0.6
+ VERSION=1.0.7
 
 
 cat >>confdefs.h <<_ACEOF
@@ -3294,6 +3296,106 @@ fi
 
 
 
+# Check whether --with-cygwin or --without-cygwin was given.
+if test "${with_cygwin+set}" = set; then
+  withval="$with_cygwin"
+
+fi;
+
+separator="/"
+use_ar='yes'
+have_aqua='no'
+have_cygwin='no'
+# Make sure we can run config.sub.
+$ac_config_sub sun4 >/dev/null 2>&1 ||
+  { { echo "$as_me:$LINENO: error: cannot run $ac_config_sub" >&5
+echo "$as_me: error: cannot run $ac_config_sub" >&2;}
+   { (exit 1); exit 1; }; }
+
+echo "$as_me:$LINENO: checking build system type" >&5
+echo $ECHO_N "checking build system type... $ECHO_C" >&6
+if test "${ac_cv_build+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_build_alias=$build_alias
+test -z "$ac_cv_build_alias" &&
+  ac_cv_build_alias=`$ac_config_guess`
+test -z "$ac_cv_build_alias" &&
+  { { echo "$as_me:$LINENO: error: cannot guess build type; you must specify one" >&5
+echo "$as_me: error: cannot guess build type; you must specify one" >&2;}
+   { (exit 1); exit 1; }; }
+ac_cv_build=`$ac_config_sub $ac_cv_build_alias` ||
+  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_build_alias failed" >&5
+echo "$as_me: error: $ac_config_sub $ac_cv_build_alias failed" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_build" >&5
+echo "${ECHO_T}$ac_cv_build" >&6
+build=$ac_cv_build
+build_cpu=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+build_vendor=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
+build_os=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+
+
+echo "$as_me:$LINENO: checking host system type" >&5
+echo $ECHO_N "checking host system type... $ECHO_C" >&6
+if test "${ac_cv_host+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_host_alias=$host_alias
+test -z "$ac_cv_host_alias" &&
+  ac_cv_host_alias=$ac_cv_build_alias
+ac_cv_host=`$ac_config_sub $ac_cv_host_alias` ||
+  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_host_alias failed" >&5
+echo "$as_me: error: $ac_config_sub $ac_cv_host_alias failed" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_host" >&5
+echo "${ECHO_T}$ac_cv_host" >&6
+host=$ac_cv_host
+host_cpu=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+host_vendor=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
+host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+
+
+case "$host" in
+     sparc-sun-*)
+       if test "x$GXX" != "xyes"; then
+# This is for Sun Workshop compiler
+         use_ar='no'
+	 xplanet_ARFLAGS="-xar -o"
+	 xplanet_LDFLAGS="-xildoff"
+       fi
+     ;;
+     mips-sgi-irix*)
+# this is for the MIPSpro compilers
+       if test "x$GXX" != "xyes"; then
+         use_ar='no'
+         xplanet_ARFLAGS="-ar -WR,-s,-u,-v -o"
+       fi
+     ;;
+     *-cygwin*)
+     if test "$with_cygwin" != 'no'; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_CYGWIN
+_ACEOF
+
+       have_cygwin='yes'
+       xplanet_LDFLAGS="-static"
+       separator="\\\\\\\\"
+     fi
+     ;;
+     *-apple-darwin*)
+     have_aqua='yes'
+     ;;
+     i686-pc-linux-gnu)
+     ;;
+esac
+
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4807,18 +4909,6 @@ echo "$as_me: WARNING: *** Xplanet will be built without X11 support ***" >&2;}
    fi
 fi
 
-
-
-if test "$have_libx11" = 'yes'; then
-  HAVE_LIBX11_TRUE=
-  HAVE_LIBX11_FALSE='#'
-else
-  HAVE_LIBX11_TRUE='#'
-  HAVE_LIBX11_FALSE=
-fi
-
-
-
 echo "$as_me:$LINENO: checking for egrep" >&5
 echo $ECHO_N "checking for egrep... $ECHO_C" >&6
 if test "${ac_cv_prog_egrep+set}" = set; then
@@ -5400,6 +5490,508 @@ _ACEOF
 fi
 fi
 
+
+
+
+# Check whether --with-freetype or --without-freetype was given.
+if test "${with_freetype+set}" = set; then
+  withval="$with_freetype"
+
+fi;
+
+have_freetype='no'
+if test "$with_freetype" != 'no'; then
+  # Extract the first word of "freetype-config", so it can be a program name with args.
+set dummy freetype-config; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_FREETYPE_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $FREETYPE_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_FREETYPE_CONFIG="$FREETYPE_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_FREETYPE_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_FREETYPE_CONFIG" && ac_cv_path_FREETYPE_CONFIG="no"
+  ;;
+esac
+fi
+FREETYPE_CONFIG=$ac_cv_path_FREETYPE_CONFIG
+
+if test -n "$FREETYPE_CONFIG"; then
+  echo "$as_me:$LINENO: result: $FREETYPE_CONFIG" >&5
+echo "${ECHO_T}$FREETYPE_CONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  if test "$FREETYPE_CONFIG" = no; then
+    { echo "$as_me:$LINENO: WARNING: *** Xplanet will be built without freetype support ***" >&5
+echo "$as_me: WARNING: *** Xplanet will be built without freetype support ***" >&2;}
+  else
+    FREETYPE_CFLAGS="`$FREETYPE_CONFIG --cflags` -I`$FREETYPE_CONFIG --prefix`/include"
+    FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
+
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBFREETYPE
+_ACEOF
+
+    have_freetype='yes'
+  fi
+fi
+
+
+
+# Check whether --with-pango or --without-pango was given.
+if test "${with_pango+set}" = set; then
+  withval="$with_pango"
+
+fi;
+
+have_pangoft2='no'
+if test "$with_pango" != 'no'; then
+   # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+
+if test -n "$PKG_CONFIG"; then
+  echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
+echo "${ECHO_T}$PKG_CONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+   if test "$PKG_CONFIG" = no; then
+      { echo "$as_me:$LINENO: WARNING: *** Xplanet will be built without pango support ***" >&5
+echo "$as_me: WARNING: *** Xplanet will be built without pango support ***" >&2;}
+   else
+
+  succeeded=no
+
+  if test -z "$PKG_CONFIG"; then
+    # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_PKG_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+
+if test -n "$PKG_CONFIG"; then
+  echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
+echo "${ECHO_T}$PKG_CONFIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  fi
+
+  if test "$PKG_CONFIG" = "no" ; then
+     echo "*** The pkg-config script could not be found. Make sure it is"
+     echo "*** in your path, or set the PKG_CONFIG environment variable"
+     echo "*** to the full path to pkg-config."
+     echo "*** Or see http://www.freedesktop.org/software/pkgconfig to get pkg-config."
+  else
+     PKG_CONFIG_MIN_VERSION=0.9.0
+     if $PKG_CONFIG --atleast-pkgconfig-version $PKG_CONFIG_MIN_VERSION; then
+        echo "$as_me:$LINENO: checking for pangoft2 >= 1.2.0" >&5
+echo $ECHO_N "checking for pangoft2 >= 1.2.0... $ECHO_C" >&6
+
+        if $PKG_CONFIG --exists "pangoft2 >= 1.2.0" ; then
+            echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+            succeeded=yes
+
+            echo "$as_me:$LINENO: checking PANGOFT2_CFLAGS" >&5
+echo $ECHO_N "checking PANGOFT2_CFLAGS... $ECHO_C" >&6
+            PANGOFT2_CFLAGS=`$PKG_CONFIG --cflags "pangoft2 >= 1.2.0"`
+            echo "$as_me:$LINENO: result: $PANGOFT2_CFLAGS" >&5
+echo "${ECHO_T}$PANGOFT2_CFLAGS" >&6
+
+            echo "$as_me:$LINENO: checking PANGOFT2_LIBS" >&5
+echo $ECHO_N "checking PANGOFT2_LIBS... $ECHO_C" >&6
+            PANGOFT2_LIBS=`$PKG_CONFIG --libs "pangoft2 >= 1.2.0"`
+            echo "$as_me:$LINENO: result: $PANGOFT2_LIBS" >&5
+echo "${ECHO_T}$PANGOFT2_LIBS" >&6
+        else
+            PANGOFT2_CFLAGS=""
+            PANGOFT2_LIBS=""
+            ## If we have a custom action on failure, don't print errors, but
+            ## do set a variable so people can do so.
+            PANGOFT2_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "pangoft2 >= 1.2.0"`
+
+        fi
+
+
+
+     else
+        echo "*** Your version of pkg-config is too old. You need version $PKG_CONFIG_MIN_VERSION or newer."
+        echo "*** See http://www.freedesktop.org/software/pkgconfig"
+     fi
+  fi
+
+  if test $succeeded = yes; then
+     have_pangoft2='yes'
+  else
+     have_pangoft2='no'
+  fi
+
+      FREETYPE_CFLAGS="$FREETYPE_CFLAGS $PANGOFT2_CFLAGS"
+      FREETYPE_LIBS="$FREETYPE_LIBS $PANGOFT2_LIBS"
+
+
+      if test "$have_pangoft2" = 'yes'; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBPANGOFT2
+_ACEOF
+
+      fi
+   fi
+fi
+
+
+
+
+# Check whether --with-cspice or --without-cspice was given.
+if test "${with_cspice+set}" = set; then
+  withval="$with_cspice"
+
+fi;
+
+have_cspice='no'
+if test "$with_cspice" != 'no'; then
+  have_cspice_h='no'
+  if test "${ac_cv_header_SpiceUsr_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for SpiceUsr.h" >&5
+echo $ECHO_N "checking for SpiceUsr.h... $ECHO_C" >&6
+if test "${ac_cv_header_SpiceUsr_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_SpiceUsr_h" >&5
+echo "${ECHO_T}$ac_cv_header_SpiceUsr_h" >&6
+else
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking SpiceUsr.h usability" >&5
+echo $ECHO_N "checking SpiceUsr.h usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <SpiceUsr.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_header_compiler=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking SpiceUsr.h presence" >&5
+echo $ECHO_N "checking SpiceUsr.h presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <SpiceUsr.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc in
+  yes:no )
+    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: SpiceUsr.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&2;}
+    (
+      cat <<\_ASBOX
+## ------------------------------------ ##
+## Report this to bug-autoconf@gnu.org. ##
+## ------------------------------------ ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+  no:yes )
+    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: SpiceUsr.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: SpiceUsr.h: check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&2;}
+    (
+      cat <<\_ASBOX
+## ------------------------------------ ##
+## Report this to bug-autoconf@gnu.org. ##
+## ------------------------------------ ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+echo "$as_me:$LINENO: checking for SpiceUsr.h" >&5
+echo $ECHO_N "checking for SpiceUsr.h... $ECHO_C" >&6
+if test "${ac_cv_header_SpiceUsr_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_SpiceUsr_h=$ac_header_preproc
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_SpiceUsr_h" >&5
+echo "${ECHO_T}$ac_cv_header_SpiceUsr_h" >&6
+
+fi
+if test $ac_cv_header_SpiceUsr_h = yes; then
+  have_cspice_h='yes'
+else
+  have_cspice_h='no'
+fi
+
+
+  if test "$have_cspice_h" = 'yes'; then
+    have_cspice_lib='no'
+    echo "$as_me:$LINENO: checking for furnsh_c in -lcspice" >&5
+echo $ECHO_N "checking for furnsh_c in -lcspice... $ECHO_C" >&6
+if test "${ac_cv_lib_cspice_furnsh_c+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcspice -lm $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char furnsh_c ();
+int
+main ()
+{
+furnsh_c ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_cspice_furnsh_c=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_cspice_furnsh_c=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_cspice_furnsh_c" >&5
+echo "${ECHO_T}$ac_cv_lib_cspice_furnsh_c" >&6
+if test $ac_cv_lib_cspice_furnsh_c = yes; then
+  have_cspice_lib='yes'
+else
+  have_cspice_lib='no'
+fi
+
+    if test "$have_cspice_lib" = 'yes'; then
+      CSPICE_LIBS="-lcspice"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_CSPICE
+_ACEOF
+
+
+      have_cspice='yes'
+    fi
+  fi
+
+  if test "$have_cspice" = 'no'; then
+    { echo "$as_me:$LINENO: WARNING: *** Xplanet will be built without SPICE support ***" >&5
+echo "$as_me: WARNING: *** Xplanet will be built without SPICE support ***" >&2;}
+  fi
+fi
+
+
+
+
+
+
+
+
+# Check whether --with-aqua or --without-aqua was given.
+if test "${with_aqua+set}" = set; then
+  withval="$with_aqua"
+
+fi;
+
+# Check whether --with-quicktime or --without-quicktime was given.
+if test "${with_quicktime+set}" = set; then
+  withval="$with_quicktime"
+
+fi;
+
+have_quicktime='no'
+if test "$with_aqua" = yes; then
+  AQUA_LIBS=""
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_AQUA
+_ACEOF
+
+  if test "$with_quicktime" != no; then
+    have_quicktime='yes'
+    AQUA_LIBS="-framework Quicktime"
+  fi
+  AQUA_LIBS="$AQUA_LIBS -framework IOKit -framework Carbon -framework Cocoa -bind_at_load"
+
+
+  OBJC="gcc"
+  OBJCFLAGS="-Wno-import"
+
+
+fi
+
+
+if test "$have_quicktime" != 'yes'; then
 
 
 GRAPHICS_LIBS=""
@@ -6819,708 +7411,10 @@ fi
 
 
 
-if test "$have_gif" = 'yes'; then
-  HAVE_LIBGIF_TRUE=
-  HAVE_LIBGIF_FALSE='#'
-else
-  HAVE_LIBGIF_TRUE='#'
-  HAVE_LIBGIF_FALSE=
-fi
-
-
-
-if test "$have_jpeg" = 'yes'; then
-  HAVE_LIBJPEG_TRUE=
-  HAVE_LIBJPEG_FALSE='#'
-else
-  HAVE_LIBJPEG_TRUE='#'
-  HAVE_LIBJPEG_FALSE=
-fi
-
-
-
-if test "$have_png" = 'yes'; then
-  HAVE_LIBPNG_TRUE=
-  HAVE_LIBPNG_FALSE='#'
-else
-  HAVE_LIBPNG_TRUE='#'
-  HAVE_LIBPNG_FALSE=
-fi
-
-
-
-if test "$have_pnm" = 'yes'; then
-  HAVE_LIBPNM_TRUE=
-  HAVE_LIBPNM_FALSE='#'
-else
-  HAVE_LIBPNM_TRUE='#'
-  HAVE_LIBPNM_FALSE=
-fi
-
-
-
-if test "$have_tiff" = 'yes'; then
-  HAVE_LIBTIFF_TRUE=
-  HAVE_LIBTIFF_FALSE='#'
-else
-  HAVE_LIBTIFF_TRUE='#'
-  HAVE_LIBTIFF_FALSE=
-fi
-
-
-
-
-
-
-
-
-# Check whether --with-freetype or --without-freetype was given.
-if test "${with_freetype+set}" = set; then
-  withval="$with_freetype"
-
-fi;
-
-have_freetype='no'
-if test "$with_freetype" != 'no'; then
-  # Extract the first word of "freetype-config", so it can be a program name with args.
-set dummy freetype-config; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_FREETYPE_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $FREETYPE_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_FREETYPE_CONFIG="$FREETYPE_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_FREETYPE_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_FREETYPE_CONFIG" && ac_cv_path_FREETYPE_CONFIG="no"
-  ;;
-esac
-fi
-FREETYPE_CONFIG=$ac_cv_path_FREETYPE_CONFIG
-
-if test -n "$FREETYPE_CONFIG"; then
-  echo "$as_me:$LINENO: result: $FREETYPE_CONFIG" >&5
-echo "${ECHO_T}$FREETYPE_CONFIG" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  if test "$FREETYPE_CONFIG" = no; then
-    { echo "$as_me:$LINENO: WARNING: *** Xplanet will be built without freetype support ***" >&5
-echo "$as_me: WARNING: *** Xplanet will be built without freetype support ***" >&2;}
-  else
-    FREETYPE_CFLAGS="`$FREETYPE_CONFIG --cflags` -I`$FREETYPE_CONFIG --prefix`/include"
-    FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
-
-
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBFREETYPE
-_ACEOF
-
-    have_freetype='yes'
-  fi
-fi
-
-
-
-if test "$have_freetype" = 'yes'; then
-  HAVE_LIBFREETYPE_TRUE=
-  HAVE_LIBFREETYPE_FALSE='#'
-else
-  HAVE_LIBFREETYPE_TRUE='#'
-  HAVE_LIBFREETYPE_FALSE=
-fi
-
-
-
-
-# Check whether --with-pango or --without-pango was given.
-if test "${with_pango+set}" = set; then
-  withval="$with_pango"
-
-fi;
-
-have_pangoft2='no'
-if test "$with_pango" != 'no'; then
-   # Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_PKG_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PKG_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
-  ;;
-esac
-fi
-PKG_CONFIG=$ac_cv_path_PKG_CONFIG
-
-if test -n "$PKG_CONFIG"; then
-  echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
-echo "${ECHO_T}$PKG_CONFIG" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-   if test "$PKG_CONFIG" = no; then
-      { echo "$as_me:$LINENO: WARNING: *** Xplanet will be built without pango support ***" >&5
-echo "$as_me: WARNING: *** Xplanet will be built without pango support ***" >&2;}
-   else
-
-  succeeded=no
-
-  if test -z "$PKG_CONFIG"; then
-    # Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_PKG_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PKG_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
-  ;;
-esac
-fi
-PKG_CONFIG=$ac_cv_path_PKG_CONFIG
-
-if test -n "$PKG_CONFIG"; then
-  echo "$as_me:$LINENO: result: $PKG_CONFIG" >&5
-echo "${ECHO_T}$PKG_CONFIG" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  fi
-
-  if test "$PKG_CONFIG" = "no" ; then
-     echo "*** The pkg-config script could not be found. Make sure it is"
-     echo "*** in your path, or set the PKG_CONFIG environment variable"
-     echo "*** to the full path to pkg-config."
-     echo "*** Or see http://www.freedesktop.org/software/pkgconfig to get pkg-config."
-  else
-     PKG_CONFIG_MIN_VERSION=0.9.0
-     if $PKG_CONFIG --atleast-pkgconfig-version $PKG_CONFIG_MIN_VERSION; then
-        echo "$as_me:$LINENO: checking for pangoft2 >= 1.2.0" >&5
-echo $ECHO_N "checking for pangoft2 >= 1.2.0... $ECHO_C" >&6
-
-        if $PKG_CONFIG --exists "pangoft2 >= 1.2.0" ; then
-            echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-            succeeded=yes
-
-            echo "$as_me:$LINENO: checking PANGOFT2_CFLAGS" >&5
-echo $ECHO_N "checking PANGOFT2_CFLAGS... $ECHO_C" >&6
-            PANGOFT2_CFLAGS=`$PKG_CONFIG --cflags "pangoft2 >= 1.2.0"`
-            echo "$as_me:$LINENO: result: $PANGOFT2_CFLAGS" >&5
-echo "${ECHO_T}$PANGOFT2_CFLAGS" >&6
-
-            echo "$as_me:$LINENO: checking PANGOFT2_LIBS" >&5
-echo $ECHO_N "checking PANGOFT2_LIBS... $ECHO_C" >&6
-            PANGOFT2_LIBS=`$PKG_CONFIG --libs "pangoft2 >= 1.2.0"`
-            echo "$as_me:$LINENO: result: $PANGOFT2_LIBS" >&5
-echo "${ECHO_T}$PANGOFT2_LIBS" >&6
-        else
-            PANGOFT2_CFLAGS=""
-            PANGOFT2_LIBS=""
-            ## If we have a custom action on failure, don't print errors, but
-            ## do set a variable so people can do so.
-            PANGOFT2_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "pangoft2 >= 1.2.0"`
-
-        fi
-
-
-
-     else
-        echo "*** Your version of pkg-config is too old. You need version $PKG_CONFIG_MIN_VERSION or newer."
-        echo "*** See http://www.freedesktop.org/software/pkgconfig"
-     fi
-  fi
-
-  if test $succeeded = yes; then
-     have_pangoft2='yes'
-  else
-     have_pangoft2='no'
-  fi
-
-      FREETYPE_CFLAGS="$FREETYPE_CFLAGS $PANGOFT2_CFLAGS"
-      FREETYPE_LIBS="$FREETYPE_LIBS $PANGOFT2_LIBS"
-
-
-      if test "$have_pangoft2" = 'yes'; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBPANGOFT2
-_ACEOF
-
-      fi
-   fi
-fi
-
-
-
-if test "$have_pangoft2" = 'yes'; then
-  HAVE_LIBPANGOFT2_TRUE=
-  HAVE_LIBPANGOFT2_FALSE='#'
-else
-  HAVE_LIBPANGOFT2_TRUE='#'
-  HAVE_LIBPANGOFT2_FALSE=
-fi
-
-
-
-
-
-# Check whether --with-cspice or --without-cspice was given.
-if test "${with_cspice+set}" = set; then
-  withval="$with_cspice"
-
-fi;
-
-have_cspice='no'
-if test "$with_cspice" != 'no'; then
-  have_cspice_h='no'
-  if test "${ac_cv_header_SpiceUsr_h+set}" = set; then
-  echo "$as_me:$LINENO: checking for SpiceUsr.h" >&5
-echo $ECHO_N "checking for SpiceUsr.h... $ECHO_C" >&6
-if test "${ac_cv_header_SpiceUsr_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_SpiceUsr_h" >&5
-echo "${ECHO_T}$ac_cv_header_SpiceUsr_h" >&6
-else
-  # Is the header compilable?
-echo "$as_me:$LINENO: checking SpiceUsr.h usability" >&5
-echo $ECHO_N "checking SpiceUsr.h usability... $ECHO_C" >&6
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-$ac_includes_default
-#include <SpiceUsr.h>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_header_compiler=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_header_compiler=no
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
-echo "${ECHO_T}$ac_header_compiler" >&6
-
-# Is the header present?
-echo "$as_me:$LINENO: checking SpiceUsr.h presence" >&5
-echo $ECHO_N "checking SpiceUsr.h presence... $ECHO_C" >&6
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <SpiceUsr.h>
-_ACEOF
-if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
-  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } >/dev/null; then
-  if test -s conftest.err; then
-    ac_cpp_err=$ac_c_preproc_warn_flag
-  else
-    ac_cpp_err=
-  fi
-else
-  ac_cpp_err=yes
-fi
-if test -z "$ac_cpp_err"; then
-  ac_header_preproc=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-  ac_header_preproc=no
-fi
-rm -f conftest.err conftest.$ac_ext
-echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
-echo "${ECHO_T}$ac_header_preproc" >&6
-
-# So?  What about this header?
-case $ac_header_compiler:$ac_header_preproc in
-  yes:no )
-    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: accepted by the compiler, rejected by the preprocessor!" >&5
-echo "$as_me: WARNING: SpiceUsr.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&2;}
-    (
-      cat <<\_ASBOX
-## ------------------------------------ ##
-## Report this to bug-autoconf@gnu.org. ##
-## ------------------------------------ ##
-_ASBOX
-    ) |
-      sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-  no:yes )
-    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: present but cannot be compiled" >&5
-echo "$as_me: WARNING: SpiceUsr.h: present but cannot be compiled" >&2;}
-    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: check for missing prerequisite headers?" >&5
-echo "$as_me: WARNING: SpiceUsr.h: check for missing prerequisite headers?" >&2;}
-    { echo "$as_me:$LINENO: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: SpiceUsr.h: proceeding with the preprocessor's result" >&2;}
-    (
-      cat <<\_ASBOX
-## ------------------------------------ ##
-## Report this to bug-autoconf@gnu.org. ##
-## ------------------------------------ ##
-_ASBOX
-    ) |
-      sed "s/^/$as_me: WARNING:     /" >&2
-    ;;
-esac
-echo "$as_me:$LINENO: checking for SpiceUsr.h" >&5
-echo $ECHO_N "checking for SpiceUsr.h... $ECHO_C" >&6
-if test "${ac_cv_header_SpiceUsr_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_cv_header_SpiceUsr_h=$ac_header_preproc
-fi
-echo "$as_me:$LINENO: result: $ac_cv_header_SpiceUsr_h" >&5
-echo "${ECHO_T}$ac_cv_header_SpiceUsr_h" >&6
-
-fi
-if test $ac_cv_header_SpiceUsr_h = yes; then
-  have_cspice_h='yes'
-else
-  have_cspice_h='no'
-fi
-
-
-  if test "$have_cspice_h" = 'yes'; then
-    have_cspice_lib='no'
-    echo "$as_me:$LINENO: checking for furnsh_c in -lcspice" >&5
-echo $ECHO_N "checking for furnsh_c in -lcspice... $ECHO_C" >&6
-if test "${ac_cv_lib_cspice_furnsh_c+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcspice -lm $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char furnsh_c ();
-int
-main ()
-{
-furnsh_c ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_cspice_furnsh_c=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_cspice_furnsh_c=no
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_cspice_furnsh_c" >&5
-echo "${ECHO_T}$ac_cv_lib_cspice_furnsh_c" >&6
-if test $ac_cv_lib_cspice_furnsh_c = yes; then
-  have_cspice_lib='yes'
-else
-  have_cspice_lib='no'
-fi
-
-    if test "$have_cspice_lib" = 'yes'; then
-      CSPICE_LIBS="-lcspice"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_CSPICE
-_ACEOF
-
-
-      have_cspice='yes'
-    fi
-  fi
-
-  if test "$have_cspice" = 'no'; then
-    { echo "$as_me:$LINENO: WARNING: *** Xplanet will be built without SPICE support ***" >&5
-echo "$as_me: WARNING: *** Xplanet will be built without SPICE support ***" >&2;}
-  fi
-fi
-
-
-
-if test "$have_cspice" = 'yes'; then
-  HAVE_CSPICE_TRUE=
-  HAVE_CSPICE_FALSE='#'
-else
-  HAVE_CSPICE_TRUE='#'
-  HAVE_CSPICE_FALSE=
-fi
-
-
-
-
-# Check whether --with-aqua or --without-aqua was given.
-if test "${with_aqua+set}" = set; then
-  withval="$with_aqua"
-
-fi;
-
-if test "$with_aqua" = yes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_AQUA
-_ACEOF
-
-  AQUA_LIBS="-framework Carbon -framework Cocoa -bind_at_load"
-
-
-  OBJC="gcc"
-  OBJCFLAGS="-Wno-import"
-
 
 fi
 
-
-
-if test "$with_aqua" = 'yes'; then
-  HAVE_AQUA_TRUE=
-  HAVE_AQUA_FALSE='#'
-else
-  HAVE_AQUA_TRUE='#'
-  HAVE_AQUA_FALSE=
-fi
-
-
-
-
-# Check whether --with-cygwin or --without-cygwin was given.
-if test "${with_cygwin+set}" = set; then
-  withval="$with_cygwin"
-
-fi;
-
-separator="/"
-use_ar='yes'
-
-# Make sure we can run config.sub.
-$ac_config_sub sun4 >/dev/null 2>&1 ||
-  { { echo "$as_me:$LINENO: error: cannot run $ac_config_sub" >&5
-echo "$as_me: error: cannot run $ac_config_sub" >&2;}
-   { (exit 1); exit 1; }; }
-
-echo "$as_me:$LINENO: checking build system type" >&5
-echo $ECHO_N "checking build system type... $ECHO_C" >&6
-if test "${ac_cv_build+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_cv_build_alias=$build_alias
-test -z "$ac_cv_build_alias" &&
-  ac_cv_build_alias=`$ac_config_guess`
-test -z "$ac_cv_build_alias" &&
-  { { echo "$as_me:$LINENO: error: cannot guess build type; you must specify one" >&5
-echo "$as_me: error: cannot guess build type; you must specify one" >&2;}
-   { (exit 1); exit 1; }; }
-ac_cv_build=`$ac_config_sub $ac_cv_build_alias` ||
-  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_build_alias failed" >&5
-echo "$as_me: error: $ac_config_sub $ac_cv_build_alias failed" >&2;}
-   { (exit 1); exit 1; }; }
-
-fi
-echo "$as_me:$LINENO: result: $ac_cv_build" >&5
-echo "${ECHO_T}$ac_cv_build" >&6
-build=$ac_cv_build
-build_cpu=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
-build_vendor=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
-build_os=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
-
-
-echo "$as_me:$LINENO: checking host system type" >&5
-echo $ECHO_N "checking host system type... $ECHO_C" >&6
-if test "${ac_cv_host+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_cv_host_alias=$host_alias
-test -z "$ac_cv_host_alias" &&
-  ac_cv_host_alias=$ac_cv_build_alias
-ac_cv_host=`$ac_config_sub $ac_cv_host_alias` ||
-  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_host_alias failed" >&5
-echo "$as_me: error: $ac_config_sub $ac_cv_host_alias failed" >&2;}
-   { (exit 1); exit 1; }; }
-
-fi
-echo "$as_me:$LINENO: result: $ac_cv_host" >&5
-echo "${ECHO_T}$ac_cv_host" >&6
-host=$ac_cv_host
-host_cpu=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
-host_vendor=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
-host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
-
-
-case "$host" in
-     sparc-sun-*)
-       if test "x$GXX" != "xyes"; then
-# This is for Sun Workshop compiler
-         use_ar='no'
-	 xplanet_ARFLAGS="-xar -o"
-	 xplanet_LDFLAGS="-xildoff"
-       fi
-     ;;
-     mips-sgi-irix*)
-# this is for the MIPSpro compilers
-       if test "x$GXX" != "xyes"; then
-         use_ar='no'
-         xplanet_ARFLAGS="-ar -WR,-s,-u,-v -o"
-       fi
-     ;;
-     *-cygwin*)
-     if test "$with_cygwin" != 'no'; then
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_CYGWIN
-_ACEOF
-
-       have_cygwin='yes'
-       xplanet_LDFLAGS="-static"
-       separator="\\\\\\\\"
-     fi
-     ;;
-     *-apple-darwin*)
-     ;;
-     i686-pc-linux-gnu)
-     ;;
-esac
-
-
-
-if test "$have_cygwin" = "yes"; then
-  HAVE_CYGWIN_TRUE=
-  HAVE_CYGWIN_FALSE='#'
-else
-  HAVE_CYGWIN_TRUE='#'
-  HAVE_CYGWIN_FALSE=
-fi
-
-
-
-if test $use_ar = 'yes'; then
-  USE_AR_TRUE=
-  USE_AR_FALSE='#'
-else
-  USE_AR_TRUE='#'
-  USE_AR_FALSE=
-fi
-
-
-
-
-
+if test "$have_aqua" = no; then
 
       if test "X$prefix" = "XNONE"; then
     acl_final_prefix="$ac_default_prefix"
@@ -8139,12 +8033,6 @@ else
   proto_iconv=""
 fi
 
-cat >>confdefs.h <<_ACEOF
-#define ICONV_CONST $proto_iconv
-_ACEOF
-
-
-
 have_locale_charset='no'
 have_localcharset_h='no'
 if test "${ac_cv_header_localcharset_h+set}" = set; then
@@ -8357,17 +8245,6 @@ _ACEOF
   fi
 fi
 
-
-
-if test "$have_locale_charset" = 'yes'; then
-  HAVE_LIBCHARSET_TRUE=
-  HAVE_LIBCHARSET_FALSE='#'
-else
-  HAVE_LIBCHARSET_TRUE='#'
-  HAVE_LIBCHARSET_FALSE=
-fi
-
-
 if test "${ac_cv_header_langinfo_h+set}" = set; then
   echo "$as_me:$LINENO: checking for langinfo.h" >&5
 echo $ECHO_N "checking for langinfo.h... $ECHO_C" >&6
@@ -8512,15 +8389,145 @@ _ACEOF
 
 fi
 
-
-if test "$have_langinfo_h" = 'yes'; then
-  HAVE_LANGINFO_H_TRUE=
-  HAVE_LANGINFO_H_FALSE='#'
-else
-  HAVE_LANGINFO_H_TRUE='#'
-  HAVE_LANGINFO_H_FALSE=
 fi
 
+
+
+if test "$have_cspice" = 'yes'; then
+  HAVE_CSPICE_TRUE=
+  HAVE_CSPICE_FALSE='#'
+else
+  HAVE_CSPICE_TRUE='#'
+  HAVE_CSPICE_FALSE=
+fi
+
+
+
+if test "$have_freetype" = 'yes'; then
+  HAVE_LIBFREETYPE_TRUE=
+  HAVE_LIBFREETYPE_FALSE='#'
+else
+  HAVE_LIBFREETYPE_TRUE='#'
+  HAVE_LIBFREETYPE_FALSE=
+fi
+
+
+
+if test "$have_pangoft2" = 'yes'; then
+  HAVE_LIBPANGOFT2_TRUE=
+  HAVE_LIBPANGOFT2_FALSE='#'
+else
+  HAVE_LIBPANGOFT2_TRUE='#'
+  HAVE_LIBPANGOFT2_FALSE=
+fi
+
+
+
+if test "$have_libx11" = 'yes'; then
+  HAVE_LIBX11_TRUE=
+  HAVE_LIBX11_FALSE='#'
+else
+  HAVE_LIBX11_TRUE='#'
+  HAVE_LIBX11_FALSE=
+fi
+
+
+
+if test "$with_aqua" = 'yes'; then
+  HAVE_AQUA_TRUE=
+  HAVE_AQUA_FALSE='#'
+else
+  HAVE_AQUA_TRUE='#'
+  HAVE_AQUA_FALSE=
+fi
+
+
+
+if test "$have_quicktime" = 'yes'; then
+  HAVE_QUICKTIME_TRUE=
+  HAVE_QUICKTIME_FALSE='#'
+else
+  HAVE_QUICKTIME_TRUE='#'
+  HAVE_QUICKTIME_FALSE=
+fi
+
+
+
+
+if test "$have_gif" = 'yes'; then
+  HAVE_LIBGIF_TRUE=
+  HAVE_LIBGIF_FALSE='#'
+else
+  HAVE_LIBGIF_TRUE='#'
+  HAVE_LIBGIF_FALSE=
+fi
+
+
+
+if test "$have_jpeg" = 'yes'; then
+  HAVE_LIBJPEG_TRUE=
+  HAVE_LIBJPEG_FALSE='#'
+else
+  HAVE_LIBJPEG_TRUE='#'
+  HAVE_LIBJPEG_FALSE=
+fi
+
+
+
+if test "$have_png" = 'yes'; then
+  HAVE_LIBPNG_TRUE=
+  HAVE_LIBPNG_FALSE='#'
+else
+  HAVE_LIBPNG_TRUE='#'
+  HAVE_LIBPNG_FALSE=
+fi
+
+
+
+if test "$have_pnm" = 'yes'; then
+  HAVE_LIBPNM_TRUE=
+  HAVE_LIBPNM_FALSE='#'
+else
+  HAVE_LIBPNM_TRUE='#'
+  HAVE_LIBPNM_FALSE=
+fi
+
+
+
+if test "$have_tiff" = 'yes'; then
+  HAVE_LIBTIFF_TRUE=
+  HAVE_LIBTIFF_FALSE='#'
+else
+  HAVE_LIBTIFF_TRUE='#'
+  HAVE_LIBTIFF_FALSE=
+fi
+
+
+
+
+if test "$have_cygwin" = "yes"; then
+  HAVE_CYGWIN_TRUE=
+  HAVE_CYGWIN_FALSE='#'
+else
+  HAVE_CYGWIN_TRUE='#'
+  HAVE_CYGWIN_FALSE=
+fi
+
+
+
+if test $use_ar = 'yes'; then
+  USE_AR_TRUE=
+  USE_AR_FALSE='#'
+else
+  USE_AR_TRUE='#'
+  USE_AR_FALSE=
+fi
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define ICONV_CONST $proto_iconv
+_ACEOF
 
 
 
@@ -8827,10 +8834,45 @@ echo "$as_me: error: conditional \"am__fastdepOBJC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${HAVE_CSPICE_TRUE}" && test -z "${HAVE_CSPICE_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_CSPICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_CSPICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_LIBFREETYPE_TRUE}" && test -z "${HAVE_LIBFREETYPE_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBFREETYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_LIBFREETYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_LIBPANGOFT2_TRUE}" && test -z "${HAVE_LIBPANGOFT2_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBPANGOFT2\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_LIBPANGOFT2\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${HAVE_LIBX11_TRUE}" && test -z "${HAVE_LIBX11_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBX11\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"HAVE_LIBX11\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_AQUA_TRUE}" && test -z "${HAVE_AQUA_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_AQUA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_AQUA\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_QUICKTIME_TRUE}" && test -z "${HAVE_QUICKTIME_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_QUICKTIME\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_QUICKTIME\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -8869,34 +8911,6 @@ echo "$as_me: error: conditional \"HAVE_LIBTIFF\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${HAVE_LIBFREETYPE_TRUE}" && test -z "${HAVE_LIBFREETYPE_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBFREETYPE\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LIBFREETYPE\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_LIBPANGOFT2_TRUE}" && test -z "${HAVE_LIBPANGOFT2_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBPANGOFT2\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LIBPANGOFT2\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_CSPICE_TRUE}" && test -z "${HAVE_CSPICE_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_CSPICE\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_CSPICE\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_AQUA_TRUE}" && test -z "${HAVE_AQUA_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_AQUA\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_AQUA\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${HAVE_CYGWIN_TRUE}" && test -z "${HAVE_CYGWIN_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_CYGWIN\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -8908,20 +8922,6 @@ if test -z "${USE_AR_TRUE}" && test -z "${USE_AR_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"USE_AR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"USE_AR\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_LIBCHARSET_TRUE}" && test -z "${HAVE_LIBCHARSET_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBCHARSET\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LIBCHARSET\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_LANGINFO_H_TRUE}" && test -z "${HAVE_LANGINFO_H_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LANGINFO_H\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LANGINFO_H\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -9515,15 +9515,50 @@ s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
 s,@am__fastdepOBJC_TRUE@,$am__fastdepOBJC_TRUE,;t t
 s,@am__fastdepOBJC_FALSE@,$am__fastdepOBJC_FALSE,;t t
 s,@PERL@,$PERL,;t t
+s,@build@,$build,;t t
+s,@build_cpu@,$build_cpu,;t t
+s,@build_vendor@,$build_vendor,;t t
+s,@build_os@,$build_os,;t t
+s,@host@,$host,;t t
+s,@host_cpu@,$host_cpu,;t t
+s,@host_vendor@,$host_vendor,;t t
+s,@host_os@,$host_os,;t t
 s,@CPP@,$CPP,;t t
 s,@X_CFLAGS@,$X_CFLAGS,;t t
 s,@X_PRE_LIBS@,$X_PRE_LIBS,;t t
 s,@X_LIBS@,$X_LIBS,;t t
 s,@X_EXTRA_LIBS@,$X_EXTRA_LIBS,;t t
-s,@HAVE_LIBX11_TRUE@,$HAVE_LIBX11_TRUE,;t t
-s,@HAVE_LIBX11_FALSE@,$HAVE_LIBX11_FALSE,;t t
 s,@EGREP@,$EGREP,;t t
 s,@XSS_LIBS@,$XSS_LIBS,;t t
+s,@FREETYPE_CONFIG@,$FREETYPE_CONFIG,;t t
+s,@FREETYPE_CFLAGS@,$FREETYPE_CFLAGS,;t t
+s,@FREETYPE_LIBS@,$FREETYPE_LIBS,;t t
+s,@PKG_CONFIG@,$PKG_CONFIG,;t t
+s,@PANGOFT2_CFLAGS@,$PANGOFT2_CFLAGS,;t t
+s,@PANGOFT2_LIBS@,$PANGOFT2_LIBS,;t t
+s,@CSPICE_LIBS@,$CSPICE_LIBS,;t t
+s,@xplanet_ARFLAGS@,$xplanet_ARFLAGS,;t t
+s,@xplanet_LDFLAGS@,$xplanet_LDFLAGS,;t t
+s,@separator@,$separator,;t t
+s,@AQUA_LIBS@,$AQUA_LIBS,;t t
+s,@OBJC@,$OBJC,;t t
+s,@OBJCFLAGS@,$OBJCFLAGS,;t t
+s,@GRAPHICS_LIBS@,$GRAPHICS_LIBS,;t t
+s,@LIBICONV@,$LIBICONV,;t t
+s,@LTLIBICONV@,$LTLIBICONV,;t t
+s,@LIBCHARSET@,$LIBCHARSET,;t t
+s,@HAVE_CSPICE_TRUE@,$HAVE_CSPICE_TRUE,;t t
+s,@HAVE_CSPICE_FALSE@,$HAVE_CSPICE_FALSE,;t t
+s,@HAVE_LIBFREETYPE_TRUE@,$HAVE_LIBFREETYPE_TRUE,;t t
+s,@HAVE_LIBFREETYPE_FALSE@,$HAVE_LIBFREETYPE_FALSE,;t t
+s,@HAVE_LIBPANGOFT2_TRUE@,$HAVE_LIBPANGOFT2_TRUE,;t t
+s,@HAVE_LIBPANGOFT2_FALSE@,$HAVE_LIBPANGOFT2_FALSE,;t t
+s,@HAVE_LIBX11_TRUE@,$HAVE_LIBX11_TRUE,;t t
+s,@HAVE_LIBX11_FALSE@,$HAVE_LIBX11_FALSE,;t t
+s,@HAVE_AQUA_TRUE@,$HAVE_AQUA_TRUE,;t t
+s,@HAVE_AQUA_FALSE@,$HAVE_AQUA_FALSE,;t t
+s,@HAVE_QUICKTIME_TRUE@,$HAVE_QUICKTIME_TRUE,;t t
+s,@HAVE_QUICKTIME_FALSE@,$HAVE_QUICKTIME_FALSE,;t t
 s,@HAVE_LIBGIF_TRUE@,$HAVE_LIBGIF_TRUE,;t t
 s,@HAVE_LIBGIF_FALSE@,$HAVE_LIBGIF_FALSE,;t t
 s,@HAVE_LIBJPEG_TRUE@,$HAVE_LIBJPEG_TRUE,;t t
@@ -9534,47 +9569,10 @@ s,@HAVE_LIBPNM_TRUE@,$HAVE_LIBPNM_TRUE,;t t
 s,@HAVE_LIBPNM_FALSE@,$HAVE_LIBPNM_FALSE,;t t
 s,@HAVE_LIBTIFF_TRUE@,$HAVE_LIBTIFF_TRUE,;t t
 s,@HAVE_LIBTIFF_FALSE@,$HAVE_LIBTIFF_FALSE,;t t
-s,@GRAPHICS_LIBS@,$GRAPHICS_LIBS,;t t
-s,@FREETYPE_CONFIG@,$FREETYPE_CONFIG,;t t
-s,@FREETYPE_CFLAGS@,$FREETYPE_CFLAGS,;t t
-s,@FREETYPE_LIBS@,$FREETYPE_LIBS,;t t
-s,@HAVE_LIBFREETYPE_TRUE@,$HAVE_LIBFREETYPE_TRUE,;t t
-s,@HAVE_LIBFREETYPE_FALSE@,$HAVE_LIBFREETYPE_FALSE,;t t
-s,@PKG_CONFIG@,$PKG_CONFIG,;t t
-s,@PANGOFT2_CFLAGS@,$PANGOFT2_CFLAGS,;t t
-s,@PANGOFT2_LIBS@,$PANGOFT2_LIBS,;t t
-s,@HAVE_LIBPANGOFT2_TRUE@,$HAVE_LIBPANGOFT2_TRUE,;t t
-s,@HAVE_LIBPANGOFT2_FALSE@,$HAVE_LIBPANGOFT2_FALSE,;t t
-s,@CSPICE_LIBS@,$CSPICE_LIBS,;t t
-s,@HAVE_CSPICE_TRUE@,$HAVE_CSPICE_TRUE,;t t
-s,@HAVE_CSPICE_FALSE@,$HAVE_CSPICE_FALSE,;t t
-s,@AQUA_LIBS@,$AQUA_LIBS,;t t
-s,@OBJC@,$OBJC,;t t
-s,@OBJCFLAGS@,$OBJCFLAGS,;t t
-s,@HAVE_AQUA_TRUE@,$HAVE_AQUA_TRUE,;t t
-s,@HAVE_AQUA_FALSE@,$HAVE_AQUA_FALSE,;t t
-s,@build@,$build,;t t
-s,@build_cpu@,$build_cpu,;t t
-s,@build_vendor@,$build_vendor,;t t
-s,@build_os@,$build_os,;t t
-s,@host@,$host,;t t
-s,@host_cpu@,$host_cpu,;t t
-s,@host_vendor@,$host_vendor,;t t
-s,@host_os@,$host_os,;t t
 s,@HAVE_CYGWIN_TRUE@,$HAVE_CYGWIN_TRUE,;t t
 s,@HAVE_CYGWIN_FALSE@,$HAVE_CYGWIN_FALSE,;t t
 s,@USE_AR_TRUE@,$USE_AR_TRUE,;t t
 s,@USE_AR_FALSE@,$USE_AR_FALSE,;t t
-s,@xplanet_ARFLAGS@,$xplanet_ARFLAGS,;t t
-s,@xplanet_LDFLAGS@,$xplanet_LDFLAGS,;t t
-s,@separator@,$separator,;t t
-s,@LIBICONV@,$LIBICONV,;t t
-s,@LTLIBICONV@,$LTLIBICONV,;t t
-s,@LIBCHARSET@,$LIBCHARSET,;t t
-s,@HAVE_LIBCHARSET_TRUE@,$HAVE_LIBCHARSET_TRUE,;t t
-s,@HAVE_LIBCHARSET_FALSE@,$HAVE_LIBCHARSET_FALSE,;t t
-s,@HAVE_LANGINFO_H_TRUE@,$HAVE_LANGINFO_H_TRUE,;t t
-s,@HAVE_LANGINFO_H_FALSE@,$HAVE_LANGINFO_H_FALSE,;t t
 s,@mapext@,$mapext,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

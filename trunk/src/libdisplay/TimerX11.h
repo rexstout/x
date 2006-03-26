@@ -26,13 +26,14 @@ class TimerX11 : public Timer
  private:
     static Display *display_;
 
-    bool Sleep(time_t sleep);
+    bool SleepForTime(time_t sleep);
 
 #ifdef HAVE_XSS
     Window root_;
     XScreenSaverInfo* screenSaverInfo_;
 #endif
 
+    unsigned long GetSystemIdleTime();
 };
 
 #endif

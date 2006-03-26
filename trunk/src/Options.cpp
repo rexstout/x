@@ -239,6 +239,7 @@ Options::parseArgs(int argc, char **argv)
             {"vroot",          no_argument,       NULL, VROOT},
             {"wait",           required_argument, NULL, WAIT},
             {"window",         no_argument,       NULL, WINDOW},
+            {"window-id",      required_argument, NULL, XWINID},
             {"window_title",   required_argument, NULL, WINDOWTITLE},
             {"XID",            required_argument, NULL, XWINID},
             {"xscreensaver",   no_argument,       NULL, VROOT},
@@ -360,32 +361,12 @@ Options::parseArgs(int argc, char **argv)
         }
         break;
         case HIBERNATE:
-#ifdef HAVE_XSS
             sscanf(optarg, "%lu", &hibernate_);
             hibernate_ *= 1000;
-#else
-            {
-                ostringstream errMsg;
-                errMsg << "This binary was built without the X Screensaver extensions.\n"
-                       << "The -" << long_options[option_index].name 
-                       << " option will be ignored.\n";
-                xpWarn(errMsg.str(), __FILE__, __LINE__);
-            }
-#endif
             break;
         case IDLEWAIT:
-#ifdef HAVE_XSS
             sscanf(optarg, "%lu", &idleWait_);
             idleWait_ *= 1000;
-#else
-            {
-                ostringstream errMsg;
-                errMsg << "This binary was built without the X Screensaver extensions.\n"
-                       << "The -" << long_options[option_index].name 
-                       << " option will be ignored.\n";
-                xpWarn(errMsg.str(), __FILE__, __LINE__);
-            }
-#endif
             break;
         case INTERPOLATE_ORIGIN_FILE:
             interpolateOriginFile_ = true;
