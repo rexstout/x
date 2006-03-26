@@ -234,22 +234,42 @@ TextRenderer::UTF8ToUnicode(const std::vector<unsigned char> &text)
 }
 
 void
-TextRenderer::drawUTF8test()
+TextRenderer::Font(const string &font)
 {
-    Options *options = Options::getInstance();
-    ifstream inFile("/home/hari/local/src/pango-1.2.5/examples/HELLO.utf8");
-    char line[256];
-    int x = 0;
-    int y = FontHeight();
-    while(inFile.getline (line, 256, '\n') != NULL)
-    {
-        DrawOutlinedText(x, y, line, options->Color());
-        y += FontHeight();
-        if (y > display_->Height()) 
-        {
-            y = FontHeight();
-            x += display_->Width()/3;
-        }
-    }
-    inFile.close();
+}
+
+void
+TextRenderer::FontSize(const int size)
+{
+}
+
+int
+TextRenderer::FontHeight() const
+{
+    return(0);
+}
+
+void
+TextRenderer::DrawText(const int x, const int y, 
+                               const unsigned char color[3])
+{
+}
+
+void
+TextRenderer::SetText(const std::string &text)
+{
+    ostringstream errMsg;
+    errMsg << "Xplanet was compiled without FreeType support. ";
+    errMsg << "Ignoring text: " << text << endl;
+    xpWarn(errMsg.str(), __FILE__, __LINE__);
+}
+
+void
+TextRenderer::FreeText()
+{
+}
+
+void
+TextRenderer::TextBox(int &textWidth, int &textHeight)
+{
 }

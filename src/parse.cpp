@@ -30,9 +30,9 @@ skipPastToken(int &i, const char *line, const char endChar)
     {
         if (isEndOfLine(line[i])) 
         {
-	    stringstream errStr;
-	    errStr << "Malformed line:\n\t" << line << "\n";
-	    xpWarn(errStr.str(), __FILE__, __LINE__);
+            stringstream errStr;
+            errStr << "Malformed line:\n\t" << line << "\n";
+            xpWarn(errStr.str(), __FILE__, __LINE__);
 
             return;
         }
@@ -94,21 +94,21 @@ parse(int &i, const char *line, char *&returnString)
     if (i >= (int) strlen(line)) return(ENDOFLINE);
 
     if (returnString != NULL) 
-	xpWarn("returnString is not NULL!\n", __FILE__, __LINE__);
+        xpWarn("returnString is not NULL!\n", __FILE__, __LINE__);
 
-    int returnval = UNKNOWN;
+    int returnVal = UNKNOWN;
 
     if (isDelimiter(line[i]))
     {
         i++;
-        returnval = DELIMITER;
+        returnVal = DELIMITER;
     }
     else if (isEndOfLine(line[i]))
-        returnval = ENDOFLINE;
+        returnVal = ENDOFLINE;
     else if (getValue(line, i, "align=", returnString))
-        returnval = ALIGN;
+        returnVal = ALIGN;
     else if (getValue(line, i, "arc_color={", '}', returnString))
-        returnval = ARC_COLOR;
+        returnVal = ARC_COLOR;
     else if (getValue(line, i, "arc_color=", returnString))
     {
         unsigned char RGB[3];
@@ -116,24 +116,24 @@ parse(int &i, const char *line, char *&returnString)
         delete [] returnString;
         returnString = new char[32];
         snprintf(returnString, 32, "%d,%d,%d", RGB[0], RGB[1], RGB[2]);
-        returnval = ARC_COLOR;
+        returnVal = ARC_COLOR;
     }
     else if (getValue(line, i, "arc_file=", returnString))
-        returnval = ARC_FILE;
+        returnVal = ARC_FILE;
     else if (getValue(line, i, "[", ']', returnString))
-        returnval = BODY;
+        returnVal = BODY;
     else if (getValue(line, i, "altcirc=", returnString))
-        returnval = CIRCLE;
+        returnVal = CIRCLE;
     else if (getValue(line, i, "circle=", returnString))
-        returnval = CIRCLE;
+        returnVal = CIRCLE;
     else if (getValue(line, i, "cloud_gamma=", returnString))
-        returnval = CLOUD_GAMMA;
+        returnVal = CLOUD_GAMMA;
     else if (getValue(line, i, "cloud_map=", returnString))
-        returnval = CLOUD_MAP;
+        returnVal = CLOUD_MAP;
     else if (getValue(line, i, "cloud_threshold=", returnString))
-        returnval = CLOUD_THRESHOLD;
+        returnVal = CLOUD_THRESHOLD;
     else if (getValue(line, i, "color={", '}', returnString))
-        returnval = COLOR;
+        returnVal = COLOR;
     else if (getValue(line, i, "color=", returnString))
     {
         unsigned char RGB[3];
@@ -141,34 +141,30 @@ parse(int &i, const char *line, char *&returnString)
         delete [] returnString;
         returnString = new char[32];
         snprintf(returnString, 32, "%d,%d,%d", RGB[0], RGB[1], RGB[2]);
-        returnval = COLOR;
+        returnVal = COLOR;
     }
     else if (getValue(line, i, "draw_orbit=", returnString))
-        returnval = DRAW_ORBIT;
+        returnVal = DRAW_ORBIT;
     else if (getValue(line, i, "font=", returnString))
-        returnval = FONT;
+        returnVal = FONT;
     else if (getValue(line, i, "fontsize=", returnString))
-        returnval = FONTSIZE;
+        returnVal = FONTSIZE;
     else if (getValue(line, i, "grid=", returnString))
-        returnval = GRID;
+        returnVal = GRID;
     else if (getValue(line, i, "grid1=", returnString))
-        returnval = GRID1;
+        returnVal = GRID1;
     else if (getValue(line, i, "grid2=", returnString))
-        returnval = GRID2;
+        returnVal = GRID2;
     else if (getValue(line, i, "grid_color=", returnString))
-        returnval = GRID_COLOR;
+        returnVal = GRID_COLOR;
     else if (getValue(line, i, "image=", returnString))
-        returnval = IMAGE;
-    else if (getValue(line, i, "\"", '"', returnString))
-        returnval = NAME;
-    else if (getValue(line, i, "{", '}', returnString))
-        returnval = NAME;
+        returnVal = IMAGE;
     else if (getValue(line, i, "magnify=", returnString))
-        returnval = MAGNIFY;
+        returnVal = MAGNIFY;
     else if (getValue(line, i, "mapbounds={", '}', returnString))
-	returnval = MAP_BOUNDS;
+        returnVal = MAP_BOUNDS;
     else if (getValue(line, i, "marker_color={", '}', returnString))
-        returnval = MARKER_COLOR;
+        returnVal = MARKER_COLOR;
     else if (getValue(line, i, "marker_color=", returnString))
     {
         unsigned char RGB[3];
@@ -176,46 +172,52 @@ parse(int &i, const char *line, char *&returnString)
         delete [] returnString;
         returnString = new char[32];
         snprintf(returnString, 32, "%d,%d,%d", RGB[0], RGB[1], RGB[2]);
-        returnval = MARKER_COLOR;
+        returnVal = MARKER_COLOR;
     }
     else if (getValue(line, i, "marker_file=", returnString))
-        returnval = MARKER_FILE;
+        returnVal = MARKER_FILE;
     else if (getValue(line, i, "marker_font=", returnString))
-        returnval = MARKER_FONT;
+        returnVal = MARKER_FONT;
     else if (getValue(line, i, "map=", returnString))
-        returnval = DAY_MAP;
+        returnVal = DAY_MAP;
     else if (getValue(line, i, "max_radius_for_label=", returnString))
-        returnval = MAX_RAD_FOR_LABEL;
+        returnVal = MAX_RAD_FOR_LABEL;
     else if (getValue(line, i, "min_radius_for_label=", returnString))
-        returnval = MIN_RAD_FOR_LABEL;
+        returnVal = MIN_RAD_FOR_LABEL;
     else if (getValue(line, i, "min_radius_for_markers=", returnString))
-        returnval = MIN_RAD_FOR_MARKERS;
+        returnVal = MIN_RAD_FOR_MARKERS;
+    else if (getValue(line, i, "\"", '"', returnString))
+        returnVal = NAME;
+    else if (getValue(line, i, "{", '}', returnString))
+        returnVal = NAME;
     else if (getValue(line, i, "night_map=", returnString))
-        returnval = NIGHT_MAP;
+        returnVal = NIGHT_MAP;
     else if (getValue(line, i, "orbit={", '}', returnString))
-        returnval = ORBIT;
+        returnVal = ORBIT;
     else if (getValue(line, i, "orbit_color={", '}', returnString))
-        returnval = ORBIT_COLOR;
+        returnVal = ORBIT_COLOR;
+    else if (getValue(line, i, "relative_to=", returnString))
+        returnVal = ORIGIN;
     else if (getValue(line, i, "position=", returnString))
-        returnval = POSITION;
+        returnVal = POSITION;
     else if (getValue(line, i, "radius=", returnString))
-        returnval = RADIUS;
+        returnVal = RADIUS;
     else if (getValue(line, i, "random_origin=", returnString))
-        returnval = RANDOM_ORIGIN;
+        returnVal = RANDOM_ORIGIN;
     else if (getValue(line, i, "random_target=", returnString))
-        returnval = RANDOM_TARGET;
+        returnVal = RANDOM_TARGET;
     else if (getValue(line, i, "satellite_file=", returnString))
-        returnval = SATELLITE_FILE;
+        returnVal = SATELLITE_FILE;
     else if (getValue(line, i, "shade=", returnString))
-        returnval = SHADE;
+        returnVal = SHADE;
     else if (getValue(line, i, "spacing=", returnString))
-        returnval = SPACING;
+        returnVal = SPACING;
     else if (getValue(line, i, "specular_map=", returnString))
-        returnval = SPECULAR_MAP;
+        returnVal = SPECULAR_MAP;
     else if (getValue(line, i, "symbolsize=", returnString))
-        returnval = SYMBOLSIZE;
+        returnVal = SYMBOLSIZE;
     else if (getValue(line, i, "text_color={", '}', returnString))
-        returnval = TEXT_COLOR;
+        returnVal = TEXT_COLOR;
     else if (strncmp(line+i, "timezone=", 9) == 0)
     {
         i += 9;
@@ -228,14 +230,14 @@ parse(int &i, const char *line, char *&returnString)
         returnString = new char[i - istart + 1];
         strncpy(returnString, (line + istart), i - istart);
         returnString[i-istart] = '\0';
-        returnval = TIMEZONE;
+        returnVal = TIMEZONE;
     }
     else if (getValue(line, i, "trail={", '}', returnString))
-        returnval = TRAIL;
+        returnVal = TRAIL;
     else if (getValue(line, i, "transparent={", '}', returnString))
-        returnval = TRANSPARENT;
+        returnVal = TRANSPARENT;
     else if (getValue(line, i, "twilight=", returnString))
-        returnval = TWILIGHT;
+        returnVal = TWILIGHT;
     else // assume it's a latitude/longitude value
     {
         int istart = i;
@@ -244,8 +246,8 @@ parse(int &i, const char *line, char *&returnString)
         strncpy(returnString, (line + istart), i - istart);
         returnString[i-istart] = '\0';
 
-        returnval = LATLON;
+        returnVal = LATLON;
     }
 
-    return(returnval);
+    return(returnVal);
 }

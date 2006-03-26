@@ -26,17 +26,60 @@ using namespace std;
 
 static vector<Satellite> satelliteVector;
 
+bool
+calculateSatellitePosition(time_t tv_sec, const int id,
+                           double &lat, double &lon, double &rad)
+{
+    Options *options = Options::getInstance();
+    if (options->LightTime())
+    {
+        double tX, tY, tZ;
+        double jd = options->getJulianDay();
+        if (options->UniversalTime()) jd += delT(jd) / 86400;
+        Planet earth(jd, EARTH);
+        earth.calcHeliocentricEquatorial();
+        earth.getPosition(tX, tY, tZ);
+
+        double oX, oY, oZ;
+        options->getOrigin(oX, oY, oZ);
+
+        // Now get the position relative to the origin
+        double dX = tX - oX;
+        double dY = tY - oY;
+        double dZ = tZ - oZ;
+        double dist = sqrt(dX*dX + dY*dY + dZ*dZ);
+
+        double light_time = dist * AU_to_km / 299792.458;
+        tv_sec -= static_cast<time_t> (light_time);
+    }
+
+    for (unsigned int i = 0; i < satelliteVector.size(); i++)
+    {
+        if (id == satelliteVector[i].getID())
+        {
+            satelliteVector[i].loadTLE();
+            satelliteVector[i].getSpherical(tv_sec, lat, lon, rad);
+            return(true);
+        }
+    }
+
+    ostringstream msg;
+    msg << "Can't find satellite # " << id << ".\n";
+    xpMsg(msg.str(), __FILE__, __LINE__);
+    return(false);
+}
+
 static void
 readSatelliteFile(const char *line, Planet *planet, 
-		  View *view, ProjectionBase *projection,
-		  PlanetProperties *planetProperties, 
-		  multimap<double, Annotation *> &annotationMap)
+                  View *view, ProjectionBase *projection,
+                  PlanetProperties *planetProperties, 
+                  multimap<double, Annotation *> &annotationMap)
 {
     int i = 0;
     while (isDelimiter(line[i]))
     {
-	i++;
-	if (static_cast<unsigned int> (i) > strlen(line)) return;
+        i++;
+        if (static_cast<unsigned int> (i) > strlen(line)) return;
     }
     if (isEndOfLine(line[i])) return;
 
@@ -67,12 +110,12 @@ readSatelliteFile(const char *line, Planet *planet,
 
     while (static_cast<unsigned int> (i) < strlen(line))
     {
-	char *returnString = NULL;
-	int val = parse(i, line, returnString);
+        char *returnString = NULL;
+        int val = parse(i, line, returnString);
 
-	switch (val)
-	{
-	case ALIGN:
+        switch (val)
+        {
+        case ALIGN:
             if (returnString == NULL) break;
             switch (returnString[0])
             {
@@ -97,13 +140,13 @@ readSatelliteFile(const char *line, Planet *planet,
                 align = CENTER;
                 break;
             default:
-		xpWarn("Unrecognized option for align in satellite file\n",
-		       __FILE__, __LINE__);
-		syntaxError = true;
+                xpWarn("Unrecognized option for align in satellite file\n",
+                       __FILE__, __LINE__);
+                syntaxError = true;
                 break;
             }
-	    break;
-	case CIRCLE:
+            break;
+        case CIRCLE:
         {
             double angle;
             sscanf(returnString, "%lf", &angle);
@@ -112,73 +155,73 @@ readSatelliteFile(const char *line, Planet *planet,
             angle = 90 - angle;
             altcirc.push_back(angle * deg_to_rad);
         }
-	break;
-	case COLOR:
-	{
-	    int r, g, b;
-	    if (sscanf(returnString, "%d,%d,%d", &r, &g, &b) == 3)
-	    {
-		color[0] = r & 0xff;
-		color[1] = g & 0xff;
-		color[2] = b & 0xff;
-	    }
-	    else
-	    {
-		xpWarn("need three values for color\n", __FILE__, __LINE__);
-		syntaxError = true;
-	    }
-	}
-	break;
-	case FONT:
-	    font.assign(returnString);
-	    break;
-	case FONTSIZE:
+        break;
+        case COLOR:
+        {
+            int r, g, b;
+            if (sscanf(returnString, "%d,%d,%d", &r, &g, &b) == 3)
+            {
+                color[0] = static_cast<unsigned char> (r & 0xff);
+                color[1] = static_cast<unsigned char> (g & 0xff);
+                color[2] = static_cast<unsigned char> (b & 0xff);
+            }
+            else
+            {
+                xpWarn("need three values for color\n", __FILE__, __LINE__);
+                syntaxError = true;
+            }
+        }
+        break;
+        case FONT:
+            font.assign(returnString);
+            break;
+        case FONTSIZE:
             sscanf(returnString, "%d", &fontSize);
-	    if (fontSize <= 0)
-	    {
-		xpWarn("fontSize must be positive.\n", __FILE__, __LINE__);
-		syntaxError = true;
-	    }
-	    break;
-	case IMAGE:
-	    image.assign(returnString);
-	    break;
-	case LATLON:
-	{
-	    int id;
-	    sscanf(returnString, "%d", &id);
-	    vector<Satellite>::iterator ii = satelliteVector.begin();
-	    while (ii != satelliteVector.end())
-	    {
-		if (ii->getID() == id)
-		{
-		    satellite = &(*ii);
-		    if (name.empty()) name.assign(satellite->getName());
-		    if (options->Verbosity() > 3)
-		    {
-			stringstream msg;
-			msg << "Found satellite # " << id 
-			    << " (" << satellite->getName() << ")\n";
-			xpMsg(msg.str(), __FILE__, __LINE__);
-		    }
-		    break;
-		}
-		ii++;
-	    }
-	}
-	break;
-	case NAME:
-	    name.assign(returnString);
-	    break;
-	case SPACING:
-	    sscanf(returnString, "%lf", &spacing);
-	    if (spacing < 0) 
-	    {
-		xpWarn("spacing must be positive\n", __FILE__, __LINE__);
-		spacing = 0.1;
-		syntaxError = true;
-	    }
-	    break;
+            if (fontSize <= 0)
+            {
+                xpWarn("fontSize must be positive.\n", __FILE__, __LINE__);
+                syntaxError = true;
+            }
+            break;
+        case IMAGE:
+            image.assign(returnString);
+            break;
+        case LATLON:
+        {
+            int id;
+            sscanf(returnString, "%d", &id);
+            vector<Satellite>::iterator ii = satelliteVector.begin();
+            while (ii != satelliteVector.end())
+            {
+                if (ii->getID() == id)
+                {
+                    satellite = &(*ii);
+                    if (name.empty()) name.assign(satellite->getName());
+                    if (options->Verbosity() > 3)
+                    {
+                        ostringstream msg;
+                        msg << "Found satellite # " << id 
+                            << " (" << satellite->getName() << ")\n";
+                        xpMsg(msg.str(), __FILE__, __LINE__);
+                    }
+                    break;
+                }
+                ii++;
+            }
+        }
+        break;
+        case NAME:
+            name.assign(returnString);
+            break;
+        case SPACING:
+            sscanf(returnString, "%lf", &spacing);
+            if (spacing < 0) 
+            {
+                xpWarn("spacing must be positive\n", __FILE__, __LINE__);
+                spacing = 0.1;
+                syntaxError = true;
+            }
+            break;
         case TRAIL:
         {
             char *ptr = returnString;
@@ -197,7 +240,8 @@ readSatelliteFile(const char *line, Planet *planet,
             if (!sscanf(++ptr, "%d,%d,%d", &trailStart, &trailEnd,
                         &trailInterval) == 3)
             {
-                xpWarn("Need four values for trail{}!\n", __FILE__, __LINE__);
+                xpWarn("Need four values for trail{}!\n", 
+                       __FILE__, __LINE__);
                 syntaxError = true;
             }
             else
@@ -213,7 +257,8 @@ readSatelliteFile(const char *line, Planet *planet,
                     trailType = ORBIT;
                     break;
                 default:
-                    xpWarn("Unknown type of orbit trail!\n", __FILE__, __LINE__);
+                    xpWarn("Unknown type of orbit trail!\n", 
+                           __FILE__, __LINE__);
                     syntaxError = true;
                     break;
                 }
@@ -221,61 +266,62 @@ readSatelliteFile(const char *line, Planet *planet,
             }
         }
         break;
-	case TRANSPARENT:
-            transparency = true;
-
+        case TRANSPARENT:
+        {
             int r, g, b;
             if (sscanf(returnString, "%d,%d,%d", &r, &g, &b) == 3)
             {
-                transparent_pixel[0] = r & 0xff;
-                transparent_pixel[1] = g & 0xff;
-                transparent_pixel[2] = b & 0xff;
+                transparent_pixel[0] = static_cast<unsigned char> (r & 0xff);
+                transparent_pixel[1] = static_cast<unsigned char> (g & 0xff);
+                transparent_pixel[2] = static_cast<unsigned char> (b & 0xff);
             }
             else
             {
-                xpWarn("Need three values for transparency pixel!\n", __FILE__, __LINE__);
-		syntaxError = true;
+                xpWarn("Need three values for transparency pixel!\n", 
+                       __FILE__, __LINE__);
+                syntaxError = true;
             }
-
+            transparency = true;
+        }
+        break;
+        case UNKNOWN:
+            syntaxError = true;
+        default:
+        case DELIMITER:
             break;
-	case UNKNOWN:
-	    syntaxError = true;
-	default:
-	case DELIMITER:
-	    break;
-	}
+        }
 
-	if (val != DELIMITER && options->Verbosity() > 3)
-	{
-	    stringstream msg;
-	    msg << "value is " << keyWordString[val - '?'];
-	    if (returnString != NULL)
-		msg << ", returnString is " << returnString;
-	    msg << endl;
-	    xpMsg(msg.str(), __FILE__, __LINE__);
-	}
+        if (val != DELIMITER && options->Verbosity() > 3)
+        {
+            stringstream msg;
+            msg << "value is " << keyWordString[val - '?'];
+            if (returnString != NULL)
+                msg << ", returnString is " << returnString;
+            msg << endl;
+            xpMsg(msg.str(), __FILE__, __LINE__);
+        }
 
-	delete [] returnString;
+        delete [] returnString;
 
         if (syntaxError)
         {
-	    stringstream errStr;
+            stringstream errStr;
             errStr << "Syntax error in satellite file\n";
             errStr << "line is \"" << line << "\"" << endl;
-	    xpWarn(errStr.str(), __FILE__, __LINE__);
+            xpWarn(errStr.str(), __FILE__, __LINE__);
             return;
         }
 
-	if (val == ENDOFLINE) break;
+        if (val == ENDOFLINE) break;
     }
 
     if (satellite == NULL) 
     {
-	
-	stringstream errStr;
-	errStr << "No satellite found for  \"" << line << "\"" << endl;
-	xpWarn(errStr.str(), __FILE__, __LINE__);
-	return;
+        
+        stringstream errStr;
+        errStr << "No satellite found for  \"" << line << "\"" << endl;
+        xpWarn(errStr.str(), __FILE__, __LINE__);
+        return;
     }
 
     // Load TLE data here since select_ephemeris() in libsgp4sdp4
@@ -289,77 +335,82 @@ readSatelliteFile(const char *line, Planet *planet,
 
     if (startTime > endTime)
     {
-	time_t tmp = startTime;
-	startTime = endTime;
-	endTime = tmp;
+        time_t tmp = startTime;
+        startTime = endTime;
+        endTime = tmp;
     }
 
-    double lat, lon, alt;
-    satellite->getSpherical(startTime, lat, lon, alt);
+    double lat, lon, rad;
+    satellite->getSpherical(startTime, lat, lon, rad);
 
     for (time_t t = startTime + interval; t <= endTime; t += interval)
     {
-	const double prevLat = lat;
-	const double prevLon = lon;
-	const double prevAlt = alt;
+        const double prevLat = lat;
+        const double prevLon = lon;
+        double prevRad = rad;
 
-	satellite->getSpherical(t, lat, lon, alt);
+        satellite->getSpherical(t, lat, lon, rad);
+        if (trailType == GROUND)
+        {
+            rad = 1;
+            prevRad = 1;
+        }
 
-	drawArc(prevLat, prevLon, prevAlt, lat, lon, alt, color,
-		spacing * deg_to_rad, planetProperties->Magnify(),
-		planet, view, projection, annotationMap);
+        drawArc(prevLat, prevLon, prevRad, lat, lon, rad, color,
+                spacing * deg_to_rad, planetProperties->Magnify(),
+                planet, view, projection, annotationMap);
     }
 
-    satellite->getSpherical(options->getTVSec(), lat, lon, alt);
+    satellite->getSpherical(options->getTVSec(), lat, lon, rad);
+    if (trailType == GROUND) rad = 1;
 
     double X, Y, Z;
-    if (sphericalToPixel(lat, lon, alt * planetProperties->Magnify(), 
-			 X, Y, Z, planet, view, projection))
+    if (sphericalToPixel(lat, lon, rad * planetProperties->Magnify(), 
+                         X, Y, Z, planet, view, projection))
     {
-	const int ix = static_cast<int> (floor(X + 0.5));
-	const int iy = static_cast<int> (floor(Y + 0.5));
-	    
-	int xOffset = 0;
-	int yOffset = 0;
-	if (image.empty())
-	{
-	    Symbol *sym = new Symbol(color, ix, iy, symbolSize);
-	    annotationMap.insert(pair<const double, Annotation*>(Z, sym));
-	    xOffset = symbolSize;
-	    yOffset = symbolSize;
-	}
-	else if (image.compare("none") != 0)
-	{
-	    unsigned char *transparent = (transparency ? transparent_pixel : NULL);
-	    Icon *icon = new Icon(ix, iy, image, transparent);
-	    annotationMap.insert(pair<const double, Annotation*>(Z, icon));
-	    xOffset = icon->Width() / 2;
-	    yOffset = icon->Height() / 2;
-	}
-	    
-	if (!name.empty())
-	{
-	    Text *t = new Text(color, ix, iy, xOffset, yOffset, align, name);
-	    if (!font.empty()) t->Font(font);
-	    if (fontSize > 0) t->FontSize(fontSize);
-		
-	    annotationMap.insert(pair<const double, Annotation*>(Z, t));
-	}
+        const int ix = static_cast<int> (floor(X + 0.5));
+        const int iy = static_cast<int> (floor(Y + 0.5));
+            
+        int xOffset = 0;
+        int yOffset = 0;
+        if (image.empty())
+        {
+            Symbol *sym = new Symbol(color, ix, iy, symbolSize);
+            annotationMap.insert(pair<const double, Annotation*>(Z, sym));
+            xOffset = symbolSize;
+            yOffset = symbolSize;
+        }
+        else if (image.compare("none") != 0)
+        {
+            unsigned char *transparent = (transparency ? transparent_pixel : NULL);
+            Icon *icon = new Icon(ix, iy, image, transparent);
+            annotationMap.insert(pair<const double, Annotation*>(Z, icon));
+            xOffset = icon->Width() / 2;
+            yOffset = icon->Height() / 2;
+        }
+            
+        if (!name.empty())
+        {
+            Text *t = new Text(color, ix, iy, xOffset, yOffset, align, name);
+            if (!font.empty()) t->Font(font);
+            if (fontSize > 0) t->FontSize(fontSize);
+                
+            annotationMap.insert(pair<const double, Annotation*>(Z, t));
+        }
     }
 
     vector<double>::iterator a = altcirc.begin();
     while (a != altcirc.end())
     {
-	// Given the angle of the spacecraft above the horizon,
-	// compute the great arc distance from the sub-spacecraft
-	// point
-	const double r = *a - asin(sin(*a)/alt);
-	drawCircle(lat, lon, r, color, spacing * deg_to_rad, 
-		   planetProperties->Magnify(), planet, view,
-		   projection, annotationMap);
-	a++;
+        // Given the angle of the spacecraft above the horizon,
+        // compute the great arc distance from the sub-spacecraft
+        // point
+        const double r = *a - asin(sin(*a)/rad);
+        drawCircle(lat, lon, r, color, spacing * deg_to_rad, 
+                   planetProperties->Magnify(), planet, view,
+                   projection, annotationMap);
+        a++;
     }
-
 }
 
 void
@@ -370,52 +421,52 @@ loadSatelliteVector(PlanetProperties *planetProperties)
 
     while (ii != satfiles.end()) 
     {
-	string tleFile = *ii + ".tle";
-	const bool foundFile = findFile(tleFile, "satellites");
-	if (foundFile)
-	{
-	    ifstream inFile(tleFile.c_str());
-	    char lines[3][80];
-	    while (inFile.getline(lines[0], 80) != NULL)
-	    {
-		if ((inFile.getline(lines[1], 80) == NULL) 
-		    || (inFile.getline(lines[2], 80) == NULL))
-		{
-		    stringstream errStr;
-		    errStr << "Malformed TLE file (" << tleFile << ")?\n";
-		    xpWarn(errStr.str(), __FILE__, __LINE__);
-		    break;
-		}
-		
-		Satellite sat(lines);
-		
-		if (!sat.isGoodData()) 
-		{
-		    stringstream errStr;
-		    errStr << "Bad TLE data in " << tleFile << endl;
-		    xpWarn(errStr.str(), __FILE__, __LINE__);
-		    continue;
-		}
-		
-		satelliteVector.push_back(sat);
-	    }
-	    
-	    inFile.close();
-	}
-	else
-	{
-	    stringstream errStr;
-	    errStr << "Can't load satellite TLE file " << tleFile << endl;
-	    xpWarn(errStr.str(), __FILE__, __LINE__);
-	}
-	ii++;
+        string tleFile = *ii + ".tle";
+        const bool foundFile = findFile(tleFile, "satellites");
+        if (foundFile)
+        {
+            ifstream inFile(tleFile.c_str());
+            char lines[3][80];
+            while (inFile.getline(lines[0], 80) != NULL)
+            {
+                if ((inFile.getline(lines[1], 80) == NULL) 
+                    || (inFile.getline(lines[2], 80) == NULL))
+                {
+                    stringstream errStr;
+                    errStr << "Malformed TLE file (" << tleFile << ")?\n";
+                    xpWarn(errStr.str(), __FILE__, __LINE__);
+                    break;
+                }
+                
+                Satellite sat(lines);
+                
+                if (!sat.isGoodData()) 
+                {
+                    stringstream errStr;
+                    errStr << "Bad TLE data in " << tleFile << endl;
+                    xpWarn(errStr.str(), __FILE__, __LINE__);
+                    continue;
+                }
+                
+                satelliteVector.push_back(sat);
+            }
+            
+            inFile.close();
+        }
+        else
+        {
+            stringstream errStr;
+            errStr << "Can't load satellite TLE file " << tleFile << endl;
+            xpWarn(errStr.str(), __FILE__, __LINE__);
+        }
+        ii++;
     }
 }
 
 void
 addSatellites(PlanetProperties *planetProperties, Planet *planet, 
-	      View *view, ProjectionBase *projection, 
-	      multimap<double, Annotation *> &annotationMap)
+              View *view, ProjectionBase *projection, 
+              multimap<double, Annotation *> &annotationMap)
 {
     if (planet->Index() != EARTH) return;
 
@@ -424,26 +475,25 @@ addSatellites(PlanetProperties *planetProperties, Planet *planet,
 
     while (ii != satfiles.end()) 
     {
-	string satFile(*ii);
-	bool foundFile = findFile(satFile, "satellites");
-	if (foundFile)
-	{
-	    ifstream inFile(satFile.c_str());
-	    char *line = new char[256];
-	    while (inFile.getline (line, 256, '\n') != NULL)
-		readSatelliteFile(line, planet, view, projection,
-				  planetProperties, annotationMap);
-	    
-	    inFile.close();
-	    delete [] line;
-	}
-	else
-	{
-	    stringstream errStr;
-	    errStr << "Can't load satellite file " << satFile << endl;
-	    xpWarn(errStr.str(), __FILE__, __LINE__);
-	}
-	ii++;
+        string satFile(*ii);
+        bool foundFile = findFile(satFile, "satellites");
+        if (foundFile)
+        {
+            ifstream inFile(satFile.c_str());
+            char *line = new char[MAX_LINE_LENGTH];
+            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
+                readSatelliteFile(line, planet, view, projection,
+                                  planetProperties, annotationMap);
+            
+            inFile.close();
+            delete [] line;
+        }
+        else
+        {
+            stringstream errStr;
+            errStr << "Can't load satellite file " << satFile << endl;
+            xpWarn(errStr.str(), __FILE__, __LINE__);
+        }
+        ii++;
     }
 }
-

@@ -8,6 +8,12 @@ else
   libephemeris_a_AR = $(CXX) @xplanet_ARFLAGS@
 endif
 
+if HAVE_CSPICE
+  spiceFiles = EphemerisSpice.cpp EphemerisSpice.h
+endif
+
+EXTRA_libephemeris_a_SOURCES = EphemerisSpice.cpp EphemerisSpice.h
+
 libephemeris_a_SOURCES = \
 			Ephemeris.cpp		\
 			Ephemeris.h		\
@@ -18,4 +24,5 @@ libephemeris_a_SOURCES = \
 			jpl_int.h		\
 			jpleph.cpp		\
 			jpleph.h		\
-			pluto.cpp
+			pluto.cpp		\
+			$(spiceFiles)

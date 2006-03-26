@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "buildPlanetMap.h"
+#include "config.h"
 #include "createMap.h"
 #include "keywords.h"
 #include "Map.h"
@@ -122,6 +123,12 @@ drawProjection(DisplayBase *display, Planet *target,
     }
 
     multimap<double, Annotation *> annotationMap;
+
+#ifdef HAVE_CSPICE
+    if (!options->SpiceFiles().empty())
+        addSpiceObjects(planetsFromSunMap, NULL, projection, annotationMap);
+#endif
+
     if (planetProperties->DrawArcs())
         addArcs(planetProperties, target, NULL, projection, 
                 annotationMap);

@@ -56,14 +56,13 @@ readArcFile(const char *line, Planet *planet,
             int r, g, b;
             if (sscanf(returnString, "%d,%d,%d", &r, &g, &b) == 3)
             {
-                color[0] = r & 0xff;
-                color[1] = g & 0xff;
-                color[2] = b & 0xff;
+                color[0] = static_cast<unsigned char> (r & 0xff);
+                color[1] = static_cast<unsigned char> (g & 0xff);
+                color[2] = static_cast<unsigned char> (b & 0xff);
             }
             else
             {
-                xpWarn("Need three values for color\n", 
-                       __FILE__, __LINE__);
+                xpWarn("Need three values for color\n", __FILE__, __LINE__);
                 syntaxError = true;
             }
         }
@@ -226,8 +225,8 @@ addArcs(PlanetProperties *planetProperties, Planet *planet,
         if (foundFile)
         {
             ifstream inFile(arcFile.c_str());
-            char *line = new char[256];
-            while (inFile.getline (line, 256, '\n') != NULL)
+            char *line = new char[MAX_LINE_LENGTH];
+            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
                 readArcFile(line, planet, view, projection,
                             color, planetProperties->Magnify(),
                             annotationMap);

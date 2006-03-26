@@ -50,6 +50,7 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CSPICE_LIBS = @CSPICE_LIBS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -67,6 +68,8 @@ FREETYPE_LIBS = @FREETYPE_LIBS@
 GRAPHICS_LIBS = @GRAPHICS_LIBS@
 HAVE_AQUA_FALSE = @HAVE_AQUA_FALSE@
 HAVE_AQUA_TRUE = @HAVE_AQUA_TRUE@
+HAVE_CSPICE_FALSE = @HAVE_CSPICE_FALSE@
+HAVE_CSPICE_TRUE = @HAVE_CSPICE_TRUE@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
 HAVE_LIBFREETYPE_FALSE = @HAVE_LIBFREETYPE_FALSE@
@@ -171,6 +174,10 @@ AM_CPPFLAGS = -I@top_srcdir@/src
 @USE_AR_TRUE@libephemeris_a_AR = $(AR) cru
 @USE_AR_FALSE@libephemeris_a_AR = $(CXX) @xplanet_ARFLAGS@
 
+@HAVE_CSPICE_TRUE@spiceFiles = EphemerisSpice.cpp EphemerisSpice.h
+
+EXTRA_libephemeris_a_SOURCES = EphemerisSpice.cpp EphemerisSpice.h
+
 libephemeris_a_SOURCES = \
 			Ephemeris.cpp		\
 			Ephemeris.h		\
@@ -181,7 +188,8 @@ libephemeris_a_SOURCES = \
 			jpl_int.h		\
 			jpleph.cpp		\
 			jpleph.h		\
-			pluto.cpp
+			pluto.cpp		\
+			$(spiceFiles)
 
 subdir = src/libplanet/libephemeris
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -191,8 +199,14 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 
 libephemeris_a_LIBADD =
+am__libephemeris_a_SOURCES_DIST = Ephemeris.cpp Ephemeris.h \
+	EphemerisHigh.cpp EphemerisHigh.h EphemerisLow.cpp \
+	EphemerisLow.h jpl_int.h jpleph.cpp jpleph.h pluto.cpp \
+	EphemerisSpice.cpp EphemerisSpice.h
+@HAVE_CSPICE_TRUE@am__objects_1 = EphemerisSpice.$(OBJEXT)
 am_libephemeris_a_OBJECTS = Ephemeris.$(OBJEXT) EphemerisHigh.$(OBJEXT) \
-	EphemerisLow.$(OBJEXT) jpleph.$(OBJEXT) pluto.$(OBJEXT)
+	EphemerisLow.$(OBJEXT) jpleph.$(OBJEXT) pluto.$(OBJEXT) \
+	$(am__objects_1)
 libephemeris_a_OBJECTS = $(am_libephemeris_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
@@ -200,7 +214,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Ephemeris.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/EphemerisHigh.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/EphemerisLow.Po ./$(DEPDIR)/jpleph.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/EphemerisLow.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/EphemerisSpice.Po ./$(DEPDIR)/jpleph.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/pluto.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -211,9 +226,10 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libephemeris_a_SOURCES)
+DIST_SOURCES = $(am__libephemeris_a_SOURCES_DIST) \
+	$(EXTRA_libephemeris_a_SOURCES)
 DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
-SOURCES = $(libephemeris_a_SOURCES)
+SOURCES = $(libephemeris_a_SOURCES) $(EXTRA_libephemeris_a_SOURCES)
 
 all: all-am
 
@@ -243,6 +259,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ephemeris.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EphemerisHigh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EphemerisLow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EphemerisSpice.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpleph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pluto.Po@am__quote@
 

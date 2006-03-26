@@ -8,6 +8,12 @@ else
   libannotate_a_AR = $(CXX) @xplanet_ARFLAGS@
 endif
 
+if HAVE_CSPICE
+  spiceFiles = addSpiceObjects.cpp
+endif
+
+EXTRA_libannotate_a_SOURCES = addSpiceObjects.cpp
+
 libannotate_a_SOURCES = 	\
 	Annotation.h 		\
 	Annotation.cpp 		\
@@ -27,4 +33,6 @@ libannotate_a_SOURCES = 	\
 	Symbol.cpp 		\
 	Text.h 			\
 	Text.cpp 		\
-	libannotate.h
+	libannotate.h		\
+	$(spiceFiles)
+

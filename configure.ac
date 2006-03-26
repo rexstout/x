@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(xplanet, 1.0.3)
+AM_INIT_AUTOMAKE(xplanet, 1.0.4)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -8,15 +8,6 @@ AC_PROG_CXX
 AC_PROG_RANLIB
 
 AM_CONDITIONAL([am__fastdepOBJC], false)
-
-# my functions
-#AC_ARG_WITH(gui, [  --with-gui              Build xplanet-gui as well as xplanet [yes]])
-
-#AC_FIND_SOCKLEN_T
-#AC_FIND_PTHREADS
-#AC_FIND_JAVA
-
-#AM_PROG_GCJ
 
 AC_PATH_PROG(PERL, perl, no)
 AC_SUBST(PERL)
@@ -26,7 +17,7 @@ AC_FIND_XSS
 AC_FIND_GRAPHICS_LIBS
 AC_FIND_FREETYPE
 AC_FIND_PANGO
-
+AC_FIND_CSPICE
 AC_USE_MACAQUA
 
 AC_ARG_WITH(cygwin,AC_HELP_STRING([--with-cygwin],[check for Cygwin environment (YES)]))

@@ -22,7 +22,5 @@ TextRenderer *getTextRenderer(DisplayBase *display)
 #ifdef HAVE_LIBFREETYPE
     return(new TextRendererFT2(display));
 #endif
-
-    xpExit("Can't open text renderer\n", __FILE__, __LINE__);
-    return(NULL);
+    return(new TextRenderer(display));
 }

@@ -68,7 +68,8 @@ class Planet
     body index_;
 
     Ephemeris *ephem_;
-    bool ephemerisLow_;
+    bool ephemerisHigh_;
+    bool ephemerisSpice_;
 
     double julianDay_;
     double T2000_;            // Julian centuries from 2000

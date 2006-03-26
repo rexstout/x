@@ -10,7 +10,7 @@ using namespace std;
 #include "libdisplay/libdisplay.h"
 
 Symbol::Symbol(const unsigned char color[3], 
-	       const int x, const int y, const int r)
+               const int x, const int y, const int r)
     : Annotation(color), x_(x), y_(y), r_(r)
 {
     width_ = 2*r;
@@ -23,15 +23,15 @@ Symbol::~Symbol()
 
 void
 Symbol::DrawCircle(DisplayBase *display, const int r, 
-		   const unsigned char color[3])
+                   const unsigned char color[3])
 {
     int xx, yy;
     double r2 = r * r;
     double dd = 1 / (M_PI_2 * r);
     for (double d = 0; d < M_PI_2; d += dd)
     {
-        xx = (int) (cos(d) * r + 0.5);
-        yy = (int) (sin(d) * r + 0.5);
+        xx = static_cast<int>(cos(d) * r + 0.5);
+        yy = static_cast<int>(sin(d) * r + 0.5);
         double opacity = (xx * xx + yy * yy) / r2;
         if (opacity > 1) opacity = 1/opacity;
 

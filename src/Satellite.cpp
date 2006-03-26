@@ -51,11 +51,11 @@ Satellite::getSpherical(const time_t tv_sec, double &lat, double &lon,
                         double &alt)
 {
     double jul_utc = toJulian(gmtime((time_t *) &tv_sec)->tm_year + 1900,
-			      gmtime((time_t *) &tv_sec)->tm_mon + 1,
-			      gmtime((time_t *) &tv_sec)->tm_mday,
-			      gmtime((time_t *) &tv_sec)->tm_hour,
-			      gmtime((time_t *) &tv_sec)->tm_min,
-			      gmtime((time_t *) &tv_sec)->tm_sec);
+                              gmtime((time_t *) &tv_sec)->tm_mon + 1,
+                              gmtime((time_t *) &tv_sec)->tm_mday,
+                              gmtime((time_t *) &tv_sec)->tm_hour,
+                              gmtime((time_t *) &tv_sec)->tm_min,
+                              gmtime((time_t *) &tv_sec)->tm_sec);
 
     double year, day;
     /* Modification to support Y2K */

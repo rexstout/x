@@ -1,6 +1,8 @@
 #ifndef LIBANNOTATE_H
 #define LIBANNOTATE_H
 
+#include "config.h"
+
 #include "Icon.h"
 #include "LineSegment.h"
 #include "Symbol.h"
@@ -35,6 +37,10 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
 	   map<double, Planet *> &planetsFromSunMap, 
 	   std::multimap<double, Annotation *> &annotationMap);
 
+extern bool
+calculateSatellitePosition(time_t tv_sec, const int id,
+			   double &lat, double &lon, double &rad);
+
 extern void
 addSatellites(PlanetProperties *planetProperties, Planet *planet, 
 	      View *view, ProjectionBase *projection, 
@@ -43,4 +49,21 @@ addSatellites(PlanetProperties *planetProperties, Planet *planet,
 extern void
 loadSatelliteVector(PlanetProperties *planetProperties);
 
+#ifdef HAVE_CSPICE
+
+extern void 
+addSpiceObjects(map<double, Planet *> &planetsFromSunMap,
+		View *view, ProjectionBase *projection,
+		multimap<double, Annotation *> &annotationMap);
+
+extern void
+loadSpiceKernels();
+
+extern bool
+calculateSpicePosition(double jd, 
+                       const int naifInt, Planet *relative,
+		       const int relativeInt,
+                       double &X, double &Y, double &Z);
+
+#endif
 #endif

@@ -1,3 +1,10 @@
+Version 1.0.4 (released 05 Mar 2004)
+
+	* Added support for SPICE kernels for spacecraft ephemerides.
+
+	* Xplanet now works without freetype.  There will be no text
+	annotation, but it will run instead of exit immediately.
+
 Version 1.0.3 (released 06 Jan 2004)
 
 	* Jupiter and Saturn are now drawn as oblate spheroids.

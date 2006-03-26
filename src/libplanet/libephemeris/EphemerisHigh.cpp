@@ -29,7 +29,7 @@ void
 EphemerisHigh::GetHeliocentricXYZ(const body b, const double tjd, 
                                   double &Px, double &Py, double &Pz)
 {
-    int target;
+    int target = -1;
     switch (b)
     {
     case MERCURY:

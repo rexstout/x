@@ -14,6 +14,8 @@ const double deg_to_rad = M_PI/180.;
 const double TWO_PI = 2 * M_PI;
 const double AU_to_km = 149597870.66;
 
+const int MAX_LINE_LENGTH = 512;
+
 extern void cross(const double a[3], const double b[3], double c[3]);
 
 extern double dot(const double A0, const double A1, const double A2, 
@@ -64,10 +66,13 @@ extern double kepler(const double e, double M);
 
 extern void precessB1950J2000(double &X, double &Y, double &Z);
 
-extern void xpExit(const std::string &message, const char *file, const int line);
+extern void xpExit(const std::string &message, const char *file, 
+                   const int line);
 
-extern void xpWarn(const std::string &message, const char *file, const int line);
+extern void xpWarn(const std::string &message, const char *file, 
+                   const int line);
 
-extern void xpMsg(const std::string &message, const char *file, const int line);
+extern void xpMsg(const std::string &message, const char *file, 
+                  const int line);
 
 #endif

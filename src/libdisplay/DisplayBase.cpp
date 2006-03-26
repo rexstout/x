@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <bitset>
 #include <cmath>
 #include <cstdio>
@@ -101,8 +99,6 @@ DisplayBase::drawLabelLine(int &currentX, int &currentY, const string &text)
 void
 DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 {
-    textRenderer_->drawUTF8test();
-
     Options *options = Options::getInstance();
     if (!options->DrawLabel()) return;
 
@@ -114,46 +110,49 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     string lookAt;
     if (options->LabelString().empty())
     {
-        lookAt.assign("Looking at ");
-        string viewTarget;
-        string viewOrigin;
-
-        if (options->Projection() == MULTIPLE)
+        if (options->TargetMode() != LOOKAT)
         {
-            viewTarget.assign(planetProperties[target]->Name());
-            switch (options->OriginMode())
+            lookAt.assign("Looking at ");
+            string viewTarget;
+            string viewOrigin;
+
+            if (options->Projection() == MULTIPLE)
             {
-            case ABOVE:
-                viewOrigin.assign(" from above");
-                break;
-            case BELOW:
-                viewOrigin.assign(" from below");
-                break;
-            case BODY:
-                if (options->OppositeSide())
+                viewTarget.assign(planetProperties[target]->Name());
+                switch (options->OriginMode())
                 {
-                    viewTarget.assign(planetProperties[origin]->Name());
-                    viewOrigin.assign(" from behind ");
-                    viewOrigin += planetProperties[target]->Name();
+                case ABOVE:
+                    viewOrigin.assign(" from above");
+                    break;
+                case BELOW:
+                    viewOrigin.assign(" from below");
+                    break;
+                case BODY:
+                    if (options->OppositeSide())
+                    {
+                        viewTarget.assign(planetProperties[origin]->Name());
+                        viewOrigin.assign(" from behind ");
+                        viewOrigin += planetProperties[target]->Name();
+                    }
+                    else
+                    {
+                        viewOrigin.assign(" from ");
+                        viewOrigin += planetProperties[origin]->Name();
+                    }
+                    break;
+                case LBR:
+                default:
+                    break;
                 }
-                else
-                {
-                    viewOrigin.assign(" from ");
-                    viewOrigin += planetProperties[origin]->Name();
-                }
-                break;
-            case LBR:
-            default:
-                break;
             }
-        }
-        else
-        {
-            viewTarget.assign(planetProperties[target]->Name());
-        }
+            else
+            {
+                viewTarget.assign(planetProperties[target]->Name());
+            }
 
-        lookAt += viewTarget;
-        lookAt += viewOrigin;
+            lookAt += viewTarget;
+            lookAt += viewOrigin;
+        }
     }
     else
     {
@@ -166,10 +165,14 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
                 switch (lookAt[i+1])
                 {
                 case 't':
-                    lookAt.replace(i, 2, planetProperties[target]->Name());
+                    if (target < RANDOM_BODY)
+                        lookAt.replace(i, 2, 
+                                       planetProperties[target]->Name());
                     break;
                 case 'o':
-                    lookAt.replace(i, 2, planetProperties[origin]->Name());
+                    if (origin < RANDOM_BODY)
+                        lookAt.replace(i, 2, 
+                                       planetProperties[origin]->Name());
                     break;
                 case '%':
                     lookAt.erase(i, 1);
@@ -177,7 +180,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
                 }
             }
         }
-   }
+    }
 
     time_t tv_sec = options->getTVSec();
     char timeString[128];
@@ -190,7 +193,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         snprintf(timeString, 128, 
                  "%4.4d/%2.2d/%2.2d %2.2d:%2.2d:%2.2d UTC",
                  year, month, day, 
-                 hour, min, (int) floor(sec));
+                 hour, min, static_cast<int> (floor(sec)));
     }
     else
     {
@@ -220,50 +223,53 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         }       
     }
 
-    labelLines.push_back(lookAt);
+    if (!lookAt.empty()) labelLines.push_back(lookAt);
     labelLines.push_back(timeString);
 
-    char obsString[128];
-    double obsLatDeg = options->Latitude() / deg_to_rad;
-    double obsLonDeg = options->Longitude() / deg_to_rad;
+    if (options->TargetMode() != LOOKAT)
+    {
+        char obsString[128];
+        double obsLatDeg = options->Latitude() / deg_to_rad;
+        double obsLonDeg = options->Longitude() / deg_to_rad;
 
-    if (target == EARTH || target == MOON)
-    {
-        if (obsLonDeg > 180) obsLonDeg -= 360;
-        snprintf(obsString, 128, "obs %4.1f %c %5.1f %c",
-                 fabs(obsLatDeg), ((obsLatDeg < 0) ? 'S' : 'N'),
-                 fabs(obsLonDeg), ((obsLonDeg < 0) ? 'W' : 'E'));
-    }
-    else
-    {
-        if (obsLonDeg < 0) obsLonDeg += 360;
-        snprintf(obsString, 128,"obs %4.1f %c %5.1f",
-                 fabs(obsLatDeg), ((obsLatDeg < 0) ? 'S' : 'N'),
-                 obsLonDeg);
-    }
-    labelLines.push_back(obsString);
-
-    if (target != SUN)
-    {
-        char sunString[128];
-        double sunLatDeg = options->SunLat() / deg_to_rad;
-        double sunLonDeg = options->SunLon() / deg_to_rad;
-        
         if (target == EARTH || target == MOON)
         {
-            if (sunLonDeg > 180) sunLonDeg -= 360;
-            snprintf(sunString, 128, "sun %4.1f %c %5.1f %c",
-                     fabs(sunLatDeg), ((sunLatDeg < 0) ? 'S' : 'N'),
-                     fabs(sunLonDeg), ((sunLonDeg < 0) ? 'W' : 'E'));
+            if (obsLonDeg > 180) obsLonDeg -= 360;
+            snprintf(obsString, 128, "obs %4.1f %c %5.1f %c",
+                     fabs(obsLatDeg), ((obsLatDeg < 0) ? 'S' : 'N'),
+                     fabs(obsLonDeg), ((obsLonDeg < 0) ? 'W' : 'E'));
         }
         else
         {
-            if (sunLonDeg < 0) sunLonDeg += 360;
-            snprintf(sunString, 128,"sun %4.1f %c %5.1f",
-                     fabs(sunLatDeg), ((sunLatDeg < 0) ? 'S' : 'N'),
-                     sunLonDeg);
+            if (obsLonDeg < 0) obsLonDeg += 360;
+            snprintf(obsString, 128,"obs %4.1f %c %5.1f",
+                     fabs(obsLatDeg), ((obsLatDeg < 0) ? 'S' : 'N'),
+                     obsLonDeg);
         }
-        labelLines.push_back(sunString);
+        labelLines.push_back(obsString);
+
+        if (target != SUN)
+        {
+            char sunString[128];
+            double sunLatDeg = options->SunLat() / deg_to_rad;
+            double sunLonDeg = options->SunLon() / deg_to_rad;
+        
+            if (target == EARTH || target == MOON)
+            {
+                if (sunLonDeg > 180) sunLonDeg -= 360;
+                snprintf(sunString, 128, "sun %4.1f %c %5.1f %c",
+                         fabs(sunLatDeg), ((sunLatDeg < 0) ? 'S' : 'N'),
+                         fabs(sunLonDeg), ((sunLonDeg < 0) ? 'W' : 'E'));
+            }
+            else
+            {
+                if (sunLonDeg < 0) sunLonDeg += 360;
+                snprintf(sunString, 128,"sun %4.1f %c %5.1f",
+                         fabs(sunLatDeg), ((sunLatDeg < 0) ? 'S' : 'N'),
+                         sunLonDeg);
+            }
+            labelLines.push_back(sunString);
+        }
     }
 
     if (options->Projection() == MULTIPLE)
@@ -319,7 +325,8 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         labelLines.push_back(fovCString);
         labelLines.push_back(distString);
 
-        if (target != SUN)
+        if (options->TargetMode() != LOOKAT 
+            && target != SUN)
         {
             char illumString[128];
             const double illumination = 50 * (ndot(tX, tY, tZ, 
@@ -487,6 +494,10 @@ DisplayBase::allocateRGBData()
         memset(alpha, 0, area_);
     }
 
+    // If a background image is specified along with -geometry and
+    // we're drawing to the root window, it will only be overlaid on
+    // the true root window. The sub-image won't have the background
+    // image.
     if (options->DisplayMode() != ROOT
         || !options->GeometrySelected())
         SetBackground(width_, height_, rgb_data);

@@ -1,42 +1,53 @@
 #!@PERL@
 
+use strict;
+
+use Math::Trig;
+
 if (@ARGV)
 {
     open(INFILE, "<$ARGV[0]") || die("Can't open $ARGV[0]\n");
 
-    @months = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
-    for ($i = 0; $i < 4; $i++)
+    my $flattening = 0.09796;
+    my $omf2 = ((1 - $flattening) * (1 - $flattening));
+    my @months = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
+    for (my $i = 0; $i < 4; $i++)
     {
-	<INFILE>;
+        <INFILE>;
     }
     while (<INFILE>)
     {
-        @fields = split(" ", $_);
-        $year      = $fields[0];
-        $day       = $fields[1];
-        $hour      = $fields[2];
-        $min       = $fields[3];
-        $sec       = $fields[4];
-        $lon       = $fields[5];
-        $lat       = $fields[6];
-	$localtime = $fields[7];
-        $rad       = $fields[8];
+        my @fields = split(" ", $_);
+        my $year      = $fields[0];
+        my $day       = $fields[1];
+        my $hour      = $fields[2];
+        my $min       = $fields[3];
+        my $sec       = $fields[4];
+        my $lon       = $fields[5];
+        my $lat       = $fields[6];
+        my $localtime = $fields[7];
+        my $rad       = $fields[8];
 
-	if ($year eq "2000" || $year eq "2004" || $year eq "2008")
-	{
-	    $months[1] = 29;
-	}
-	else
-	{
-	    $months[1] = 28;
-	}
+        if ($year eq "2000" || $year eq "2004" || $year eq "2008")
+        {
+            $months[1] = 29;
+        }
+        else
+        {
+            $months[1] = 28;
+        }
 
-	$month = 0;
-	while ($day > $months[$month])
-	{
-	    $day -= $months[$month++];
-	}
-	$month++;
+        my $month = 0;
+        while ($day > $months[$month])
+        {
+            $day -= $months[$month++];
+        }
+        $month++;
+
+        # convert planetocentric latitude to planetographic
+        $lat = deg2rad($lat);
+        $lat = atan(tan($lat) / $omf2);
+        $lat = rad2deg($lat);
 
         printf("%4.4d%2.2d%2.2d.%2.2d%2.2d%2.2d %10.3f %8.3f %8.3f %8.3f\n",
                $year, $month, $day, $hour, $min, $sec, $rad, $lat, $lon, $localtime);

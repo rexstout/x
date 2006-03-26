@@ -1,6 +1,3 @@
-#include <iostream>
-using namespace std;
-
 #include "Map.h"
 #include "Options.h"
 #include "View.h"
@@ -19,19 +16,12 @@ drawEllipsoid(const double pX, const double pY, const double pR,
 {
     double lat, lon;
     unsigned char color[3];
-    int j0 = static_cast<int> (floor(pY - 1.25*pR - 2));
-    int j1 = static_cast<int> (ceil(pY + 1.25*pR + 2));
-    int i0 = static_cast<int> (floor(pX - 1.25*pR - 2));
-    int i1 = static_cast<int> (ceil(pX + 1.25*pR + 2));
-            
-    const int width = display->Width();
-    const int height = display->Height();
 
-    if (j0 < 0) j0 = 0;
-    if (j1 > height) j1 = height;
-    if (i0 < 0) i0 = 0;
-    if (i1 > width) i1 = width;
-            
+    const int j0 = 0;
+    const int j1 = display->Height();
+    const int i0 = 0;
+    const int i1 = display->Width();
+
     // P1 (Observer) is at (oX, oY, oZ), or (0, 0, 0) in view
     // coordinates
     // P2 (current pixel) is on the line from P1 to (vX, vY, vZ)

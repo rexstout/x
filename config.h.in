@@ -3,6 +3,9 @@
 /* Define for Mac OS X */
 #undef HAVE_AQUA
 
+/* Define if you have CSPICE library */
+#undef HAVE_CSPICE
+
 /* Define if compiling under cygwin */
 #undef HAVE_CYGWIN
 

@@ -14,7 +14,8 @@ using namespace std;
 
 #include "vroot.h"
 
-// The window is static because needs to stay open between renderings.
+// The window is static because it needs to stay open between
+// renderings.
 Window DisplayX11::window;
 
 DisplayX11::DisplayX11(const int tr) : DisplayBase(tr)
@@ -30,58 +31,73 @@ DisplayX11::DisplayX11(const int tr) : DisplayBase(tr)
         xpExit("Can't open X display\n", __FILE__, __LINE__);
 
     const int screen_num    = DefaultScreen(display);
-    fullWidth_  = DisplayWidth(display, screen_num);
-    fullHeight_ = DisplayHeight(display, screen_num);
 
     if (options->VirtualRoot())
         root = VirtualRootWindowOfScreen(ScreenOfDisplay(display, screen_num));
     else
         root = ScreenOfDisplay(display, screen_num)->root;
+    
+    XWindowAttributes xgwa;
+    XGetWindowAttributes(display, root, &xgwa);
+    fullWidth_  = xgwa.width;
+    fullHeight_ = xgwa.height;
 
     switch (options->DisplayMode())
     {
     case WINDOW:
-        width_ = options->getWidth();
-        height_ = options->getHeight();
-            
-        if (times_run == 0)
+    {
+        if (options->XID())
         {
-            int x = options->getWindowX();
-            int y = options->getWindowY();
-            if (options->GeometryMask() & XNegative) 
-                x += (fullWidth_ - width_);
-            if (options->GeometryMask() & YNegative) 
-                y += (fullHeight_ - height_);
-            
-            window = XCreateSimpleWindow(display, root, x, y, 
-                                         width_, height_, 4,
-                                         WhitePixel(display, screen_num),
-                                         BlackPixel(display, screen_num));
-            
-            if (options->GeometryMask() != NoValue)
-            {
-                XSizeHints *hints = XAllocSizeHints();
-                hints->flags = USPosition;
-                XSetWMNormalHints(display, window, hints);
-            }
-
-            string title;
-            if (options->WindowTitle().empty()) 
-            {
-                title.assign("Xplanet ");
-                title += VERSION;
-            }
-            else
-            {
-                title.assign(options->WindowTitle());
-            }
-
-            XTextProperty windowName;
-            char *titlec = (char *) title.c_str();
-            XStringListToTextProperty(&titlec, 1, &windowName);
-            XSetWMName(display, window, &windowName);       
+            window = static_cast<Window> (options->XID());
         }
-        break;
+        else
+        {
+            width_ = options->getWidth();
+            height_ = options->getHeight();
+            
+            if (times_run == 0)
+            {
+                int x = options->getWindowX();
+                int y = options->getWindowY();
+                if (options->GeometryMask() & XNegative) 
+                    x += (fullWidth_ - width_);
+                if (options->GeometryMask() & YNegative) 
+                    y += (fullHeight_ - height_);
+            
+                window = XCreateSimpleWindow(display, root, x, y, 
+                                             width_, height_, 4,
+                                             WhitePixel(display, screen_num),
+                                             BlackPixel(display, screen_num));
+            
+                if (options->GeometryMask() != NoValue)
+                {
+                    XSizeHints *hints = XAllocSizeHints();
+                    hints->flags = USPosition;
+                    XSetWMNormalHints(display, window, hints);
+                }
+
+                string title;
+                if (options->WindowTitle().empty()) 
+                {
+                    title.assign("Xplanet ");
+                    title += VERSION;
+                }
+                else
+                {
+                    title.assign(options->WindowTitle());
+                }
+
+                XTextProperty windowName;
+                char *titlec = (char *) title.c_str();
+                XStringListToTextProperty(&titlec, 1, &windowName);
+                XSetWMName(display, window, &windowName);       
+            }
+        }
+        XGetWindowAttributes(display, window, &xgwa);
+        width_  = xgwa.width;
+        height_ = xgwa.height;
+    }
+    break;
     case ROOT:
         if (options->GeometrySelected())
         {
