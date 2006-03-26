@@ -1,3 +1,4 @@
+#include <clocale>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -317,7 +318,6 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         case RANDOM_TARGET:
             currentProperties->RandomTarget(returnString[0] == 't' 
                                             || returnString[0] == 'T');
-            break;
             break;
         case SATELLITE_FILE:
             currentProperties->AddSatelliteFile(returnString);

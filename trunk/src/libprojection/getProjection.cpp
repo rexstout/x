@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstring>
+#include <vector>
 using namespace std;
 
 #include "keywords.h"
@@ -15,6 +16,23 @@ using namespace std;
 #include "ProjectionOrthographic.h"
 #include "ProjectionPeters.h"
 #include "ProjectionRectangular.h"
+
+int
+getRandomProjection()
+{
+    vector<int> projectionTypes;
+    projectionTypes.push_back(ANCIENT);
+    projectionTypes.push_back(AZIMUTHAL);
+    projectionTypes.push_back(HEMISPHERE);
+    projectionTypes.push_back(LAMBERT);
+    projectionTypes.push_back(MERCATOR);
+    projectionTypes.push_back(MOLLWEIDE);
+    projectionTypes.push_back(ORTHOGRAPHIC);
+    projectionTypes.push_back(PETERS);
+    projectionTypes.push_back(RECTANGULAR);
+    int index = static_cast<int> (random() % projectionTypes.size());
+    return(projectionTypes[index]);
+}
 
 int 
 getProjectionType(char *proj_string)
@@ -40,12 +58,14 @@ getProjectionType(char *proj_string)
         projection = ORTHOGRAPHIC;
     else if (strncmp(lowercase, "peters", 1) == 0)
         projection = PETERS;
-    else if (strncmp(lowercase, "rectangular", 1) == 0)
+    else if (strncmp(lowercase, "random", 2) == 0)
+        projection = RANDOM;
+    else if (strncmp(lowercase, "rectangular", 2) == 0)
         projection = RECTANGULAR;
     else 
     {
         xpWarn("Unknown projection, using rectangular\n", 
-	       __FILE__, __LINE__);
+               __FILE__, __LINE__);
         projection = RECTANGULAR;
     }
     return(projection);
@@ -53,7 +73,7 @@ getProjectionType(char *proj_string)
 
 ProjectionBase *
 getProjection(const int projection, const int flipped,
-	      const int width, const int height)
+              const int width, const int height)
 {
     ProjectionBase *thisProjection = NULL;
     switch (projection)
@@ -86,8 +106,8 @@ getProjection(const int projection, const int flipped,
         thisProjection = new ProjectionRectangular(flipped, width, height);
         break;
     default:
-	xpWarn("getProjection: Unknown projection type specified\n",
-	       __FILE__, __LINE__);
+        xpWarn("getProjection: Unknown projection type specified\n",
+               __FILE__, __LINE__);
         thisProjection = new ProjectionRectangular(flipped, width, height);
         break;
     }

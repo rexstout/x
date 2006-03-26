@@ -1,3 +1,12 @@
+Version 1.0.6 (released 21 Apr 2004)
+
+	* Fixed a bug where markers on the far side of a planet were being
+	drawn when they shouldn't have been.
+	
+	* Fixed a bug where satellites were not drawn for some locales.
+	
+	* Added -projection random.  This picks a random projection.
+
 Version 1.0.5 (released 23 Mar 2004)
 
 	* Improved locale support. The date string is now converted to

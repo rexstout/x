@@ -101,6 +101,7 @@ Options::Options() :
     primary_(SUN),
     printEphemeris_(false),
     projection_(MULTIPLE),
+    projectionMode_(MULTIPLE),
     quality_(80), 
     radius_(0.45),
     random_(false),
@@ -430,18 +431,18 @@ Options::parseArgs(int argc, char **argv)
             lightTime_ = true;
             break;
         case LOCALTIME:
-          sscanf(optarg, "%lf", &localTime_);
-          if (localTime_ < 0 || localTime_ > 24)
-          {
-              localTime_ = fmod(localTime_, 24.);
-              if (localTime_ < 0) localTime_ += 24;
+            sscanf(optarg, "%lf", &localTime_);
+            if (localTime_ < 0 || localTime_ > 24)
+            {
+                localTime_ = fmod(localTime_, 24.);
+                if (localTime_ < 0) localTime_ += 24;
 
-              ostringstream errStr;
-              errStr << "localtime set to " << localTime_ << "\n";
-              xpWarn(errStr.str(), __FILE__, __LINE__);
-          }
-          originMode_ = LBR;
-          break;
+                ostringstream errStr;
+                errStr << "localtime set to " << localTime_ << "\n";
+                xpWarn(errStr.str(), __FILE__, __LINE__);
+            }
+            originMode_ = LBR;
+            break;
         case LOGMAGSTEP:
             sscanf(optarg, "%lf", &logMagStep_);
             break;
@@ -584,13 +585,13 @@ Options::parseArgs(int argc, char **argv)
 #endif
             break;
         case POST_COMMAND:
-          post_command_.assign(optarg);
-          break;
+            post_command_.assign(optarg);
+            break;
         case PREV_COMMAND:
-          prev_command_.assign(optarg);
-          break;
+            prev_command_.assign(optarg);
+            break;
         case PROJECTION:
-            projection_ = getProjectionType(optarg);
+            projectionMode_ = getProjectionType(optarg);
             break;
         case QUALITY:
             sscanf(optarg, "%d", &quality_);
@@ -831,13 +832,13 @@ Options::parseArgs(int argc, char **argv)
 
     if (targetMode_ == LOOKAT)
     {
-        if (projection_ != MULTIPLE)
+        if (projectionMode_ != MULTIPLE)
         {
             ostringstream errStr;
             errStr << "Can't use -projection option without a "
                    << "planetary body\n";
             xpWarn(errStr.str(), __FILE__, __LINE__);
-            projection_ = MULTIPLE;
+            projectionMode_ = MULTIPLE;
         }
 
         if (fovMode_ != FOV)
@@ -868,9 +869,9 @@ Options::getTarget(double &X, double &Y, double &Z)
 void
 Options::setTarget(const double X, const double Y, const double Z)
 {
-  tX_ = X;
-  tY_ = Y;
-  tZ_ = Z;
+    tX_ = X;
+    tY_ = Y;
+    tZ_ = Z;
 }
 
 void
@@ -981,7 +982,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
             {
                 ostringstream msg;
                 msg << "target = " << body_string[target_] << ", origin = " 
-                       << body_string[origin_] << endl;
+                    << body_string[origin_] << endl;
                 xpMsg(msg.str(), __FILE__, __LINE__);
             }
 
@@ -1066,7 +1067,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
         oZ_ = dist * north[2]/mag + pZ;
 
         const double radius = sqrt(pos[0] * pos[0] + pos[1] * pos[1] 
-                             + pos[2] * pos[2]);
+                                   + pos[2] * pos[2]);
 
         if (fov_ < 0) // will only be zero if -fov or -radius haven't
                       // been specified

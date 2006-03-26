@@ -223,7 +223,7 @@ main(int argc, char **argv)
         // Initialize display device
         DisplayBase *display = getDisplay(times_run);
 
-        if (options->Projection() == MULTIPLE)
+        if (options->ProjectionMode() == MULTIPLE)
         {
             drawMultipleBodies(display, target, planetsFromSunMap,
                                planetProperties);

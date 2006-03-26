@@ -169,7 +169,7 @@
 # 59.93   10.75 "Oslo"                           timezone=Europe/Oslo           # Norway
 #  8.95  -79.50 "Panama"                         timezone=America/Panama        # Panama
 # 48.87    2.33 "Paris"                          timezone=Europe/Paris          # France
-# 11.58  104.92 "Phnum Pénh"                     timezone=Phnom_Penh           # Cambodia
+# 11.58  104.92 "Phnum Pénh"                     timezone=Asia/Phnom_Penh           # Cambodia
 # 10.63  -61.52 "Port of Spain"                  timezone=America/Port_of_Spain # Trinidad and Tobago
 # -0.90  -89.60 "Puerto Baquerizo Moreno"        timezone=Pacific/Galapagos     # Ecuador
 # 16.78   96.17 "Rangoon"                        timezone=Asia/Rangoon          # Myanmar

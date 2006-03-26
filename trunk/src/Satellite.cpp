@@ -12,7 +12,9 @@ using namespace sgp4sdp4;
 
 Satellite::Satellite(char tle_lines[3][80])
 {
+    checkLocale(LC_NUMERIC, "C");
     good = (Get_Next_Tle_Set(tle_lines, &tle) == 1);
+    checkLocale(LC_NUMERIC, "");
     memcpy(tle_entry, tle_lines, 240);
 }
 
@@ -41,7 +43,9 @@ Satellite::isGoodData() const
 void
 Satellite::loadTLE()
 {
+    checkLocale(LC_NUMERIC, "C");
     Get_Next_Tle_Set(tle_entry, &tle);
+    checkLocale(LC_NUMERIC, "");
     ClearFlag(ALL_FLAGS);
     select_ephemeris(&tle);  // SGP4 or SDP4 depending on period
 }
