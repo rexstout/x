@@ -1,5 +1,4 @@
 #include <bitset>
-#include <fstream>
 #include <sstream>
 #include <string>
 using namespace std;

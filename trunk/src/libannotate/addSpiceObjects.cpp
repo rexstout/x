@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <fstream>
 #include <map>
 #include <sstream>
@@ -233,8 +231,7 @@ readSpiceFile(const char *line,
             break;
         case TRAIL:
         {
-            setlocale(LC_NUMERIC, "C");
-
+	    checkLocale(LC_NUMERIC, "C");
             if (!sscanf(returnString, "%lf,%lf,%lf", &trailStart, &trailEnd,
                         &trailInterval) == 3)
             {
@@ -246,8 +243,7 @@ readSpiceFile(const char *line,
             {
                 if (trailInterval < 1e-4) trailInterval = 1e-4;
             }
-
-            setlocale(LC_NUMERIC, "");
+	    checkLocale(LC_NUMERIC, "");
         }
         break;
         case TRANSPARENT:

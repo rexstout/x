@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(xplanet, 1.0.4)
+AM_INIT_AUTOMAKE(xplanet, 1.0.5)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -61,6 +61,17 @@ AM_CONDITIONAL(USE_AR, test $use_ar = 'yes')
 AC_SUBST(xplanet_ARFLAGS)
 AC_SUBST(xplanet_LDFLAGS)
 AC_SUBST(separator)
+
+AM_ICONV
+if test "$am_cv_func_iconv" = yes; then
+  proto_iconv="$am_cv_proto_iconv_arg1"
+else
+  proto_iconv=""
+fi
+AC_DEFINE_UNQUOTED(ICONV_CONST, $proto_iconv,
+  [Define as const if the declaration of iconv() needs const.])
+
+AC_FIND_LOCALE_CHARSET
 
 AC_ARG_WITH(map-extension, [  --with-map-extension=EXTENSION
                           use EXTENSION as default map extension [jpg]], mapext="$withval", mapext="jpg")

@@ -1,10 +1,8 @@
-#include <bitset>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <fstream>
 #include <sstream>
 #include <vector>
 using namespace std;
@@ -183,42 +181,48 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     }
 
     time_t tv_sec = options->getTVSec();
-    char timeString[128];
+    string timeString;
     if (tv_sec == (time_t) (-1))
     {
         int year, month, day, hour, min;
         double sec;
         double jd = options->getJulianDay();
         fromJulian(jd, year, month, day, hour, min, sec);
-        snprintf(timeString, 128, 
+
+	char timeBuffer[MAX_LINE_LENGTH];
+	memset(timeBuffer, 0, MAX_LINE_LENGTH);
+        snprintf(timeBuffer, MAX_LINE_LENGTH, 
                  "%4.4d/%2.2d/%2.2d %2.2d:%2.2d:%2.2d UTC",
                  year, month, day, 
                  hour, min, static_cast<int> (floor(sec)));
+	timeString.assign(timeBuffer);
     }
     else
     {
-        string tz_save("");
+        char *tzEnv = getenv("TZ");
+        string tzSave("");
         if (options->DrawUTCLabel())
         {
-            char *get_tz = getenv("TZ");
-            if (get_tz != NULL)
+            if (tzEnv != NULL)
             {
-                tz_save = "TZ=";
-                tz_save += get_tz;
+                tzSave = "TZ=";
+                tzSave += tzEnv;
             }
             putenv("TZ=UTC");
             tzset();
         }
 
-        strftime(timeString, 128, options->DateFormat().c_str(),
-                 localtime(&tv_sec));
+	timeString.assign(options->DateFormat());
+
+	// run date string through strftime() and convert to UTF-8
+	strftimeUTF8(timeString);
 
         if (options->DrawUTCLabel())
         {
-            if (tz_save.empty()) 
+            if (tzEnv == NULL)
                 removeFromEnvironment("TZ"); 
             else
-                putenv((char *) tz_save.c_str()); 
+                putenv((char *) tzSave.c_str()); 
             tzset();
         }       
     }
@@ -228,21 +232,21 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 
     if (options->TargetMode() != LOOKAT)
     {
-        char obsString[128];
+        char obsString[MAX_LINE_LENGTH];
         double obsLatDeg = options->Latitude() / deg_to_rad;
         double obsLonDeg = options->Longitude() / deg_to_rad;
 
         if (target == EARTH || target == MOON)
         {
             if (obsLonDeg > 180) obsLonDeg -= 360;
-            snprintf(obsString, 128, "obs %4.1f %c %5.1f %c",
+            snprintf(obsString, MAX_LINE_LENGTH, "obs %4.1f %c %5.1f %c",
                      fabs(obsLatDeg), ((obsLatDeg < 0) ? 'S' : 'N'),
                      fabs(obsLonDeg), ((obsLonDeg < 0) ? 'W' : 'E'));
         }
         else
         {
             if (obsLonDeg < 0) obsLonDeg += 360;
-            snprintf(obsString, 128,"obs %4.1f %c %5.1f",
+            snprintf(obsString, MAX_LINE_LENGTH,"obs %4.1f %c %5.1f",
                      fabs(obsLatDeg), ((obsLatDeg < 0) ? 'S' : 'N'),
                      obsLonDeg);
         }
@@ -250,21 +254,21 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 
         if (target != SUN)
         {
-            char sunString[128];
+            char sunString[MAX_LINE_LENGTH];
             double sunLatDeg = options->SunLat() / deg_to_rad;
             double sunLonDeg = options->SunLon() / deg_to_rad;
         
             if (target == EARTH || target == MOON)
             {
                 if (sunLonDeg > 180) sunLonDeg -= 360;
-                snprintf(sunString, 128, "sun %4.1f %c %5.1f %c",
+                snprintf(sunString, MAX_LINE_LENGTH, "sun %4.1f %c %5.1f %c",
                          fabs(sunLatDeg), ((sunLatDeg < 0) ? 'S' : 'N'),
                          fabs(sunLonDeg), ((sunLonDeg < 0) ? 'W' : 'E'));
             }
             else
             {
                 if (sunLonDeg < 0) sunLonDeg += 360;
-                snprintf(sunString, 128,"sun %4.1f %c %5.1f",
+                snprintf(sunString, MAX_LINE_LENGTH,"sun %4.1f %c %5.1f",
                          fabs(sunLatDeg), ((sunLatDeg < 0) ? 'S' : 'N'),
                          sunLonDeg);
             }
@@ -274,24 +278,27 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 
     if (options->Projection() == MULTIPLE)
     {
-        char fovCString[128];
+        char fovCString[MAX_LINE_LENGTH];
         double fov = options->FieldOfView() / deg_to_rad;
         if (fov > 1)
-            snprintf(fovCString, 128, "fov %.1f degrees", fov);
+            snprintf(fovCString, MAX_LINE_LENGTH, "fov %.1f degrees", fov);
         else if (fov * 60 > 1)
         {
             fov *= 60;
-            snprintf(fovCString, 128, "fov %.1f arc minutes", fov);
+            snprintf(fovCString, MAX_LINE_LENGTH, 
+		     "fov %.1f arc minutes", fov);
         }
         else if (fov * 3600 > 1)
         {
             fov *= 3600;
-            snprintf(fovCString, 128, "fov %.1f arc seconds", fov);
+            snprintf(fovCString, MAX_LINE_LENGTH, 
+		     "fov %.1f arc seconds", fov);
         }
         else
         {
             fov *= 3600000;
-            snprintf(fovCString, 128, "fov %.1f milliarc seconds", fov);
+            snprintf(fovCString, MAX_LINE_LENGTH, 
+		     "fov %.1f milliarc seconds", fov);
         }
         
         double oX, oY, oZ;
@@ -306,20 +313,23 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         double targetDist = AU_to_km * sqrt(deltX*deltX 
                                             + deltY*deltY + deltZ*deltZ);
         
-        char distString[128];
+        char distString[MAX_LINE_LENGTH];
         if (targetDist < 1e6)
         {
-            snprintf(distString, 128, "dist %.0f km", targetDist);
+            snprintf(distString, MAX_LINE_LENGTH, "dist %.0f km", 
+		     targetDist);
         }
         else if (targetDist < 1e9)
         {
             targetDist /= 1e6;
-            snprintf(distString, 128, "dist %.1f million km", targetDist);
+            snprintf(distString, MAX_LINE_LENGTH, "dist %.1f million km", 
+                     targetDist);
         }
         else
         {
             targetDist /= 1e9;
-            snprintf(distString, 128, "dist %.1f billion km", targetDist);
+            snprintf(distString, MAX_LINE_LENGTH, "dist %.1f billion km", 
+                     targetDist);
         }
 
         labelLines.push_back(fovCString);
@@ -328,11 +338,12 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         if (options->TargetMode() != LOOKAT 
             && target != SUN)
         {
-            char illumString[128];
+            char illumString[MAX_LINE_LENGTH];
             const double illumination = 50 * (ndot(tX, tY, tZ, 
                                                    deltX, deltY, deltZ) + 1);
             
-            snprintf(illumString, 128, "illumination %.1f %%", illumination);
+            snprintf(illumString, MAX_LINE_LENGTH, "illumination %.1f %%", 
+                     illumination);
             labelLines.push_back(illumString);
         }
     }
@@ -342,7 +353,8 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 
     if (options->LabelMask() & YNegative)
     {
-        labelY += (height_ - labelLines.size() * textRenderer_->FontHeight());
+        labelY += (height_ - labelLines.size() 
+		   * textRenderer_->FontHeight());
     }
 
     for (unsigned int i = 0; i < labelLines.size(); i++)

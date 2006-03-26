@@ -11,6 +11,21 @@ extern char **environ;
 
 #include "config.h"
 
+#ifdef HAVE_ICONV
+# include <iconv.h>
+# ifdef HAVE_LIBCHARSET
+#  include <localcharset.h>
+# else
+#  ifdef HAVE_LANGINFO_H
+#   include <langinfo.h>
+#  else
+#   define NO_ICONV
+#  endif
+# endif
+#else
+# define NO_ICONV
+#endif
+
 #include "Options.h"
 #include "xpUtil.h"
 
@@ -326,13 +341,6 @@ delT(const double jd)
     return(delT);
 }
 
-double 
-poly(const double a1, const double a2, const double a3, const double a4,
-     const double t)
-{
-    return(a1 + t*(a2 + t*(a3 + t*a4)));
-}
-
 void 
 rotateX(double &X, double &Y, double &Z, const double theta)
 {
@@ -441,4 +449,191 @@ precessB1950J2000(double &X, double &Y, double &Z)
     X = newX;
     Y = newY;
     Z = newZ;
+}
+
+static void
+convertEncoding(const bool toNative, ICONV_CONST char *inBuf, char *outBuf)
+{
+#ifdef NO_ICONV
+    memcpy(outBuf, inBuf, MAX_LINE_LENGTH);
+#else
+#ifdef HAVE_LIBCHARSET
+    const char *fromCode = (toNative ? "UTF-8" : locale_charset());
+    const char *toCode =   (toNative ? locale_charset() : "UTF-8");
+#else
+    const char *fromCode = (toNative ? "UTF-8" : nl_langinfo(CODESET));
+    const char *toCode =   (toNative ? nl_langinfo(CODESET) : "UTF-8");
+#endif
+    iconv_t conv = iconv_open(toCode, fromCode);
+    if (conv != (iconv_t) -1)
+    {
+        size_t inbytesleft = strlen(inBuf);
+        size_t outbytesleft = MAX_LINE_LENGTH;
+        while (inbytesleft != (size_t) 0)
+        {
+            size_t retVal = iconv(conv, &inBuf, &inbytesleft, 
+                                  &outBuf, &outbytesleft);
+            if (retVal == (size_t) -1)
+            {
+                ostringstream errStr;
+                errStr << "Can't convert sequence " << inBuf 
+                       << " from encoding " << fromCode
+                       << " to encoding " << toCode << endl;
+                switch (errno)
+                {
+                case EINVAL:
+                    errStr << "Incomplete character or shift sequence "
+                           << "(EINVAL)\n";
+                    break;
+                case E2BIG:
+                    errStr << "Lack of space in output buffer (E2BIG)\n";
+                    break;
+                case EILSEQ:
+                    errStr << "Illegal character or shift sequence "
+                           << "(EILSEQ)\n";
+                    break;
+                case EBADF:
+                    errStr << "Invalid conversion descriptor (EBADF)\n";
+                    break;
+                default:
+                    errStr << "Unknown iconv error\n";
+                }
+                xpWarn(errStr.str(), __FILE__, __LINE__);
+                iconv_close(conv);
+                return;
+            }
+        }
+        iconv_close(conv);
+    }
+    else
+    {
+        ostringstream errStr;
+        errStr << "iconv_open() failed, fromCode is " << fromCode 
+               << ", toCode is " << toCode << "\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
+    }
+#endif
+}
+
+void
+strftimeUTF8(string &timeString)
+{
+    string convertedString(timeString);
+    unsigned int convertedStringIndex = 0;
+    for (unsigned int i = 0; i < timeString.size() - 1; i++)
+    {
+        if (timeString[i] == '%')
+        {
+            // hold the output from strftime()
+            char buffer_native[MAX_LINE_LENGTH];
+            memset(buffer_native, 0, MAX_LINE_LENGTH);
+
+            // hold the strftime() output after conversion to
+            // UTF-8
+            char buffer_UTF8[MAX_LINE_LENGTH];
+            memset(buffer_UTF8, 0, MAX_LINE_LENGTH);
+
+            // format string input to strftime()
+            char buffer_native_format[3];
+            buffer_native_format[0] = '%';
+            buffer_native_format[1] = timeString[i+1];
+            buffer_native_format[2] = '\0';
+
+            Options *options = Options::getInstance();
+            time_t tv_sec = options->getTVSec();
+            strftime(buffer_native, MAX_LINE_LENGTH, 
+                     buffer_native_format, 
+                     localtime((time_t *) &tv_sec));
+            convertEncoding(false, buffer_native, buffer_UTF8);
+
+            convertedString.replace(convertedStringIndex, 
+                                  2, buffer_UTF8);
+            convertedStringIndex += (strlen(buffer_UTF8) - 1);
+            i++;
+        }
+        convertedStringIndex++;
+    }
+    timeString.assign(convertedString);
+}
+
+char *
+checkLocale(const int category, const char *locale)
+{
+    static bool showWarning = true;
+    char *returnVal = setlocale(category, locale);
+    if (locale != NULL)
+    {
+        if (returnVal == NULL)
+        {
+            ostringstream errMsg;
+            errMsg << "setlocale(";
+            switch (category)
+            {
+            case LC_CTYPE:
+                errMsg << "LC_CTYPE";
+                break;
+            case LC_COLLATE:
+                errMsg << "LC_COLLATE";
+                break;
+            case LC_TIME:
+                errMsg << "LC_TIME";
+                break;
+            case LC_NUMERIC:
+                errMsg << "LC_NUMERIC";
+                break;
+            case LC_MONETARY:
+                errMsg << "LC_MONETARY";
+                break;
+            case LC_MESSAGES:
+                errMsg << "LC_MESSAGES";
+                break;
+            case LC_ALL:
+                errMsg << "LC_ALL";
+                break;
+            default:
+                errMsg << "UNKNOWN CATEGORY!";
+            }
+            errMsg << ", ";
+            if (strlen(locale) == 0)
+            {
+                errMsg << "\"\"";
+            }
+            else
+            {
+                errMsg << "\"" << locale << "\"";
+            }
+            errMsg << ") failed! ";
+
+            if (strlen(locale) == 0)
+            {
+                errMsg << "Check your LANG environment variable "
+                       << "(currently ";
+                char *lang = getenv("LANG");
+                if (lang == NULL)
+                {
+                    errMsg << "NULL";
+                }
+                else
+                {
+                    errMsg << "\"" << lang << "\"";
+                }
+                errMsg << "). Setting to \"C\".\n";
+                
+                if (showWarning)
+                {
+                    xpWarn(errMsg.str(), __FILE__, __LINE__);
+                    showWarning = false;
+                }
+                returnVal = setlocale(category, "C");
+            }
+            else
+            {
+                errMsg << "Trying native ...\n";
+                xpWarn(errMsg.str(), __FILE__, __LINE__);
+                showWarning = true;
+                returnVal = checkLocale(category, "");
+            }
+        }
+    }
+    return(returnVal);
 }

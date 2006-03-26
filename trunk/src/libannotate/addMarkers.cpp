@@ -44,6 +44,8 @@ readMarkerFile(const char *line, Planet *planet,
     bool haveLat = false;
     double lat, lon;
     string image;
+
+    string lang("");
     string name("");
     bool pixelCoords = false;
     double radius = -1;
@@ -123,7 +125,11 @@ readMarkerFile(const char *line, Planet *planet,
         case IMAGE:
             image.assign(returnString);
             break;
+        case LANGUAGE:
+            lang.assign(returnString);
+            break;
         case LATLON:
+            checkLocale(LC_NUMERIC, "C");
             if (haveLat)
             {
                 sscanf(returnString, "%lf", &lon);
@@ -133,6 +139,7 @@ readMarkerFile(const char *line, Planet *planet,
                 sscanf(returnString, "%lf", &lat);
                 haveLat = true;
             }
+            checkLocale(LC_NUMERIC, "");
             break;
         case NAME:
             name.assign(returnString);
@@ -166,8 +173,9 @@ readMarkerFile(const char *line, Planet *planet,
                     }
                 }
             }
-        break;
+            break;
         case RADIUS:
+            checkLocale(LC_NUMERIC, "C");
             sscanf(returnString, "%lf", &radius);
             if (radius < 0) 
             {
@@ -176,6 +184,7 @@ readMarkerFile(const char *line, Planet *planet,
                 radius = -1;
                 syntaxError = true;
             }
+            checkLocale(LC_NUMERIC, "");
             break;
         case SYMBOLSIZE:
             sscanf(returnString, "%d", &symbolSize);
@@ -211,7 +220,7 @@ readMarkerFile(const char *line, Planet *planet,
 
         if (val != DELIMITER && options->Verbosity() > 3)
         {
-            stringstream msg;
+            ostringstream msg;
             msg << "value is " << keyWordString[val - '?'];
             if (returnString != NULL)
                 msg << ", returnString is " << returnString;
@@ -223,7 +232,7 @@ readMarkerFile(const char *line, Planet *planet,
 
         if (syntaxError)
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Syntax error in marker file\n"
                    << "line is \"" << line << "\"\n";
             xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -299,14 +308,16 @@ readMarkerFile(const char *line, Planet *planet,
             iconHeight = i->Height();
         }
 
-        if (!timezone.empty())
+        // if the name string has time formatting codes, and the
+        // timezone is defined, run the name string through strftime()
+        if (name.find("%") != string::npos && !timezone.empty())
         {
-            char *get_tz = getenv("TZ");
-            string tz_save;
-            if (get_tz != NULL)
+            const char *tzEnv = getenv("TZ");
+            string tzSave;
+            if (tzEnv != NULL)
             {
-                tz_save = "TZ=";
-                tz_save += get_tz;
+                tzSave = "TZ=";
+                tzSave += tzEnv;
             }
 
             string tz = "TZ=";
@@ -315,23 +326,27 @@ readMarkerFile(const char *line, Planet *planet,
 
             tzset();
 
-            char name_str[MAX_LINE_LENGTH];
-            time_t tv_sec = options->getTVSec();
-            strftime(name_str, sizeof(name_str), name.c_str(), 
-                     localtime((time_t *) &tv_sec));
-            name.assign(name_str);
+            if (!lang.empty())
+                checkLocale(LC_ALL, lang.c_str());
 
-            if (tz_save.empty()) 
+            // run name string through strftime() and convert to UTF-8
+            strftimeUTF8(name);
+
+            if (tzEnv == NULL) 
                 removeFromEnvironment("TZ"); 
             else
-                putenv((char *) tz_save.c_str()); 
+                putenv((char *) tzSave.c_str()); 
 
             tzset();
+
+            if (!lang.empty())
+                checkLocale(LC_ALL, "");
         }
 
         if (!name.empty())
         {
-            Text *t = new Text(color, ix, iy, iconWidth, iconHeight, 
+            Text *t = new Text(color, ix, iy, 
+                               iconWidth, iconHeight, 
                                align, name);
 
             if (!font.empty()) t->Font(font);
@@ -379,7 +394,7 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
         }
         else
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Can't load marker file " << markerFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }
@@ -421,7 +436,7 @@ addMarkers(View *view, const int width, const int height,
         }
         else
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Can't load marker file " << markerFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }

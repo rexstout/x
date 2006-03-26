@@ -62,4 +62,4 @@ xplanet_LDADD =	libannotate/libannotate.a	\
 		libplanet/libmoons/libmoons.a 	\
 		libprojection/libprojection.a 	\
 		libsgp4sdp4/libsgp4sdp4.a	\
-		@GRAPHICS_LIBS@ @CSPICE_LIBS@ @X_LIBS@ @XSS_LIBS@ @FREETYPE_LIBS@ @AQUA_LIBS@
+		@GRAPHICS_LIBS@ @CSPICE_LIBS@ @X_LIBS@ @XSS_LIBS@ @FREETYPE_LIBS@ @AQUA_LIBS@ @LIBICONV@ @LIBCHARSET@

@@ -49,10 +49,9 @@ The "transparent" keyword is only meaningful in conjunction with
 values range from 0 to 255.  Any pixels with this color value will be
 considered to be transparent.
 
-Delimiters (whitespace, tabs, forward slashes, or commas) are not
-permitted in any of these keyword/value pairs (except for with
-"transparent", as shown above).  The text string may be enclosed in
-either quotes ("") or braces ({}).
+Delimiters (whitespace or tabs) are not permitted in any of these
+keyword/value pairs (except for with "transparent", as shown above).
+The text string may be enclosed in either quotes ("") or braces ({}).
 
 Some sample marker file entries are given below:
 
