@@ -1,5 +1,3 @@
-SUBDIRS = libephemeris libmoons
-
 noinst_LIBRARIES = libplanet.a
 
 AM_CPPFLAGS = -I@top_srcdir@/src

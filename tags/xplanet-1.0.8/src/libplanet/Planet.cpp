@@ -5,19 +5,12 @@
 #include <string>
 using namespace std;
 
-#include "config.h"
-
 #include "findFile.h"
 #include "Options.h"
 #include "Planet.h"
 #include "xpUtil.h"
 
-#include "libephemeris/EphemerisHigh.h"
-#include "libephemeris/EphemerisLow.h"
-#ifdef HAVE_CSPICE
-#include "libephemeris/EphemerisSpice.h"
-#endif
-#include "libmoons/libmoons.h"
+#include "libephemeris/ephemerisWrapper.h"
 
 body
 Planet::parseBodyName(char *name)
@@ -126,9 +119,6 @@ Planet::parseBodyName(char *name)
 */
 Planet::Planet(const double jd, const body this_body) 
     : index_(this_body), 
-      ephem_(NULL), 
-      ephemerisHigh_(false),
-      ephemerisSpice_(false),
       julianDay_(jd), 
       needRotationMatrix_(true), 
       period_(0),
@@ -837,54 +827,10 @@ Planet::Planet(const double jd, const body this_body)
 
     Options *options = Options::getInstance();
     if (options->UniversalTime()) julianDay_ += delT(jd) / 86400;
-
-    vector<int> spiceList = options->SpiceEphemeris();
-    for (unsigned int i = 0; i < spiceList.size(); i++)
-    {
-        if (naif_id[index_] == spiceList[i])
-        {
-#ifdef HAVE_CSPICE
-            ephemerisSpice_ = true;
-            ephem_ = new EphemerisSpice();
-#else
-            ostringstream errStr;
-            errStr << "Can't use SPICE ephemeris for " 
-                   << body_string[index_] << ".\n";
-            xpWarn(errStr.str(), __FILE__, __LINE__);
-#endif
-            break;
-        }
-    }
-
-    if (!ephemerisSpice_)
-    {
-        string ephemerisFile(options->JPLFile());
-        ephemerisHigh_ = !ephemerisFile.empty();
-        if (ephemerisHigh_)
-        {
-            bool foundFile = findFile(ephemerisFile, "ephemeris");
-            if (foundFile)
-            {
-                ephem_ = new EphemerisHigh(ephemerisFile.c_str());
-            }
-            else
-            {
-                ostringstream errStr;
-                errStr << "Can't load ephemeris file " 
-                       << ephemerisFile << "\n";
-                xpExit(errStr.str(), __FILE__, __LINE__);
-            }
-        }
-        else
-        {
-            ephem_ = new EphemerisLow();
-        }
-    }
 }
 
 Planet::~Planet()
 {
-    delete ephem_;
 }
 
 // Return the distance from the surface to the center, in units of
@@ -921,66 +867,8 @@ Planet::calcHeliocentricEquatorial()
 void
 Planet::calcHeliocentricEquatorial(const bool relativeToSun)
 {
-    if (ephemerisSpice_)
-    {
-        ephem_->GetHeliocentricXYZ(index_, julianDay_, X_, Y_, Z_);
-        return;
-    }
-    
-    if (primary_ == SUN)
-    {
-        ephem_->GetHeliocentricXYZ(index_, julianDay_, X_, Y_, Z_);
-    }
-    else if (primary_ == EARTH && ephemerisHigh_)
-    {
-        // Lunar ephemeris is part of JPL's Digital Ephemeris
-        ephem_->GetHeliocentricXYZ(index_, julianDay_, X_, Y_, Z_);
-        if (!relativeToSun)
-        {
-            double Prx, Pry, Prz;
-            ephem_->GetHeliocentricXYZ(primary_, julianDay_, Prx, Pry, Prz);
-            X_ -= Prx;
-            Y_ -= Pry;
-            Z_ -= Prz;
-        }
-    }
-    else
-    {
-        switch(primary_)
-        {
-        case EARTH:
-            moon(julianDay_, X_, Y_, Z_);
-            break;
-        case MARS:
-            marsat(julianDay_, index_, X_, Y_, Z_);
-            break;
-        case JUPITER:
-            jupsat(julianDay_, index_, X_, Y_, Z_);
-            break;
-        case SATURN:
-            satsat(julianDay_, index_, X_, Y_, Z_);
-            break;
-        case URANUS:
-            urasat(julianDay_, index_, X_, Y_, Z_);
-            break;
-        case NEPTUNE:
-            nepsat(julianDay_, index_, X_, Y_, Z_);
-            break;
-        case PLUTO:
-            plusat(julianDay_, X_, Y_, Z_);
-            break;
-        default:
-            break;
-        }
-        if (relativeToSun)
-        {
-            double Prx, Pry, Prz;
-            ephem_->GetHeliocentricXYZ(primary_, julianDay_, Prx, Pry, Prz);
-            X_ += Prx;
-            Y_ += Pry;
-            Z_ += Prz;
-        }
-    }
+    GetHeliocentricXYZ(index_, primary_, julianDay_, 
+                       relativeToSun, X_, Y_, Z_);
 }
 
 // Return rectangular coordinates in heliocentric equatorial frame
@@ -1166,6 +1054,8 @@ Planet::ComputeShadowCoeffs()
     ellipseCoeffC_ += sunY_ * sunY_;
     ellipseCoeffC_ += sunX_ * sunX_;
     ellipseCoeffC_ -= 1;
+
+    needShadowCoeffs_ = false;
 }
 
 // x, y, z must be in planetary XYZ frame
@@ -1206,8 +1096,10 @@ Planet::getOrbitalNorth(double &X, double &Y, double &Z) const
     double pX0, pY0, pZ0;
     double pX1, pY1, pZ1;
 
-    ephem_->GetHeliocentricXYZ(index_, julianDay_ - 0.5, pX0, pY0, pZ0);
-    ephem_->GetHeliocentricXYZ(index_, julianDay_ + 0.5, pX1, pY1, pZ1);
+    GetHeliocentricXYZ(index_, primary_, julianDay_ - 0.5, 
+                       true, pX0, pY0, pZ0);
+    GetHeliocentricXYZ(index_, primary_, julianDay_ + 0.5, 
+                       true, pX1, pY1, pZ1);
 
     double vel[3] = { pX1 - pX0, pY1 - pY0, pZ1 - pZ0 };
 

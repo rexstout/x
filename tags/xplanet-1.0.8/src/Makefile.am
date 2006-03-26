@@ -1,4 +1,4 @@
-SUBDIRS = libannotate libdisplay libimage libmultiple libplanet libprojection libsgp4sdp4
+SUBDIRS = libannotate libdisplay libephemeris libimage libmultiple libplanet libprojection libsgp4sdp4
 
 bin_PROGRAMS = xplanet
 
@@ -52,14 +52,16 @@ xplanet_SOURCES = \
 	xplanet.cpp		\
 	$(parsegeom)
 
-xplanet_LDADD =	libannotate/libannotate.a	\
-		libdisplay/libdisplay.a 	\
-		libdisplay/libtimer.a 		\
-		libimage/libimage.a 		\
-		libmultiple/libmultiple.a	\
-		libplanet/libplanet.a 		\
-		libplanet/libephemeris/libephemeris.a \
-		libplanet/libmoons/libmoons.a 	\
-		libprojection/libprojection.a 	\
-		libsgp4sdp4/libsgp4sdp4.a	\
-		@GRAPHICS_LIBS@ @CSPICE_LIBS@ @X_LIBS@ @XSS_LIBS@ @FREETYPE_LIBS@ @AQUA_LIBS@ @LIBICONV@ @LIBCHARSET@
+xplanet_LDADD =	libannotate/libannotate.a		\
+		libdisplay/libdisplay.a 		\
+		libdisplay/libtimer.a 			\
+		libephemeris/libephemeris.a 		\
+		libephemeris/libmoons/libmoons.a	\
+		libimage/libimage.a 			\
+		libmultiple/libmultiple.a		\
+		libplanet/libplanet.a 			\
+		libprojection/libprojection.a 		\
+		libsgp4sdp4/libsgp4sdp4.a		\
+		@GRAPHICS_LIBS@ @CSPICE_LIBS@ @X_LIBS@ 	\
+		@XSS_LIBS@ @FREETYPE_LIBS@ @AQUA_LIBS@ 	\
+		@LIBICONV@ @LIBCHARSET@

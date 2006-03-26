@@ -172,56 +172,34 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 xplanet_ARFLAGS = @xplanet_ARFLAGS@
 xplanet_LDFLAGS = @xplanet_LDFLAGS@
-noinst_LIBRARIES = libephemeris.a
+noinst_LIBRARIES = libmoons.a
 
 AM_CPPFLAGS = -I@top_srcdir@/src
 
-@USE_AR_TRUE@libephemeris_a_AR = $(AR) cru
-@USE_AR_FALSE@libephemeris_a_AR = $(CXX) @xplanet_ARFLAGS@
+@USE_AR_TRUE@libmoons_a_AR = $(AR) cru
+@USE_AR_FALSE@libmoons_a_AR = $(CXX) @xplanet_ARFLAGS@
 
-@HAVE_CSPICE_TRUE@spiceFiles = EphemerisSpice.cpp EphemerisSpice.h
-
-EXTRA_libephemeris_a_SOURCES = EphemerisSpice.cpp EphemerisSpice.h
-
-libephemeris_a_SOURCES = \
-			Ephemeris.cpp		\
-			Ephemeris.h		\
-			EphemerisHigh.cpp	\
-			EphemerisHigh.h		\
-			EphemerisLow.cpp	\
-			EphemerisLow.h		\
-			jpl_int.h		\
-			jpleph.cpp		\
-			jpleph.h		\
-			pluto.cpp		\
-			$(spiceFiles)
-
-subdir = src/libplanet/libephemeris
+libmoons_a_SOURCES = elp82b.h earth.cpp mars.cpp jupiter.cpp libmoons.h  tass17.h saturn.cpp  uranus.cpp neptune.cpp pluto.cpp
+subdir = src/libephemeris/libmoons
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 
-libephemeris_a_LIBADD =
-am__libephemeris_a_SOURCES_DIST = Ephemeris.cpp Ephemeris.h \
-	EphemerisHigh.cpp EphemerisHigh.h EphemerisLow.cpp \
-	EphemerisLow.h jpl_int.h jpleph.cpp jpleph.h pluto.cpp \
-	EphemerisSpice.cpp EphemerisSpice.h
-@HAVE_CSPICE_TRUE@am__objects_1 = EphemerisSpice.$(OBJEXT)
-am_libephemeris_a_OBJECTS = Ephemeris.$(OBJEXT) EphemerisHigh.$(OBJEXT) \
-	EphemerisLow.$(OBJEXT) jpleph.$(OBJEXT) pluto.$(OBJEXT) \
-	$(am__objects_1)
-libephemeris_a_OBJECTS = $(am_libephemeris_a_OBJECTS)
+libmoons_a_LIBADD =
+am_libmoons_a_OBJECTS = earth.$(OBJEXT) mars.$(OBJEXT) jupiter.$(OBJEXT) \
+	saturn.$(OBJEXT) uranus.$(OBJEXT) neptune.$(OBJEXT) \
+	pluto.$(OBJEXT)
+libmoons_a_OBJECTS = $(am_libmoons_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/Ephemeris.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/EphemerisHigh.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/EphemerisLow.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/EphemerisSpice.Po ./$(DEPDIR)/jpleph.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/pluto.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/earth.Po ./$(DEPDIR)/jupiter.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/mars.Po ./$(DEPDIR)/neptune.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/pluto.Po ./$(DEPDIR)/saturn.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/uranus.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -231,10 +209,9 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(am__libephemeris_a_SOURCES_DIST) \
-	$(EXTRA_libephemeris_a_SOURCES)
+DIST_SOURCES = $(libmoons_a_SOURCES)
 DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
-SOURCES = $(libephemeris_a_SOURCES) $(EXTRA_libephemeris_a_SOURCES)
+SOURCES = $(libmoons_a_SOURCES)
 
 all: all-am
 
@@ -242,7 +219,7 @@ all: all-am
 .SUFFIXES: .cpp .o .obj
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/libplanet/libephemeris/Makefile
+	  $(AUTOMAKE) --gnu  src/libephemeris/libmoons/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
@@ -250,10 +227,10 @@ AR = ar
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libephemeris.a: $(libephemeris_a_OBJECTS) $(libephemeris_a_DEPENDENCIES) 
-	-rm -f libephemeris.a
-	$(libephemeris_a_AR) libephemeris.a $(libephemeris_a_OBJECTS) $(libephemeris_a_LIBADD)
-	$(RANLIB) libephemeris.a
+libmoons.a: $(libmoons_a_OBJECTS) $(libmoons_a_DEPENDENCIES) 
+	-rm -f libmoons.a
+	$(libmoons_a_AR) libmoons.a $(libmoons_a_OBJECTS) $(libmoons_a_LIBADD)
+	$(RANLIB) libmoons.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -261,12 +238,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ephemeris.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EphemerisHigh.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EphemerisLow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EphemerisSpice.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpleph.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jupiter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mars.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neptune.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pluto.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/saturn.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uranus.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \

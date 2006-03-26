@@ -52,11 +52,8 @@ class Ring
     Planet *planet_;
 
     double shade_;
-    double sun_lat, sun_lon;
+    double sunLat_, sunLon_;
     double sunX_, sunY_, sunZ_;
-
-    double ellipseCoeffC_; // constant in quadratic to solve for
-                           // ellipsoid intersection
 
     // get a window average of array
     double getValue(const double *array, const int size, const int window,
