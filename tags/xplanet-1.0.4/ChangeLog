@@ -1,0 +1,76 @@
+Version 1.0.4 (released 05 Mar 2004)
+
+	* Added support for SPICE kernels for spacecraft ephemerides.
+
+	* Xplanet now works without freetype.  There will be no text
+	annotation, but it will run instead of exit immediately.
+
+Version 1.0.3 (released 06 Jan 2004)
+
+	* Jupiter and Saturn are now drawn as oblate spheroids.
+
+Version 1.0.2 (released 22 Dec 2003)
+
+	* Added -interpolate_origin_file option so that origin_files may
+	be used as ephemeris files.
+
+	* Added -label_string option to set the first line of the label. 
+
+	* Added the Lambert (Cylindrical Equal Area) projection.
+
+	* The -geometry option now applies to the root window.  The area
+	outside the image is black.
+
+	* The format for the star map is different.  It is now Dec, RA,
+	Mag to be consistent with marker and arc files, which have lat
+	then lon.
+
+	* -marker_file and -arc_file can now be used on the command line.
+	Coordinates for these files are Declination and Right Ascension.
+	Markers and arcs are plotted against the star field.
+
+	* Fixed a text rendering bug where the text wasn't positioned
+	properly.
+	
+	* Added -dynamic_origin option to read a file for the observer's
+	position before each rendering.
+
+	* Changed --disable-screensaver to --with-xscreensaver in
+	configure script.
+	
+	* -origin and -range options can now be used together.
+
+	* Added -save_desktop_file option for Windows and OS X.
+
+	* Added twilight option in config file to adjust extent of
+	terminator.
+
+	* -localtime option wasn't right for most planets.
+
+	* Added -ephemeris_file option.  This allows the use of JPL's
+	DExxx files for super-duper accuracy.
+
+	* Added pango support.  The workings of pango are still mysterious
+	to me so there may be things that don't quite look right.  There
+	are memory leaks inside the pango library, so using this option
+	all of the time is not a good idea.
+	
+Version 1.0.1 (released 17 Mar 2003)
+
+	* mapbounds is now supported as an option in the configuration
+	file. 
+
+	* Xplanet now works natively on Aqua, but is a little flaky; it
+	sometimes fails to set the desktop and the default "Aqua Blue"
+	shows up.  Reproducible bug reports are greatly appreciated!
+
+	* The timer would cause an exit after one drawing on non-X11
+	systems. 
+
+	* Markers on the other planets were not drawn properly with the
+	-projection option.
+
+Version 1.0.0 (released 11 Mar 2003)
+
+	* First public release.  See the NEWS file for changes from the
+	previous version.
