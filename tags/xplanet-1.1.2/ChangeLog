@@ -1,0 +1,154 @@
+Version 1.1.2 (released 5 Dec 2004)
+
+        * Saturn's rings are now drawn properly when using "magnify" in
+        the config file.
+
+        * Added marker_fontsize as an option in the configuration file.
+
+        * Added the Bonne, Gnomonic, Polyconic, and Tangential Spherical
+        Cube (TSC) projections.
+
+        * Added the -proj_param option.  Note that the -projection option
+	cannot be abbreviated to -proj anymore!
+
+        * Color cloud maps are now allowed.
+
+        * A color may now be specified with -background.
+
+Version 1.1.1 (released 23 Jul 2004)
+
+        * Added -north path, -target path, and -path_relative_to options.
+
+        * Added -output_start_index option.
+
+        * Print a list of compile-time options when using the -version
+        option.
+
+        * Fixed a bug where orbits were not drawn for bodies using SPICE
+        kernels.
+
+        * Added ssec_map option to configuration files to use University
+        of Wisconsin cloud maps.
+
+Version 1.1.0 (released 20 Jun 2004)
+
+        * Added the -fork option.
+
+        * Fixed a bug where stars were not drawn when using the -proj
+        option. 
+
+Version 1.0.8 (released 23 May 2004)
+
+        * Fixed a bug where eclipse shadows were not drawn properly. 
+
+        * Timer now sleeps until it's time to wake up, instead
+        of sleeping for a set time.
+
+Version 1.0.7 (released 04 May 2004)
+
+        * The native Quicktime library can be used when reading/writing
+        image files on Mac OS X.
+
+        * The -hibernate and -idlewait options now work on Mac OS X.
+
+        * Fixed a segfault when writing image files.
+
+        * Minor updates to allow compilation with gcc 3.4.0.
+
+Version 1.0.6 (released 21 Apr 2004)
+
+        * Fixed a bug where markers on the far side of a planet were being
+        drawn when they shouldn't have been.
+        
+        * Fixed a bug where satellites were not drawn for some locales.
+        
+        * Added -projection random.  This picks a random projection.
+
+Version 1.0.5 (released 23 Mar 2004)
+
+        * Improved locale support. The date string is now converted to
+        UTF-8 using iconv() after being created by strftime() in the
+        default encoding.  Added the "lang" keyword to marker files.
+
+        * Floating point numbers in all input files must be in the "C"
+        locale format, meaning that the decimal separator must be the '.'
+        character and not the ','.
+
+        * Fixed align=center option in marker files.
+        
+Version 1.0.4 (released 05 Mar 2004)
+
+        * Added support for SPICE kernels for spacecraft ephemerides.
+
+        * Xplanet now works without freetype.  There will be no text
+        annotation, but it will run instead of exit immediately.
+
+Version 1.0.3 (released 06 Jan 2004)
+
+        * Jupiter and Saturn are now drawn as oblate spheroids.
+
+Version 1.0.2 (released 22 Dec 2003)
+
+        * Added -interpolate_origin_file option so that origin_files may
+        be used as ephemeris files.
+
+        * Added -label_string option to set the first line of the label. 
+
+        * Added the Lambert (Cylindrical Equal Area) projection.
+
+        * The -geometry option now applies to the root window.  The area
+        outside the image is black.
+
+        * The format for the star map is different.  It is now Dec, RA,
+        Mag to be consistent with marker and arc files, which have lat
+        then lon.
+
+        * -marker_file and -arc_file can now be used on the command line.
+        Coordinates for these files are Declination and Right Ascension.
+        Markers and arcs are plotted against the star field.
+
+        * Fixed a text rendering bug where the text wasn't positioned
+        properly.
+        
+        * Added -dynamic_origin option to read a file for the observer's
+        position before each rendering.
+
+        * Changed --disable-screensaver to --with-xscreensaver in
+        configure script.
+        
+        * -origin and -range options can now be used together.
+
+        * Added -save_desktop_file option for Windows and OS X.
+
+        * Added twilight option in config file to adjust extent of
+        terminator.
+
+        * -localtime option wasn't right for most planets.
+
+        * Added -ephemeris_file option.  This allows the use of JPL's
+        DExxx files for super-duper accuracy.
+
+        * Added pango support.  The workings of pango are still mysterious
+        to me so there may be things that don't quite look right.  There
+        are memory leaks inside the pango library, so using this option
+        all of the time is not a good idea.
+        
+Version 1.0.1 (released 17 Mar 2003)
+
+        * mapbounds is now supported as an option in the configuration
+        file. 
+
+        * Xplanet now works natively on Aqua, but is a little flaky; it
+        sometimes fails to set the desktop and the default "Aqua Blue"
+        shows up.  Reproducible bug reports are greatly appreciated!
+
+        * The timer would cause an exit after one drawing on non-X11
+        systems. 
+
+        * Markers on the other planets were not drawn properly with the
+        -projection option.
+
+Version 1.0.0 (released 11 Mar 2003)
+
+        * First public release.  See the NEWS file for changes from the
+        previous version.
