@@ -57,7 +57,7 @@ TimerX11::SleepForTime(time_t sleep_time)
     nextUpdate_ = sleep_time + currentTime_.tv_sec;
         
     Options *options = Options::getInstance();
-    if (static_cast<int> (sleep_time) != 1)
+    if (static_cast<int> (sleep_time) > 1)
     {
         if (options->Verbosity() > 0)
         {
@@ -81,7 +81,7 @@ TimerX11::SleepForTime(time_t sleep_time)
 
         // Check every 1/10th of a second if there's been a request to
         // kill the window
-        for (int i = 0; i < sleep_time * 10; i++)
+        while (currentTime_.tv_sec < nextUpdate_)
         {
             if (XCheckTypedWindowEvent(display_, window, 
                                        ClientMessage, &event) == True) 
@@ -98,15 +98,20 @@ TimerX11::SleepForTime(time_t sleep_time)
                 if (keybuf == 'q' || keybuf == 'Q') 
                     return(false);
             }
-            else
-            {
-                usleep(100000);  // sleep for 1/10 second
-            }
+
+            usleep(100000);  // sleep for 1/10 second
+            gettimeofday(&currentTime_, NULL);
         }
     }
     else
     {
-        sleep(sleep_time);
+        // Check every second if we've reached the time for the next
+        // update.
+        while (currentTime_.tv_sec < nextUpdate_)
+        {
+            sleep(1);
+            gettimeofday(&currentTime_, NULL);
+        }
     }
 
     return(true);

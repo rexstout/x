@@ -298,7 +298,7 @@ readSatelliteFile(const char *line, Planet *planet,
 
         if (val != DELIMITER && options->Verbosity() > 3)
         {
-            stringstream msg;
+            ostringstream msg;
             msg << "value is " << keyWordString[val - '?'];
             if (returnString != NULL)
                 msg << ", returnString is " << returnString;
@@ -310,7 +310,7 @@ readSatelliteFile(const char *line, Planet *planet,
 
         if (syntaxError)
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Syntax error in satellite file\n";
             errStr << "line is \"" << line << "\"" << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -323,7 +323,7 @@ readSatelliteFile(const char *line, Planet *planet,
     if (satellite == NULL) 
     {
         
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "No satellite found for  \"" << line << "\"" << endl;
         xpWarn(errStr.str(), __FILE__, __LINE__);
         return;
@@ -437,7 +437,7 @@ loadSatelliteVector(PlanetProperties *planetProperties)
                 if ((inFile.getline(lines[1], 80) == NULL) 
                     || (inFile.getline(lines[2], 80) == NULL))
                 {
-                    stringstream errStr;
+                    ostringstream errStr;
                     errStr << "Malformed TLE file (" << tleFile << ")?\n";
                     xpWarn(errStr.str(), __FILE__, __LINE__);
                     break;
@@ -447,7 +447,7 @@ loadSatelliteVector(PlanetProperties *planetProperties)
                 
                 if (!sat.isGoodData()) 
                 {
-                    stringstream errStr;
+                    ostringstream errStr;
                     errStr << "Bad TLE data in " << tleFile << endl;
                     xpWarn(errStr.str(), __FILE__, __LINE__);
                     continue;
@@ -460,7 +460,7 @@ loadSatelliteVector(PlanetProperties *planetProperties)
         }
         else
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Can't load satellite TLE file " << tleFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }
@@ -495,7 +495,7 @@ addSatellites(PlanetProperties *planetProperties, Planet *planet,
         }
         else
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Can't load satellite file " << satFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }
