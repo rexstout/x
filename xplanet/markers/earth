@@ -7,11 +7,10 @@
 #
 # The text strings must be encoded in UTF-8.  If there is time
 # formatting information in the string and the timezone is defined,
-# the string is converted to native using iconv(), run through
-# strftime(), and then converted back to UTF-8.  The locale is taken
-# from the environment.  The "lang" keyword may also be used to
-# specify an alternate locale.  Valid locales can be listed on most
-# systems using 'locale -a'.
+# the formatting codes are run through strftime() and then converted
+# to UTF-8 using iconv().  The locale is taken from the environment.
+# The "lang" keyword may also be used to specify an alternate locale.
+# Valid locales can be listed on most systems using 'locale -a'.
 #
 # For example, the text string below will display the date and time
 # for Montreal in Japanese, provided your system supports the

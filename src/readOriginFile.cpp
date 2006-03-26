@@ -81,7 +81,7 @@ readDynamicOrigin(string filename, LBRPoint &originPoint)
 {
     if (!findFile(filename, "origin"))
     {
-        ostringstream errStr;
+        stringstream errStr;
         errStr << "Can't open origin file " << filename << "\n";
         xpExit(errStr.str(), __FILE__, __LINE__);
     }

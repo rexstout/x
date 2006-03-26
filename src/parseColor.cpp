@@ -17,7 +17,7 @@ buildColorMap()
     bool foundFile = findFile(RGBFile, "");
     if (!foundFile)
     {
-        ostringstream errStr;
+        stringstream errStr;
         errStr << "Can't load RGB file " << RGBFile << "\n";
         xpWarn(errStr.str(), __FILE__, __LINE__);
         return;
@@ -86,7 +86,7 @@ parseColor(string color, unsigned char RGB[3])
         {
             if (color.compare(defaultcolor) != 0)
             {
-                ostringstream errStr;
+                stringstream errStr;
                 errStr << "Can't find color " << color << ", using "
                        << defaultcolor << "\n";
                 xpWarn(errStr.str(), __FILE__, __LINE__);

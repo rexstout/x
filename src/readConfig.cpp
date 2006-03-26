@@ -368,7 +368,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         default:
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Unknown keyword in configuration file:\n\t" 
                    << line << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -378,7 +378,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
 
         if (val != DELIMITER && options->Verbosity() > 3)
         {
-            ostringstream msg;
+            stringstream msg;
             msg << "value is " << keyWordString[val - '?'];
             if (returnString != NULL)
                 msg << ", returnString is " << returnString;

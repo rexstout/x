@@ -143,7 +143,7 @@ readArcFile(const char *line, Planet *planet,
 
         if (val != DELIMITER && options->Verbosity() > 3)
         {
-            ostringstream msg;
+            stringstream msg;
             msg << "value is " << keyWordString[val - '?'];
             if (returnString != NULL)
                 msg << ", returnString is " << returnString;
@@ -155,7 +155,7 @@ readArcFile(const char *line, Planet *planet,
 
         if (syntaxError)
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Syntax error in arc file\n"
                    << "line is \"" << line << "\"\n";
             xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -167,7 +167,7 @@ readArcFile(const char *line, Planet *planet,
     
     if (j != 4)
     {
-        ostringstream errStr;
+        stringstream errStr;
         errStr << "Incomplete entry in arc file\n"
                << "line is \"" << line << "\"\n";
         xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -242,7 +242,7 @@ addArcs(PlanetProperties *planetProperties, Planet *planet,
         }
         else
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Can't load arc file " << arcFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }
@@ -277,7 +277,7 @@ addArcs(View *view, multimap<double, Annotation *> &annotationMap)
         }
         else
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Can't load arc file " << arcFile << endl;
             xpWarn(errStr.str(), __FILE__, __LINE__);
         }

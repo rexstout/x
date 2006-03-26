@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(xplanet, 1.0.8)
+AM_INIT_AUTOMAKE(xplanet, 1.0.7)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC

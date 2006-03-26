@@ -30,7 +30,7 @@ loadRGB(Image *&image, const unsigned char *&rgb, string &imageFile,
         if ((image->Width() != imageWidth)
             || (image->Height() != imageHeight))
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Resizing " << name << " map\n"
                    << "For better performance, all image maps should "
                    << "be the same size as the day map\n";
@@ -41,7 +41,7 @@ loadRGB(Image *&image, const unsigned char *&rgb, string &imageFile,
     }
     else
     {
-        ostringstream errStr;
+        stringstream errStr;
         errStr << "Can't load map file " << imageFile << "\n";
         xpWarn(errStr.str(), __FILE__, __LINE__);
     }

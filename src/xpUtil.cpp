@@ -377,11 +377,11 @@ rotateZ(double &X, double &Y, double &Z, const double theta)
   
   Given a point (x, y), compute the area weighting of each pixel.
 
-   --- ---
-  | 0 | 1 |
-   --- ---
-  | 2 | 3 |
-   --- ---
+  --- ---
+ | 0 | 1 |
+  --- ---
+ | 2 | 3 |
+  --- ---
 */
 void
 getWeights(const double t, const double u, double weights[4])
@@ -412,13 +412,7 @@ calcGreatArc(const double lat1, const double lon1,
     const double dlon = lon1 - lon2;
 
     // Arc length between points (in radians)
-    double arg = sin_lat1 * sin_lat2 + cos_lat1 * cos_lat2 * cos(dlon); 
-    if (arg >= 1)
-        dist = 0;
-    else if (arg <= -1)
-        dist = M_PI;
-    else
-        dist = acos(arg);
+    dist = acos(sin_lat1 * sin_lat2 + cos_lat1 * cos_lat2 * cos(dlon));
 
     // True course
     trueCourse = fmod(atan2(sin(dlon) * cos_lat2, 
@@ -526,27 +520,42 @@ convertEncoding(const bool toNative, ICONV_CONST char *inBuf, char *outBuf)
 void
 strftimeUTF8(string &timeString)
 {
-    // This is the input string, with formatting characters
-    char buffer_UTF8[MAX_LINE_LENGTH];
-    memset(buffer_UTF8, 0, MAX_LINE_LENGTH);
-    strncpy(buffer_UTF8, timeString.c_str(), MAX_LINE_LENGTH);
+    string convertedString(timeString);
+    unsigned int convertedStringIndex = 0;
+    for (unsigned int i = 0; i < timeString.size() - 1; i++)
+    {
+        if (timeString[i] == '%')
+        {
+            // hold the output from strftime()
+            char buffer_native[MAX_LINE_LENGTH];
+            memset(buffer_native, 0, MAX_LINE_LENGTH);
 
-    // Convert to native encoding
-    char buffer_native_format[MAX_LINE_LENGTH];
-    memset(buffer_native_format, 0, MAX_LINE_LENGTH);
-    convertEncoding(true, buffer_UTF8, buffer_native_format);
+            // hold the strftime() output after conversion to
+            // UTF-8
+            char buffer_UTF8[MAX_LINE_LENGTH];
+            memset(buffer_UTF8, 0, MAX_LINE_LENGTH);
 
-    // Run it through strftime()
-    char buffer_native[MAX_LINE_LENGTH];
-    Options *options = Options::getInstance();
-    time_t tv_sec = options->getTVSec();
-    strftime(buffer_native, MAX_LINE_LENGTH, 
-             buffer_native_format, 
-             localtime((time_t *) &tv_sec));
+            // format string input to strftime()
+            char buffer_native_format[3];
+            buffer_native_format[0] = '%';
+            buffer_native_format[1] = timeString[i+1];
+            buffer_native_format[2] = '\0';
 
-    // Convert back to UTF8
-    convertEncoding(false, buffer_native, buffer_UTF8);
-    timeString.assign(buffer_UTF8);
+            Options *options = Options::getInstance();
+            time_t tv_sec = options->getTVSec();
+            strftime(buffer_native, MAX_LINE_LENGTH, 
+                     buffer_native_format, 
+                     localtime((time_t *) &tv_sec));
+            convertEncoding(false, buffer_native, buffer_UTF8);
+
+            convertedString.replace(convertedStringIndex, 
+                                  2, buffer_UTF8);
+            convertedStringIndex += (strlen(buffer_UTF8) - 1);
+            i++;
+        }
+        convertedStringIndex++;
+    }
+    timeString.assign(convertedString);
 }
 
 char *

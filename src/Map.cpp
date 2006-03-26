@@ -295,7 +295,7 @@ Map::OverlayClouds(const unsigned char *clouds)
         d.Quality(options->JPEGQuality());
         if (!d.Write(dayFile.c_str()))
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Can't create " << dayFile << "\n";
             xpExit(errStr.str(), __FILE__, __LINE__);
         }
@@ -305,14 +305,14 @@ Map::OverlayClouds(const unsigned char *clouds)
         n.Quality(options->JPEGQuality());
         if (!n.Write(nightFile.c_str()))
         {
-            ostringstream errStr;
+            stringstream errStr;
             errStr << "Can't create " << nightFile << "\n";
             xpExit(errStr.str(), __FILE__, __LINE__);
         }
 
         if (options->Verbosity() > 0)
         {
-            ostringstream msg;
+            stringstream msg;
             msg << "Wrote " << dayFile << " and " << nightFile 
                 << ".\n";
             xpMsg(msg.str(), __FILE__, __LINE__);
@@ -372,7 +372,7 @@ Map::AddShadows(map<double, Planet *> &planetsFromSunMap)
 
         if (options->Verbosity() > 1)
         {
-            ostringstream msg;
+            stringstream msg;
             msg << "separation between " << body_string[p->Index()] 
                 << " and " << body_string[target_->Index()] << " is " 
                 << sep/deg_to_rad << "\n";
@@ -458,8 +458,7 @@ Map::AddShadow(Planet *p, const double sun_size)
                     dayData_[ipos] = (unsigned char) ((1 - covered)
                                                       * dayData_[ipos]
                                                       + covered 
-                                                      * nightData_[ipos]);
-                    ipos++;
+                                                      * nightData_[ipos++]);
                 }
             }
         }
@@ -596,7 +595,7 @@ Map::Reduce(const int factor)
     Options *options = Options::getInstance();
     if (options->Verbosity() > 1)
     {
-        ostringstream msg;
+        stringstream msg;
         msg << "Shrinking map by 2^" << factor << "\n";;
         xpMsg(msg.str(), __FILE__, __LINE__);
     }
