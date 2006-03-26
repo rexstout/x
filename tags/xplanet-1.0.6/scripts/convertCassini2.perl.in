@@ -1,0 +1,44 @@
+#!@PERL@
+
+use strict;
+
+use Math::Trig;
+
+if (@ARGV)
+{
+    open(INFILE, "<$ARGV[0]") || die("Can't open $ARGV[0]\n");
+
+    my $flattening = 0.09796;
+    my $omf2 = ((1 - $flattening) * (1 - $flattening));
+
+    <INFILE>;
+    while (<INFILE>)
+    {
+        my @fields = split(" ", $_);
+        my $year = $fields[0];
+        my $month = $fields[1];
+        my $day = $fields[2];
+        my $hour = $fields[3];
+        my $min = $fields[4];
+        my $sec = $fields[5];
+        my $rad = $fields[6];
+        my $lat = $fields[7];
+        my $lon = $fields[8];
+
+        # convert planetocentric latitude to planetographic
+        $lat = deg2rad($lat);
+        $lat = atan(tan($lat) / $omf2);
+        $lat = rad2deg($lat);
+        
+        printf("%4.4d%2.2d%2.2d.%2.2d%2.2d%2.2d %10.3f %8.3f %8.3f\n",
+               $year, $month, $day, $hour, $min, $sec, $rad/60268, $lat, $lon);
+    }
+}
+else
+{
+    print "Use this perl script with the Cassini/Saturn Ephemeris Generator 1.1 at http://ringmaster.arc.nasa.gov/tools/ephem2_satc.html\n";
+    print "Choose the following columns:\n";
+    print "\tYear, Month, Day, Hour, Minute, Second (UTC)\n";
+    print "\tCassini-Saturn distance (km)\n";
+    print"\tSub-spacecraft planetocentric latitude & rotating longitude (deg)\n";
+}
