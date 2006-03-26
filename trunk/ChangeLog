@@ -1,3 +1,20 @@
+Version 1.1.2 (released 5 Dec 2004)
+
+        * Saturn's rings are now drawn properly when using "magnify" in
+        the config file.
+
+        * Added marker_fontsize as an option in the configuration file.
+
+        * Added the Bonne, Gnomonic, Polyconic, and Tangential Spherical
+        Cube (TSC) projections.
+
+        * Added the -proj_param option.  Note that the -projection option
+	cannot be abbreviated to -proj anymore!
+
+        * Color cloud maps are now allowed.
+
+        * A color may now be specified with -background.
+
 Version 1.1.1 (released 23 Jul 2004)
 
         * Added -north path, -target path, and -path_relative_to options.

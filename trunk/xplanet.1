@@ -37,7 +37,8 @@ option has no effect if -projection is specified.
 .B \-background background_file
 Use background_file as the background image, with the planet to be
 superimposed upon it.  This option is only meaningful with the
-azimuthal, mollweide, orthographic, and peters projections.
+-projection option.  A color may also be supplied (e.g. -background
+"navy blue" or -background 0xff00ff).
 
 .TP
 .B \-base_magnitude magnitude
@@ -108,7 +109,7 @@ specified with -origin (by default, this is the Sun).  The last line
 of the file must be of the form
 .nf
 .sp
-YYYYMMDD.HHMMSS range lat lon [localtime]
+YYYYMMDD.HHMMSS range lat lon localtime
 .sp
 .fi
 For example,
@@ -118,11 +119,11 @@ For example,
 .sp
 .fi
 The specified time is ignored and the current time is used.  The range
-is in planetary radii, and lat and lon are in degrees.  As with
-origin_file, localtime (in hours) is optional, but if present, it will
-be used in place of the longitude.  Only the last line of the file is
-used.  This file may be updated between renderings using a script
-executed with the -prev_command or -post_command options.
+is in planetary radii, and lat and lon are in degrees.  Localtime (in
+hours) is optional, but if present, it will be used in place of the
+longitude.  Only the last line of the file is used.  This file may be
+updated between renderings using a script executed with the
+-prev_command or -post_command options.
 
 .TP
 .B \-ephemeris_file filename
@@ -329,7 +330,7 @@ are relative to the body specified with -origin (by default, this is
 the Sun).  Each line should be of the form
 .nf
 .sp
-YYYYMMDD.HHMMSS range lat lon [localtime]
+YYYYMMDD.HHMMSS range lat lon localtime
 .sp
 .fi
 For example,
@@ -338,13 +339,13 @@ For example,
 19951207.120000     10.328   -3.018   97.709    9.595
 .sp
 .fi
-Range is in planetary radii, and lat and lon are in degrees.  The
-localtime (in hours) is optional, but if supplied, it will be used in
-place of the longitude.  For each line in the origin file, the
-observer is placed at the specified position, relative to the body
-specified with -origin.  This option is useful for showing spacecraft
-flybys or orbiting around a planet.  Any line with a # in the first
-column is ignored.
+Range is in planetary radii, and lat and lon are in degrees.  The date
+is the only required value.  If the localtime (in hours) is supplied,
+it will be used in place of the longitude.  For each line in the
+origin file, the observer is placed at the specified position,
+relative to the body specified with -origin.  This option is useful
+for showing spacecraft flybys or orbiting around a planet.  Any line
+with a # in the first column is ignored.
 
 .TP
 .B \-output filename
@@ -397,6 +398,18 @@ The projection type may be one of ancient, azimuthal, hemisphere,
 lambert, mercator, mollweide, peters, orthographic, or rectangular.
 The default is no projection.  Multiple bodies will not be shown if
 this options is specified, although shadows will still be drawn.
+
+.TP
+.B \-proj_param value
+Pass additional parameters for some projections.  The only projections
+that use this option at present are the Bonne, Gnomonic, and Mercator
+projections.  The Bonne projection is conformal at the specified
+latitude.  Higher values lead to a thinner heart shape.  The default
+is 50 degrees.  The Gnomonic and Mercator projections use the
+specified latitude as the boundaries of the projection.  The defaults
+are 45 and 80 degrees, respectively.  This option may be used more
+than once for future projections that require additional parameters.
+Only the first value is used at present.
 
 .TP
 .B \-quality quality

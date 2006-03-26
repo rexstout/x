@@ -34,7 +34,7 @@ class TextRendererPangoFT2 : public TextRenderer
     PangoContext *context_;
     PangoDirection direction_;
     PangoFontDescription *fontDescription_;
-    PangoFontMap *fontMap_;
+    static PangoFontMap *fontMap_;
     PangoLayout *layout_;
 };
 

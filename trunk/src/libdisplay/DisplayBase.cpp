@@ -11,6 +11,7 @@ using namespace std;
 #include "findFile.h"
 #include "keywords.h"
 #include "Options.h"
+#include "parseColor.h"
 #include "ParseGeom.h"
 #include "PlanetProperties.h"
 #include "xpDefines.h"
@@ -452,26 +453,43 @@ DisplayBase::SetBackground(const int width, const int height,
     string backgroundFile(options->Background());
     if (!backgroundFile.empty())
     {
-        Image *image = new Image;
-        bool foundFile = findFile(backgroundFile, "images");
-        if (foundFile) 
-            foundFile = image->Read(backgroundFile.c_str());
-        
-        if (foundFile)
+        // First check if requesting a color
+        unsigned char color[3];
+        string failed;
+        parseColor(backgroundFile, color, failed);
+        if (failed.empty())
         {
-            if ((image->Width() != width)
-                || (image->Height() != height))
+            int ipos = 0;
+            for (int i = 0; i < width * height; i++)
             {
-                ostringstream errStr;
-                errStr << "For better performance, "
-                       << "background image should "
-                       << "be the same size as the output image\n";
-                xpWarn(errStr.str(), __FILE__, __LINE__);
-                image->Resize(width, height);
+                for (int j = 0; j < 3; j++)
+                    memcpy(rgb + ipos++, &color[j], 1);
             }
-            memcpy(rgb, image->getRGBData(), 3 * width * height);
         }
-        delete image;
+        else
+        {
+            // look for an image file
+            Image *image = new Image;
+            bool foundFile = findFile(backgroundFile, "images");
+            if (foundFile) 
+                foundFile = image->Read(backgroundFile.c_str());
+            
+            if (foundFile)
+            {
+                if ((image->Width() != width)
+                    || (image->Height() != height))
+                {
+                    ostringstream errStr;
+                    errStr << "For better performance, "
+                           << "background image should "
+                           << "be the same size as the output image\n";
+                    xpWarn(errStr.str(), __FILE__, __LINE__);
+                    image->Resize(width, height);
+                }
+                memcpy(rgb, image->getRGBData(), 3 * width * height);
+            }
+            delete image;
+        }
     }
     else
     {

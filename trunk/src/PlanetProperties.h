@@ -47,6 +47,9 @@ class PlanetProperties
     const std::string & MarkerFont() const { return(markerFont_); };
     void MarkerFont(const std::string &font) { markerFont_ = font; };
 
+    int MarkerFontSize() const { return(markerFontSize_); };
+    void MarkerFontSize(const int fontsize) { markerFontSize_ = fontsize; };
+
     const unsigned char * OrbitColor() const { return(orbitColor_); };
     void OrbitColor(unsigned char color[3]) { memcpy(orbitColor_, color, 3); };
     const unsigned char * TextColor() const { return(textColor_); };
@@ -152,6 +155,7 @@ class PlanetProperties
 
     unsigned char markerColor_[3];
     std::string markerFont_;
+    int markerFontSize_;
     std::vector<std::string> markerFiles_;
 
     double minRadiusForLabel_, maxRadiusForLabel_;

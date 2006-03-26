@@ -22,6 +22,7 @@ PlanetProperties::PlanetProperties(const body index)
       mapBounds_(false), 
       mapUlx_(0), mapUly_(0), mapLrx_(0), mapLry_(0),
       markerFont_(""),
+      markerFontSize_(-1),
       minRadiusForLabel_(.01),
       maxRadiusForLabel_(3.0),
       minRadiusForMarkers_(40.0), 
@@ -105,6 +106,7 @@ PlanetProperties::operator= (const PlanetProperties &p)
     mapLrx_ = p.mapLrx_;
 
     markerFont_ = p.markerFont_;
+    markerFontSize_ = p.markerFontSize_;
 
     minRadiusForLabel_ = p.minRadiusForLabel_;
     maxRadiusForLabel_ = p.maxRadiusForLabel_;

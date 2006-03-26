@@ -30,14 +30,12 @@ extern "C" {
 #include "keywords.h"
 #include "findBodyXYZ.h"
 #include "Options.h"
+#include "parseColor.h"
 #include "PlanetProperties.h"
 
 #include "libannotate/libannotate.h"
 #include "libplanet/Planet.h"
 #include "libprojection/libprojection.h"
-
-extern void 
-parseColor(string color, unsigned char RGB[3]);
 
 extern void
 printVersion();
@@ -229,6 +227,7 @@ Options::parseArgs(int argc, char **argv)
             {"prev_command",   required_argument, NULL, PREV_COMMAND},
             {"print_ephemeris",no_argument,       NULL, EPHEMERIS},
             {"projection",     required_argument, NULL, PROJECTION},
+            {"proj_param",     required_argument, NULL, PROJECTIONPARAMETER},
             {"quality",        required_argument, NULL, QUALITY},
             {"radius",         required_argument, NULL, RADIUS},
             {"random",         no_argument,       NULL, RANDOM},
@@ -643,6 +642,13 @@ Options::parseArgs(int argc, char **argv)
         case PROJECTION:
             projectionMode_ = getProjectionType(optarg);
             break;
+        case PROJECTIONPARAMETER:
+        {
+            double d;
+            sscanf(optarg, "%lf", &d);
+            projectionParameters_.push_back(d * deg_to_rad);
+        }
+        break;
         case QUALITY:
             sscanf(optarg, "%d", &quality_);
             if (quality_ < 0) quality_ = 0;

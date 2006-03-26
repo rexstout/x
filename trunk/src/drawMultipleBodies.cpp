@@ -376,7 +376,11 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
             // Draw the far side of Saturn's rings
             if (current_planet->Index() == SATURN) 
             {
-                ring = new Ring(inner_radius, outer_radius, saturn_radius, 
+		const double r_in = (currentProperties->Magnify() 
+				     * inner_radius/saturn_radius);
+		const double r_out = (currentProperties->Magnify() 
+				     * outer_radius/saturn_radius);
+		ring = new Ring(r_in, r_out, 
                                 ring_brightness, LIT, ring_transparency, 
                                 TRANSP, sLon, sLat,
                                 currentProperties->Shade(), 

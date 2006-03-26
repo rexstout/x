@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstring>
+#include <sstream>
 #include <vector>
 using namespace std;
 
@@ -9,27 +10,45 @@ using namespace std;
 #include "ProjectionBase.h"
 #include "ProjectionAncient.h"
 #include "ProjectionAzimuthal.h"
+#include "ProjectionBonne.h"
+#include "ProjectionGnomonic.h"
 #include "ProjectionHemisphere.h"
 #include "ProjectionLambert.h"
 #include "ProjectionMercator.h"
 #include "ProjectionMollweide.h"
 #include "ProjectionOrthographic.h"
 #include "ProjectionPeters.h"
+#include "ProjectionPolyconic.h"
 #include "ProjectionRectangular.h"
+#include "ProjectionTSC.h"
+
+static vector<int> projectionTypes;
+
+static void
+setProjectionTypes()
+{
+    if (projectionTypes.empty())
+    {
+        projectionTypes.push_back(ANCIENT);
+        projectionTypes.push_back(AZIMUTHAL);
+        projectionTypes.push_back(BONNE);
+        projectionTypes.push_back(GNOMONIC);
+        projectionTypes.push_back(HEMISPHERE);
+        projectionTypes.push_back(LAMBERT);
+        projectionTypes.push_back(MERCATOR);
+        projectionTypes.push_back(MOLLWEIDE);
+        projectionTypes.push_back(ORTHOGRAPHIC);
+        projectionTypes.push_back(PETERS);
+        projectionTypes.push_back(POLYCONIC);
+        projectionTypes.push_back(RECTANGULAR);
+        projectionTypes.push_back(TSC);
+    }
+}
 
 int
 getRandomProjection()
 {
-    vector<int> projectionTypes;
-    projectionTypes.push_back(ANCIENT);
-    projectionTypes.push_back(AZIMUTHAL);
-    projectionTypes.push_back(HEMISPHERE);
-    projectionTypes.push_back(LAMBERT);
-    projectionTypes.push_back(MERCATOR);
-    projectionTypes.push_back(MOLLWEIDE);
-    projectionTypes.push_back(ORTHOGRAPHIC);
-    projectionTypes.push_back(PETERS);
-    projectionTypes.push_back(RECTANGULAR);
+    setProjectionTypes();
     int index = static_cast<int> (random() % projectionTypes.size());
     return(projectionTypes[index]);
 }
@@ -46,6 +65,10 @@ getProjectionType(char *proj_string)
         projection = ANCIENT;
     else if (strncmp(lowercase, "azimuthal", 2) == 0)
         projection = AZIMUTHAL;
+    else if (strncmp(lowercase, "bonne", 1) == 0)
+        projection = BONNE;
+    else if (strncmp(lowercase, "gnomonic", 1) == 0)
+        projection = GNOMONIC;
     else if (strncmp(lowercase, "hemisphere", 1) == 0)
         projection = HEMISPHERE;
     else if (strncmp(lowercase, "lambert", 1) == 0)
@@ -56,17 +79,27 @@ getProjectionType(char *proj_string)
         projection = MOLLWEIDE;
     else if (strncmp(lowercase, "orthographic", 1) == 0)
         projection = ORTHOGRAPHIC;
-    else if (strncmp(lowercase, "peters", 1) == 0)
+    else if (strncmp(lowercase, "peters", 2) == 0)
         projection = PETERS;
+    else if (strncmp(lowercase, "polyconic", 2) == 0)
+        projection = POLYCONIC;
     else if (strncmp(lowercase, "random", 2) == 0)
         projection = RANDOM;
     else if (strncmp(lowercase, "rectangular", 2) == 0)
         projection = RECTANGULAR;
+    else if (strncmp(lowercase, "tsc", 1) == 0)
+        projection = TSC;
     else 
     {
-        xpWarn("Unknown projection, using rectangular\n", 
-               __FILE__, __LINE__);
-        projection = RECTANGULAR;
+        setProjectionTypes();
+
+        ostringstream errMsg;
+        errMsg << "Unknown projection \"" << lowercase <<  "\"."
+               << "  Valid projections are:\n";
+
+        for (unsigned int i = 0; i < projectionTypes.size(); i++)
+            errMsg << "\t" << keyWordString[projectionTypes[i]-'?'] << "\n";
+        xpExit(errMsg.str(), __FILE__, __LINE__);
     }
     return(projection);
 }
@@ -83,6 +116,12 @@ getProjection(const int projection, const int flipped,
         break;
     case AZIMUTHAL:
         thisProjection = new ProjectionAzimuthal(flipped, width, height);
+        break;
+    case BONNE:
+        thisProjection = new ProjectionBonne(flipped, width, height);
+        break;
+    case GNOMONIC:
+        thisProjection = new ProjectionGnomonic(flipped, width, height);
         break;
     case HEMISPHERE:
         thisProjection = new ProjectionHemisphere(flipped, width, height);
@@ -102,8 +141,14 @@ getProjection(const int projection, const int flipped,
     case PETERS:
         thisProjection = new ProjectionPeters(flipped, width, height);
         break;
+    case POLYCONIC:
+        thisProjection = new ProjectionPolyconic(flipped, width, height);
+        break;
     case RECTANGULAR:
         thisProjection = new ProjectionRectangular(flipped, width, height);
+        break;
+    case TSC:
+        thisProjection = new ProjectionTSC(flipped, width, height);
         break;
     default:
         xpWarn("getProjection: Unknown projection type specified\n",

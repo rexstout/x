@@ -11,6 +11,9 @@ class ProjectionMercator : public ProjectionBase
 			  double &lon, double &lat);
 
     bool sphericalToPixel(double lon, double lat, double &x, double &y) const;
+
+ private:
+    double yScale_;
 };
 
 #endif

@@ -3,6 +3,11 @@ The config file is divided into sections which start with a line like
 which should be at the top, applies to all bodies unless overridden
 later), or a body name like saturn.
 
+Be careful to specify options that apply to only one planet under that
+planet's section, and not under [default].  For example, a common
+mistake is to put cloud_map=clouds.jpg under [default] and not under
+[earth].  Overlaying clouds on every planet is a huge waste of time!
+
 I won't explain the format of the config file beyond that; instead
 just look at the default supplied with xplanet.  It should be
 straightforward.  When making your own config file just modify a copy
@@ -102,9 +107,14 @@ marker file.  See the README and sample files in the xplanet/markers
 directory for more information.
 
 marker_font
-Specify the default font for all markers.  This option may be
-overridden inside the marker file.  The default is blank (use the
-value from the command line -font option).
+Specify the default font for all markers for this body.  This option
+may be overridden inside the marker file.  The default is to use the
+value from the command line -font option.
+
+marker_fontsize
+Specify the default font size for all markers for this body.  This
+option may be overridden inside the marker file.  The default is to
+use the value from the command line -fontsize option.
 
 max_radius_for_label
 Don't draw a label for the body if its radius is greater than this

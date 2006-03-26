@@ -5,10 +5,8 @@
 using namespace std;
 
 #include "keywords.h"
+#include "parseColor.h"
 #include "xpUtil.h"
-
-extern void 
-parseColor(string color, unsigned char RGB[3]);
 
 bool
 isDelimiter(char c)
@@ -182,6 +180,8 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = MARKER_FILE;
     else if (getValue(line, i, "marker_font=", returnString))
         returnVal = MARKER_FONT;
+    else if (getValue(line, i, "marker_fontsize=", returnString))
+        returnVal = MARKER_FONTSIZE;
     else if (getValue(line, i, "map=", returnString))
         returnVal = DAY_MAP;
     else if (getValue(line, i, "max_radius_for_label=", returnString))

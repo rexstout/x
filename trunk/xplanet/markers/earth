@@ -59,7 +59,7 @@
  33.50   36.32 "Damascus"                       timezone=Asia/Damascus          # Syria
  -6.85   39.30 "Dar es Salaam"                  timezone=Africa/Dar_es_Salaam   # Tanzania
 -12.38  130.73 "Darwin"                         timezone=Australia/Darwin       # Australia
- 22.67   77.22 "Delhi"                          timezone=Asia/Calcutta          # India
+ 28.67   77.22 "Delhi"                          timezone=Asia/Calcutta          # India
  39.73 -104.98 "Denver"                         timezone=America/Denver         # USA
  23.72   90.37 "Dhaka"                          timezone=Asia/Dhaka             # Bangladesh
 -27.12 -109.37 "Easter Island"                  timezone=Pacific/Easter         # Chile

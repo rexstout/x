@@ -7,7 +7,6 @@ class Ring
 {
  public:
     Ring(const double inner_radius, const double outer_radius, 
-         const double planet_radius, 
          const double *ring_brightness, const int num_bright,
          const double *ring_transparency, const int num_trans,
          const double sunlon, const double sunlat,
