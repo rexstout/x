@@ -892,16 +892,23 @@ Planet::~Planet()
 double
 Planet::Radius(const double lat) const
 {
-    double tmpLat = lat;
-    double tmpLon = 0;
-    PlanetographicToPlanetocentric(tmpLat, tmpLon);
+    double returnValue = 1;
+    if (index_ == JUPITER ||
+        index_ == SATURN)
+    {
+        double tmpLat = lat;
+        double tmpLon = 0;
+        PlanetographicToPlanetocentric(tmpLat, tmpLon);
+        
+        const double ReSinLat = radiusEq_  * sin(tmpLat);
+        const double RpCosLat = radiusPol_ * cos(tmpLat);
+        
+        // from http://mathworld.wolfram.com/Ellipse.html
+        returnValue = radiusPol_ / sqrt(RpCosLat * RpCosLat 
+                                        + ReSinLat * ReSinLat);
+    }
 
-    const double ReSinLat = radiusEq_  * sin(tmpLat);
-    const double RpCosLat = radiusPol_ * cos(tmpLat);
-
-    // from http://mathworld.wolfram.com/Ellipse.html
-    return(radiusPol_ / sqrt(RpCosLat * RpCosLat 
-                            + ReSinLat * ReSinLat));
+    return(returnValue);
 }
 
 // Compute heliocentric equatorial coordinates of the planet

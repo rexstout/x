@@ -96,6 +96,8 @@ class Options
     const std::string & PrevCommand() const { return(prev_command_); };
     bool PrintEphemeris() const { return(printEphemeris_); };
     int Projection() const       { return(projection_); };
+    void Projection(const int p)     { projection_ = p; };
+    int ProjectionMode() const       { return(projectionMode_); };
 
     double Radius() const        { return(radius_); };
     void Radius(const double r)  { radius_ = r; };
@@ -227,7 +229,8 @@ class Options
     std::string prev_command_;    // command to run before xplanet renders
     body primary_;
     bool printEphemeris_;
-    int projection_;     // type of map projection
+    int projection_;         // type of map projection
+    int projectionMode_;         // type of map projection
 
     int quality_;        // For JPEG images
 

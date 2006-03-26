@@ -85,6 +85,9 @@ buildPlanetMap(const double jd,
     }
     if (options->PrintEphemeris())
     {
+        const double dist = sqrt(oX*oX + oY*oY + oZ*oZ);
+        printf("%10s: %12.4f %13.9f %13.9f %13.9f %13.9f\n", 
+               "origin", jd, oX, oY, oZ, dist);
         exit(EXIT_SUCCESS);
     }
 

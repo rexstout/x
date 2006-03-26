@@ -104,6 +104,11 @@ drawProjection(DisplayBase *display, Planet *target,
 
     ProjectionBase *projection = NULL;
 
+    if (options->ProjectionMode() == RANDOM)
+        options->Projection(getRandomProjection());
+    else
+        options->Projection(options->ProjectionMode());
+
     if (options->Projection() == RECTANGULAR
         && planetProperties->MapBounds())
     {
@@ -134,7 +139,7 @@ drawProjection(DisplayBase *display, Planet *target,
                 annotationMap);
 
     if (planetProperties->DrawMarkers())
-        addMarkers(planetProperties, target, 0, 0, 0, 
+        addMarkers(planetProperties, target, 0, 0, 0, 0, 
                    NULL, projection, width, height, 
                    planetsFromSunMap, annotationMap);
 
@@ -180,7 +185,7 @@ drawProjection(DisplayBase *display, Planet *target,
             {
                 double X, Y, Z;
                 if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, 
-				     NULL, projection)) 
+                                     NULL, projection)) 
                     display->setPixel(X, Y, color);
             }
         }
@@ -191,7 +196,7 @@ drawProjection(DisplayBase *display, Planet *target,
             {
                 double X, Y, Z;
                 if (sphericalToPixel(lat, lon, 1, X, Y, Z, target, 
-				     NULL, projection)) 
+                                     NULL, projection)) 
                     display->setPixel(X, Y, color);
             }
         }

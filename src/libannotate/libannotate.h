@@ -21,8 +21,8 @@ addArcs(View *view, multimap<double, Annotation *> &annotationMap);
 
 extern void
 addArcs(PlanetProperties *planetProperties, Planet *planet, 
-	View *view, ProjectionBase *projection, 
-	multimap<double, Annotation *> &annotationMap);
+        View *view, ProjectionBase *projection, 
+        multimap<double, Annotation *> &annotationMap);
 
 extern void
 addMarkers(View *view, const int width, const int height, 
@@ -30,21 +30,22 @@ addMarkers(View *view, const int width, const int height,
            multimap<double, Annotation *> &annotationMap);
 
 extern void
-addMarkers(PlanetProperties *planetProperties, Planet *planet, 
-	   const double X, const double Y, const double Z,
-	   View *view, ProjectionBase *projection, 
-	   const int width, const int height, 
-	   map<double, Planet *> &planetsFromSunMap, 
-	   std::multimap<double, Annotation *> &annotationMap);
+addMarkers(PlanetProperties *planetProperties, Planet *planet,
+           const double pR, 
+           const double X, const double Y, const double Z,
+           View *view, ProjectionBase *projection, 
+           const int width, const int height, 
+           map<double, Planet *> &planetsFromSunMap, 
+           std::multimap<double, Annotation *> &annotationMap);
 
 extern bool
 calculateSatellitePosition(time_t tv_sec, const int id,
-			   double &lat, double &lon, double &rad);
+                           double &lat, double &lon, double &rad);
 
 extern void
 addSatellites(PlanetProperties *planetProperties, Planet *planet, 
-	      View *view, ProjectionBase *projection, 
-	      std::multimap<double, Annotation *> &annotationMap);
+              View *view, ProjectionBase *projection, 
+              std::multimap<double, Annotation *> &annotationMap);
 
 extern void
 loadSatelliteVector(PlanetProperties *planetProperties);
@@ -53,8 +54,8 @@ loadSatelliteVector(PlanetProperties *planetProperties);
 
 extern void 
 addSpiceObjects(map<double, Planet *> &planetsFromSunMap,
-		View *view, ProjectionBase *projection,
-		multimap<double, Annotation *> &annotationMap);
+                View *view, ProjectionBase *projection,
+                multimap<double, Annotation *> &annotationMap);
 
 extern void
 loadSpiceKernels();
@@ -62,7 +63,7 @@ loadSpiceKernels();
 extern bool
 calculateSpicePosition(double jd, 
                        const int naifInt, Planet *relative,
-		       const int relativeInt,
+                       const int relativeInt,
                        double &X, double &Y, double &Z);
 
 #endif

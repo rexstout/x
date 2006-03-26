@@ -262,8 +262,8 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                         annotationMap);
             
             if (currentProperties->DrawMarkers())
-                addMarkers(currentProperties, current_planet, X, Y, Z, 
-                           view, NULL, width, height, 
+                addMarkers(currentProperties, current_planet, pixel_radius,
+                           X, Y, Z, view, NULL, width, height, 
                            planetsFromSunMap, annotationMap);
             
             if (currentProperties->DrawSatellites())
