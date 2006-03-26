@@ -86,8 +86,8 @@ moon(const double jd, double &X, double &Y, double &Z)
     // Convert to radians
     for (int i = 0; i < 8; i++)
     {
-	plon[i][0] *= sec_to_rad;
-	plon[i][1] *= sec_to_rad;
+        plon[i][0] *= sec_to_rad;
+        plon[i][1] *= sec_to_rad;
     }
 
     // Corrections of the constants (fit to DE200/LE200)
@@ -101,12 +101,12 @@ moon(const double jd, double &X, double &Y, double &Z)
     double del[4][5];
     for (int i = 0; i < 5; i++)
     {
-	del[0][i] = w[0][i] - T[i];
-	del[1][i] = T[i] - omega[i];
-	del[2][i] = w[0][i] - w[1][i];
-	del[3][i] = w[0][i] - w[2][i];
-	for (int j = 0; j < 4; j++) 
-	    del[j][i] *= sec_to_rad;
+        del[0][i] = w[0][i] - T[i];
+        del[1][i] = T[i] - omega[i];
+        del[2][i] = w[0][i] - w[1][i];
+        del[3][i] = w[0][i] - w[2][i];
+        for (int j = 0; j < 4; j++) 
+            del[j][i] *= sec_to_rad;
     }
     del[0][0] += M_PI;
 
@@ -143,152 +143,152 @@ moon(const double jd, double &X, double &Y, double &Z)
     // Main problem
     for (int i = 1; i < 4; i++)
     {
-	int iv = ((i - 1) % 3);
+        int iv = ((i - 1) % 3);
 
-	const int *ilu = ILU[i-1];
-	const double *p_coef = COEF[i-1];
+        const int *ilu = ILU[i-1];
+        const double *p_coef = COEF[i-1];
 
-	for (int ii = 0; ii < NUM[i-1]; ii++)
-	{
-	    if (ii > 0) 
-	    {
-		ilu += 4;
-		p_coef += 7;
-	    }
+        for (int ii = 0; ii < NUM[i-1]; ii++)
+        {
+            if (ii > 0) 
+            {
+                ilu += 4;
+                p_coef += 7;
+            }
 
-	    double coef[7];
-	    for (int j = 0; j < 7; j++)
-		coef[j] = p_coef[j];
+            double coef[7];
+            for (int j = 0; j < 7; j++)
+                coef[j] = p_coef[j];
 
-	    double x = coef[0];
+            double x = coef[0];
 
-	    double tgv = coef[1] + dtasm * coef[5];
+            double tgv = coef[1] + dtasm * coef[5];
 
-	    if (i == 3) 
-		coef[0] -= 2 * coef[0] * delnu / 3;
+            if (i == 3) 
+                coef[0] -= 2 * coef[0] * delnu / 3;
 
-	    x = (coef[0] + tgv * (delnp - am * delnu) 
-		 + coef[2] * delg + coef[3] * dele 
-		 + coef[4] * delep);
-	    double y = 0;
+            x = (coef[0] + tgv * (delnp - am * delnu) 
+                 + coef[2] * delg + coef[3] * dele 
+                 + coef[4] * delep);
+            double y = 0;
 
-	    for (int k = 0; k < 5; k++)
-	    {
-		for (int j = 0; j < 4; j++)
-		{
-		    y += ilu[j] * del[j][k] * t[k];
-		}
-	    }
+            for (int k = 0; k < 5; k++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    y += ilu[j] * del[j][k] * t[k];
+                }
+            }
 
-	    if (i == 3)	y += M_PI_2;
-	    y = fmod(y, 2 * M_PI);
+            if (i == 3) y += M_PI_2;
+            y = fmod(y, 2 * M_PI);
 
-	    R[iv] += x * sin(y);
+            R[iv] += x * sin(y);
 
-	}
+        }
     }
 
     // Figures - Tides - Relativity - Solar eccentricity
     for (int i = 4; i < 37; i++)
     {
-	if (i > 9 && i < 22) continue;
-	int iv = ((i - 1) % 3);
+        if (i > 9 && i < 22) continue;
+        int iv = ((i - 1) % 3);
 
-	const int *ilu = ILU[i-1];
-	const int *p_iz = IZ[i-1];
-	const double *p_pha = PHA[i-1];
-	const double *p_x = XX[i-1];
+        const int *ilu = ILU[i-1];
+        const int *p_iz = IZ[i-1];
+        const double *p_pha = PHA[i-1];
+        const double *p_x = XX[i-1];
 
-	for (int ii = 0; ii < NUM[i-1]; ii++)
-	{
-	    if (ii > 0)
-	    {
-		ilu += 4;
-		p_iz++;
-		p_pha++;
-		p_x++;
-	    }
-	    
-	    int iz = *p_iz;
-	    double pha = *p_pha;
-	    double x = *p_x;
+        for (int ii = 0; ii < NUM[i-1]; ii++)
+        {
+            if (ii > 0)
+            {
+                ilu += 4;
+                p_iz++;
+                p_pha++;
+                p_x++;
+            }
+            
+            int iz = *p_iz;
+            double pha = *p_pha;
+            double x = *p_x;
 
-	    if ((i > 6 && i < 10) || (i > 24 && i < 28)) x *= t[1];
-	    if (i > 33 && i < 37) x *= t[2];
+            if ((i > 6 && i < 10) || (i > 24 && i < 28)) x *= t[1];
+            if (i > 33 && i < 37) x *= t[2];
 
-	    double y = pha * deg_to_rad;
+            double y = pha * deg_to_rad;
 
-	    for (int k = 0; k < 2; k++)
-	    {
-		y += iz * zeta[k] * t[k];
-		for (int l = 0; l < 4; l++)
-		{
-		    y += ilu[l] * del[l][k] * t[k];
-		}
-	    }
-	    y = fmod(y, 2*M_PI);
-	    R[iv] += x * sin(y);
-	}
+            for (int k = 0; k < 2; k++)
+            {
+                y += iz * zeta[k] * t[k];
+                for (int l = 0; l < 4; l++)
+                {
+                    y += ilu[l] * del[l][k] * t[k];
+                }
+            }
+            y = fmod(y, 2*M_PI);
+            R[iv] += x * sin(y);
+        }
     }
 
     // Planetary perturbations
     for (int i = 10; i < 22; i++)
     {
-	int iv = ((i - 1) % 3);
+        int iv = ((i - 1) % 3);
 
-	const int *ipla = IPLA[i-1];
-	const double *p_pha = PHA[i-1];
-	const double *p_x = XX[i-1];
+        const int *ipla = IPLA[i-1];
+        const double *p_pha = PHA[i-1];
+        const double *p_x = XX[i-1];
 
-	for (int ii = 0; ii < NUM[i-1]; ii++)
-	{
-	    if (ii > 0)
-	    {
-		ipla += 11;
-		p_pha++;
-		p_x++;
-	    }
+        for (int ii = 0; ii < NUM[i-1]; ii++)
+        {
+            if (ii > 0)
+            {
+                ipla += 11;
+                p_pha++;
+                p_x++;
+            }
 
-	    double pha = *p_pha;
-	    double x = *p_x;
+            double pha = *p_pha;
+            double x = *p_x;
 
-	    if ((i > 12 && i < 16) || (i > 18 && i < 22)) x *= t[1];
+            if ((i > 12 && i < 16) || (i > 18 && i < 22)) x *= t[1];
 
-	    double y = pha * deg_to_rad;
+            double y = pha * deg_to_rad;
 
-	    if (i < 16)
-	    {
-		for (int k = 0; k < 2; k++)
-		{
-		    y += (ipla[8] * del[0][k] + ipla[9] * del[2][k] 
-			  + ipla[10] * del[3][k]) * t[k];
-		    for (int l = 0; l < 8; l++)
-		    {
-			y += ipla[l] * plon[l][k] * t[k];
-		    }
-		}
-	    }
-	    else
-	    {
-		for (int k = 0; k < 2; k++)
-		{
-		    for (int l = 0; l < 4; l++)
-			y += ipla[l+7] * del[l][k] * t[k];
-		    for (int l = 0; l < 7; l++)
-		    {
-			y += ipla[l] * plon[l][k] * t[k];
-		    }
-		}
-	    }
+            if (i < 16)
+            {
+                for (int k = 0; k < 2; k++)
+                {
+                    y += (ipla[8] * del[0][k] + ipla[9] * del[2][k] 
+                          + ipla[10] * del[3][k]) * t[k];
+                    for (int l = 0; l < 8; l++)
+                    {
+                        y += ipla[l] * plon[l][k] * t[k];
+                    }
+                }
+            }
+            else
+            {
+                for (int k = 0; k < 2; k++)
+                {
+                    for (int l = 0; l < 4; l++)
+                        y += ipla[l+7] * del[l][k] * t[k];
+                    for (int l = 0; l < 7; l++)
+                    {
+                        y += ipla[l] * plon[l][k] * t[k];
+                    }
+                }
+            }
 
-	    y = fmod(y, 2*M_PI);
-	    R[iv] += x * sin(y);
-	}
+            y = fmod(y, 2*M_PI);
+            R[iv] += x * sin(y);
+        }
     }
 
     // Change of coordinates
     for (int i = 0; i < 5; i++)
-	R[0] += w[0][i] * t[i];
+        R[0] += w[0][i] * t[i];
     R[0] *= sec_to_rad;
     R[1] *= sec_to_rad;
     R[2] *= a0/ath;
@@ -302,8 +302,8 @@ moon(const double jd, double &X, double &Y, double &Z)
     double qw = 0;
     for (int i = 0; i < 5; i++)
     {
-	pw += p[i] * t[i];
-	qw += q[i] * t[i];
+        pw += p[i] * t[i];
+        qw += q[i] * t[i];
     }
 
     pw *= t[1];

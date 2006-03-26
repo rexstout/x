@@ -34,12 +34,14 @@ class Options
     bool DrawUTCLabel() const { return(drawUTCLabel_); };
     const std::string & DynamicOrigin() const { return(dynamicOrigin_); };
     
+    double FieldOfView() const           { return(fov_); };
+    void FieldOfView(const double f)     { fov_ = f; };
+
     const std::string & Font() const { return(font_); };
     int FontSize() const { return(fontSize_); };
 
+    bool Fork() const { return(fork_); };
     int FOVMode() const          { return(fovMode_); };
-    double FieldOfView() const           { return(fov_); };
-    void FieldOfView(const double f)     { fov_ = f; };
 
     void setCenterX(const double x)    { center_x = x; };
     void setCenterY(const double y)    { center_y = y; };
@@ -184,6 +186,7 @@ class Options
 
     std::string font_;
     int fontSize_;
+    bool fork_;
     double fov_;          // field of view
     int fovMode_;
 

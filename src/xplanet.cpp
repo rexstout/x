@@ -21,6 +21,7 @@ using namespace std;
 #include "libannotate/libannotate.h"
 #include "libdisplay/libdisplay.h"
 #include "libdisplay/libtimer.h"
+#include "libephemeris/ephemerisWrapper.h"
 #include "libplanet/Planet.h"
 
 extern void
@@ -61,6 +62,35 @@ main(int argc, char **argv)
 
     Options *options = Options::getInstance();
     options->parseArgs(argc, argv);
+
+    if (options->Fork())
+    {
+        pid_t pid = fork();
+        switch (pid)
+        {
+        case 0:
+            // This is the child process
+            close(STDIN_FILENO);
+            close(STDOUT_FILENO);
+            close(STDERR_FILENO);
+            setsid();
+            break;
+        case -1:
+            xpExit("fork() failed!\n", __FILE__, __LINE__);
+            break;
+        default:
+            // This is the parent process
+            if (options->Verbosity() > 1)
+            {
+                ostringstream msg;
+                msg << "Forked child process, PID is " << pid << "\n";
+                xpMsg(msg.str(), __FILE__, __LINE__);
+            }
+            return(EXIT_SUCCESS);
+        }
+    }
+
+    setUpEphemeris();
 
     PlanetProperties *planetProperties[RANDOM_BODY];
     for (int i = 0; i < RANDOM_BODY; i++)
@@ -283,6 +313,8 @@ main(int argc, char **argv)
     delete timer;
 
     for (int i = 0; i < RANDOM_BODY; i++) delete planetProperties[i];
+
+    cleanUpEphemeris();
 
     return(EXIT_SUCCESS);
 }

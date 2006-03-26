@@ -474,7 +474,7 @@ DisplayBase::SetBackground(const int width, const int height,
     }
     else
     {
-        if (options->Projection() != MULTIPLE)
+        if (options->ProjectionMode() != MULTIPLE)
         {
             // add random stars
             int numStars = static_cast<int> (width * height 
@@ -537,6 +537,7 @@ void
 DisplayBase::PlaceImageOnRoot()
 {
     Options *options = Options::getInstance();
+    if (!options->GeometrySelected()) return;
 
     const int area = fullWidth_ * fullHeight_;
     unsigned char *tmp = new unsigned char [ 3 * area ];

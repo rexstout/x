@@ -1,3 +1,10 @@
+Version 1.1.0 (released 20 Jun 2004)
+
+	* Added the -fork option.
+
+	* Fixed a bug where stars were not drawn when using the -proj
+	option. 
+
 Version 1.0.8 (released 23 May 2004)
 
 	* Fixed a bug where eclipse shadows were not drawn properly. 

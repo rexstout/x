@@ -15,7 +15,7 @@ void
 plusat(const double jd, double &X, double &Y, double &Z)
 {
     double td = jd - 2445000.5;                      // Julian days from
-					             // reference date
+                                                     // reference date
     const double a = 19130 / AU_to_km;               // semimajor axis (km)
     
     const double n = 360 / 6.38723;                  // mean motion (degrees/day)

@@ -14,7 +14,10 @@ Ring::Ring(const double inner_radius, const double outer_radius,
            const double *ring_transparency, const int num_trans,
            const double sunlon, const double sunlat,
            const double shade, 
-           Planet *p) : planet_(p), shade_(shade)
+           Planet *p) : planet_(p), 
+			shade_(shade), 
+			sunLon_(sunlon), 
+			sunLat_(sunlat)
 {
     r_out = outer_radius/planet_radius;
     dr_b = (outer_radius - inner_radius) / (num_bright * planet_radius);
@@ -44,7 +47,7 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     for (int i = 0; i < innerPadding; i++)
         brightness[outerPadding + num_bright + i] = ring_brightness[num_bright-1];
 
-    const double cos_sun_lat = cos(sunlat);
+    const double cos_sun_lat = cos(sunLat_);
     for (int i = 0; i < num_b; i++)
         brightness[i] *= cos_sun_lat;
 
@@ -72,15 +75,6 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     }
 
     planet_->XYZToPlanetaryXYZ(0, 0, 0, sunX_, sunY_, sunZ_);
-
-    sun_lon = sunlon;
-    sun_lat = sunlat;
-
-    ellipseCoeffC_ = sunZ_ / (1 - planet_->Flattening());
-    ellipseCoeffC_ *= ellipseCoeffC_;
-    ellipseCoeffC_ += sunY_ * sunY_;
-    ellipseCoeffC_ += sunX_ * sunX_;
-    ellipseCoeffC_ -= 1;
 }
 
 Ring::~Ring()
@@ -102,7 +96,7 @@ Ring::getShadowRadius(double lat, double lon)
 {
     // If this point is on the same side of the rings as the sun,
     // there's no shadow.
-    if(sun_lat * lat >= 0) return(-1);
+    if(sunLat_ * lat >= 0) return(-1);
 
     const double rad = planet_->Radius(lat);
     planet_->PlanetographicToPlanetocentric(lat, lon);
@@ -150,7 +144,7 @@ double
 Ring::getValue(const double *array, const int size, const int window,
                const double dr, const double r)
 {
-    int i = (int) ((r_out - r)/dr);
+    int i = static_cast<int> ((r_out - r)/dr);
 
     if (i < 0 || i >= size) return(-1.0);
 
@@ -170,8 +164,8 @@ double
 Ring::getValue(const double *array, const int size, const int window,
                const double dr, const double r, const double lon)
 {
-    double cos_lon = cos(lon-sun_lon);
-    if (cos_lon > -0.45) return(getValue(array, size, window, dr, r));
+    if (cos(lon-sunLon_) > -0.45) 
+	return(getValue(array, size, window, dr, r));
     
     int i = static_cast<int> ((r_out - r)/dr);
 
@@ -179,18 +173,18 @@ Ring::getValue(const double *array, const int size, const int window,
 
     int j1 = i - window;
     int j2 = i + window;
-    const int interval = j2 - j1;
-
     if (j1 < 0) j1 = 0;
     if (j2 >= size) j2 = size - 1;
 
-    double r0 = r;
     double sum = 0;
+    double r0 = r;
+    const double cosLon = cos(lon);
+    const double sinLon = sin(lon);
     for (int j = j1; j < j2; j++) 
     {
-	const double x = r0 * cos(-lon);
-	const double y = r0 * sin(-lon);
-	const double z = 0;
+	const double x =  r0 * cosLon;
+	const double y = -r0 * sinLon;
+	const double z =  0;
 
 	if (planet_->IsInMyShadow(x, y, z))
             sum += (shade_ * array[j]);
@@ -199,7 +193,7 @@ Ring::getValue(const double *array, const int size, const int window,
 
         r0 += dr;
     }
-    sum /= interval;
+    sum /= (j2 - j1);
 
     return(sum);
 }
