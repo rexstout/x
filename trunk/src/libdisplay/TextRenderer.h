@@ -16,28 +16,26 @@ class TextRenderer
                           const std::string &text, 
                           const unsigned char color[3]);
 
-    virtual void Font(const std::string &font) = 0;
+    virtual void Font(const std::string &font);
     const std::string & Font() const { return(font_); };
 
-    virtual void FontSize(const int size) = 0;
+    virtual void FontSize(const int size);
     int FontSize() const { return(fontSize_); };
 
     virtual void DrawText(const int x, const int y, 
-                          const unsigned char color[3]) = 0;
+                          const unsigned char color[3]);
 
-    virtual void SetText(const std::string &text) = 0;
-    virtual void FreeText() = 0;
+    virtual void SetText(const std::string &text);
+    virtual void FreeText();
 
-    virtual void TextBox(int &textWidth, int &textHeight) = 0;
+    virtual void TextBox(int &textWidth, int &textHeight);
 
-    virtual int FontHeight() const = 0;
+    virtual int FontHeight() const;
 
     bool CheckUnicode(const unsigned long unicode, 
                       const std::vector<unsigned char> &text);
 
     unsigned long UTF8ToUnicode(const std::vector<unsigned char> &text);
-
-    void drawUTF8test();
 
  protected:
 

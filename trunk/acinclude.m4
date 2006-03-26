@@ -1,77 +1,29 @@
-AC_DEFUN([AC_FIND_JAVA],
+AC_DEFUN(AC_FIND_CSPICE,
 [
-have_java='no'
-AC_ARG_WITH(gui, [  --with-gui    Build java GUI [yes]])
-if test "$with_gui" != 'no'; then
-  AC_PATH_PROG(JAVA, java, no)
-  if test "$JAVA" = 'no'; then
-    AC_MSG_WARN(*** Java GUI will not be built ***)
-    have_java='no'
-  else
-    have_java='yes'
-  fi
-fi
 
-AM_CONDITIONAL(HAVE_JAVA, test "$have_java" = 'yes')
-])
+AC_ARG_WITH(cspice,AC_HELP_STRING([--with-cspice],[Use JPL's SPICE toolkit (NO)]))
 
-dnl adapted from openssh-3.6p1 configure script
-dnl Check for socklen_t: historically on BSD it is an int, and in
-dnl POSIX 1g it is a type of its own, but some platforms use different
-dnl types for the argument to getsockopt, getpeername, etc.  So we
-dnl have to test to find something that will work.
-AC_DEFUN([AC_FIND_SOCKLEN_T],
-[
-  AC_CHECK_TYPE([socklen_t],have_socklen_t='yes',have_socklen_t='no', [#include <sys/types.h>
-#include <sys/socket.h>])
-  if test "$have_socklen_t" != 'yes'; then
-    AC_MSG_CHECKING([for socklen_t equivalent])
-    socklen_t_equiv=""
-    # Systems have either "struct sockaddr *" or
-    # "void *" as the second argument to getpeername
-    for arg2 in "struct sockaddr" void; do
-      for t in int size_t unsigned long "unsigned long"; do
-        AC_TRY_COMPILE([
-#include <sys/types.h>
-#include <sys/socket.h>
-
-int getpeername (int, $arg2 *, $t *);
-                       ],[
-$t len;
-getpeername(0,0,&len);
-                       ],[
-socklen_t_equiv="$t"
-break
-                       ])
-      done
-    done
-    if test "x$socklen_t_equiv" = x; then
-      AC_MSG_ERROR([Cannot find a type to use in place of socklen_t])
+have_cspice='no'
+if test "$with_cspice" = yes; then
+  have_cspice_h='no'
+  AC_CHECK_HEADER(SpiceUsr.h,have_cspice_h='yes',have_cspice_h='no')
+  if test "$have_cspice_h" = 'yes'; then
+    have_cspice_lib='no'
+    AC_CHECK_LIB(cspice,furnsh_c,have_cspice_lib='yes',have_cspice_lib='no',-lm)
+    if test "$have_cspice_lib" = 'yes'; then
+      CSPICE_LIBS="-lcspice"
+      AC_DEFINE(HAVE_CSPICE,,Define if you have CSPICE library)
+      AC_SUBST(CSPICE_LIBS)
+      have_cspice='yes'
     fi
-    AC_MSG_RESULT($socklen_t_equiv)
-    AC_DEFINE_UNQUOTED(socklen_t, $socklen_t_equiv,[type to use in place of socklen_t if not defined])
   fi
-])
 
-AC_DEFUN(AC_FIND_PTHREADS,
-[
-if test "$with_gui" != 'no'; then
-  PTHREAD_LIB=""
-  AC_CHECK_LIB(pthread, pthread_create, PTHREAD_LIB="-lpthread",
- 		[AC_CHECK_LIB(pthreads, pthread_create, PTHREAD_LIB="-lpthreads",
- 		    [AC_CHECK_LIB(c_r, pthread_create, PTHREAD_LIB="-lc_r",
- 			[AC_CHECK_FUNC(pthread_create)]
- 		    )]
- 		)]
-	       )
-  if test "$PTHREAD_LIB" = ""; then
-    AC_MSG_WARN(*** GUI will not be built ***)
+  if test "$have_cspice" = 'no'; then
+    AC_MSG_WARN(*** Xplanet will be built without SPICE support ***)
   fi
-  AC_SUBST(PTHREAD_LIB)
 fi
 
-AM_CONDITIONAL(HAVE_PTHREADS, test "$PTHREAD_LIB" != "")
-
+AM_CONDITIONAL(HAVE_CSPICE, test "$have_cspice" = 'yes')
 ])
 
 AC_DEFUN(AC_FIND_FREETYPE,

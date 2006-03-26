@@ -50,6 +50,7 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CSPICE_LIBS = @CSPICE_LIBS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -67,6 +68,8 @@ FREETYPE_LIBS = @FREETYPE_LIBS@
 GRAPHICS_LIBS = @GRAPHICS_LIBS@
 HAVE_AQUA_FALSE = @HAVE_AQUA_FALSE@
 HAVE_AQUA_TRUE = @HAVE_AQUA_TRUE@
+HAVE_CSPICE_FALSE = @HAVE_CSPICE_FALSE@
+HAVE_CSPICE_TRUE = @HAVE_CSPICE_TRUE@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
 HAVE_LIBFREETYPE_FALSE = @HAVE_LIBFREETYPE_FALSE@
@@ -170,7 +173,9 @@ man_MANS = xplanet.1
 
 nobase_dist_data_DATA = \
 	xplanet/rgb.txt			\
+	xplanet/arcs/README		\
 	xplanet/arcs/constellations	\
+	xplanet/config/README		\
 	xplanet/config/default		\
 	xplanet/config/earth_markers	\
 	xplanet/config/moon_orbit	\
@@ -180,13 +185,16 @@ nobase_dist_data_DATA = \
 	xplanet/fonts/FreeMonoBold.ttf	\
 	xplanet/images/README		\
 	xplanet/images/earth.jpg	\
-	xplanet/images/night.jpg	\
 	xplanet/images/hubble.png       \
-	xplanet/images/shuttle.png      \
-	xplanet/images/sublunar.png	\
 	xplanet/images/iss.png          \
+	xplanet/images/mgs.png		\
+	xplanet/images/night.jpg	\
+	xplanet/images/odyssey.png	\
+	xplanet/images/shuttle.png      \
 	xplanet/images/smile.png        \
+	xplanet/images/sublunar.png	\
 	xplanet/images/subsolar.png	\
+	xplanet/markers/README		\
 	xplanet/markers/brightStars	\
 	xplanet/markers/earth		\
 	xplanet/markers/mars		\
@@ -194,8 +202,18 @@ nobase_dist_data_DATA = \
 	xplanet/origin/README		\
 	xplanet/origin/cassini		\
 	xplanet/origin/galileo		\
+	xplanet/satellites/README	\
 	xplanet/satellites/iss		\
 	xplanet/satellites/iss.tle	\
+	xplanet/spice/README		\
+	xplanet/spice/asteroids		\
+	xplanet/spice/asteroids.krn	\
+	xplanet/spice/cassini		\
+	xplanet/spice/cassini.krn	\
+	xplanet/spice/mgs		\
+	xplanet/spice/mgs.krn		\
+	xplanet/spice/voyager		\
+	xplanet/spice/voyager.krn	\
 	xplanet/stars/BSC
 
 
@@ -211,7 +229,7 @@ derived = \
 
 nobase_pkgdata_SCRIPTS = $(derived)
 
-EXTRA_DIST = README.config xplanet.1 $(sources)
+EXTRA_DIST = xplanet.1 $(sources)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -510,7 +528,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/. $(distdir)/scripts $(distdir)/xplanet $(distdir)/xplanet/arcs $(distdir)/xplanet/config $(distdir)/xplanet/ephemeris $(distdir)/xplanet/fonts $(distdir)/xplanet/images $(distdir)/xplanet/markers $(distdir)/xplanet/origin $(distdir)/xplanet/satellites $(distdir)/xplanet/stars
+	$(mkinstalldirs) $(distdir)/. $(distdir)/scripts $(distdir)/xplanet $(distdir)/xplanet/arcs $(distdir)/xplanet/config $(distdir)/xplanet/ephemeris $(distdir)/xplanet/fonts $(distdir)/xplanet/images $(distdir)/xplanet/markers $(distdir)/xplanet/origin $(distdir)/xplanet/satellites $(distdir)/xplanet/spice $(distdir)/xplanet/stars
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -201,6 +201,8 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         case MAP_BOUNDS:
         {
+            setlocale(LC_NUMERIC, "C");
+
             double uly, ulx, lry, lrx;
             int numRead = sscanf(returnString, "%lf,%lf,%lf,%lf", 
                                  &uly, &ulx, &lry, &lrx);
@@ -213,6 +215,8 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
                 xpWarn("Need four values for mapbounds\n",
                        __FILE__, __LINE__);
             }
+
+            setlocale(LC_NUMERIC, "");
         }
         break;
         case MARKER_COLOR:
@@ -265,6 +269,8 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             break;
         case ORBIT:
         {
+            setlocale(LC_NUMERIC, "C");
+
             double start, stop, delta;
             int numRead = sscanf(returnString, "%lf,%lf,%lf", 
                                  &start, &stop, &delta);
@@ -279,6 +285,8 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
                 xpWarn("Need three values for orbit\n", 
                        __FILE__, __LINE__);
             }
+
+            setlocale(LC_NUMERIC, "");
         }
         break;
         case ORBIT_COLOR:
@@ -410,7 +418,7 @@ readConfigFile(string configFile, PlanetProperties *planetProperties[])
     }
     else
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "Can't load configuration file " << configFile << endl;
         xpExit(errStr.str(), __FILE__, __LINE__);
     }

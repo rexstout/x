@@ -5,6 +5,8 @@
 #include <string>
 using namespace std;
 
+#include "config.h"
+
 #include "findFile.h"
 #include "Options.h"
 #include "Planet.h"
@@ -12,6 +14,9 @@ using namespace std;
 
 #include "libephemeris/EphemerisHigh.h"
 #include "libephemeris/EphemerisLow.h"
+#ifdef HAVE_CSPICE
+#include "libephemeris/EphemerisSpice.h"
+#endif
 #include "libmoons/libmoons.h"
 
 body
@@ -66,10 +71,14 @@ Planet::parseBodyName(char *name)
         return_body = MIRANDA;
     else if (strncmp(lowercase, body_string[MOON], 2) == 0)
         return_body = MOON;
+    else if (strncmp(lowercase, "naif", 2) == 0)
+        return_body = NAIF;
     else if (strncmp(lowercase, body_string[NEPTUNE], 3) == 0)
         return_body = NEPTUNE;
     else if (strncmp(lowercase, body_string[NEREID], 3) == 0)
         return_body = NEREID;
+    else if (strncmp(lowercase, "norad", 2) == 0)
+        return_body = NORAD;
     else if (strncmp(lowercase, body_string[OBERON], 1) == 0)
         return_body = OBERON;
     else if (strncmp(lowercase, body_string[PHOBOS], 4) == 0)
@@ -118,37 +127,13 @@ Planet::parseBodyName(char *name)
 Planet::Planet(const double jd, const body this_body) 
     : index_(this_body), 
       ephem_(NULL), 
-      ephemerisLow_(true),
+      ephemerisHigh_(false),
+      ephemerisSpice_(false),
       julianDay_(jd), 
       needRotationMatrix_(true), 
       period_(0),
       needShadowCoeffs_(true)
 {
-    Options *options = Options::getInstance();
-    if (options->UniversalTime())
-        julianDay_ += delT(jd) / 86400;
-
-    string ephemerisFile(options->JPLFile());
-    ephemerisLow_ = ephemerisFile.empty();
-    if (ephemerisLow_)
-    {
-        ephem_ = new EphemerisLow();
-    }
-    else
-    {
-        bool foundFile = findFile(ephemerisFile, "ephemeris");
-        if (foundFile)
-        {
-            ephem_ = new EphemerisHigh(ephemerisFile.c_str());
-        }
-        else
-        {
-            ostringstream errStr;
-            errStr << "Can't load ephemeris file " << ephemerisFile << "\n";
-            xpExit(errStr.str(), __FILE__, __LINE__);
-        }
-    }
-
     d2000_ = (julianDay_ - 2451545.0);
     T2000_ = d2000_ / 36525;
 
@@ -271,6 +256,7 @@ Planet::Planet(const double jd, const body this_body)
 
         radiusEq_ = 1737.5;
         flattening_ = 0.002;
+
     }
     break;
     case MARS:
@@ -298,7 +284,7 @@ Planet::Planet(const double jd, const body this_body)
             
             radiusEq_ = 3397;
             flattening_ = 0.0065;
-            
+
             break;
         case PHOBOS:
             primary_ = MARS;
@@ -314,6 +300,7 @@ Planet::Planet(const double jd, const body this_body)
 
             radiusEq_ = 10;  // non-spherical
             flattening_ = 0;
+
             break;
         case DEIMOS:
             primary_ = MARS;
@@ -328,6 +315,7 @@ Planet::Planet(const double jd, const body this_body)
             period_ = 1.2624407;
             radiusEq_ = 6;  // non-spherical
             flattening_ = 0;
+
             break;
         default:
             break;
@@ -340,7 +328,6 @@ Planet::Planet(const double jd, const body this_body)
     case GANYMEDE:
     case CALLISTO:
     {
-
         flipped_ = -1;
 
         const double J3 = (283.90 +  4850.7 * T2000_) * deg_to_rad;
@@ -605,6 +592,7 @@ Planet::Planet(const double jd, const body this_body)
 
             radiusEq_ = 110;
             flattening_ = 0;
+
             break;
         default:
             break;
@@ -742,6 +730,7 @@ Planet::Planet(const double jd, const body this_body)
             
             radiusEq_ = 24764;
             flattening_ = 0.0171;
+
         }
         break;
         case TRITON:
@@ -845,6 +834,52 @@ Planet::Planet(const double jd, const body this_body)
 
     radiusPol_ = radiusEq_ * (1 - flattening_);
     omf2_ = (1 - flattening_) * (1 - flattening_);
+
+    Options *options = Options::getInstance();
+    if (options->UniversalTime()) julianDay_ += delT(jd) / 86400;
+
+    vector<int> spiceList = options->SpiceEphemeris();
+    for (unsigned int i = 0; i < spiceList.size(); i++)
+    {
+        if (naif_id[index_] == spiceList[i])
+        {
+#ifdef HAVE_CSPICE
+            ephemerisSpice_ = true;
+            ephem_ = new EphemerisSpice();
+#else
+            ostringstream errStr;
+            errStr << "Can't use SPICE ephemeris for " 
+                   << body_string[index_] << ".\n";
+            xpWarn(errStr.str(), __FILE__, __LINE__);
+#endif
+            break;
+        }
+    }
+
+    if (!ephemerisSpice_)
+    {
+        string ephemerisFile(options->JPLFile());
+        ephemerisHigh_ = !ephemerisFile.empty();
+        if (ephemerisHigh_)
+        {
+            bool foundFile = findFile(ephemerisFile, "ephemeris");
+            if (foundFile)
+            {
+                ephem_ = new EphemerisHigh(ephemerisFile.c_str());
+            }
+            else
+            {
+                ostringstream errStr;
+                errStr << "Can't load ephemeris file " 
+                       << ephemerisFile << "\n";
+                xpExit(errStr.str(), __FILE__, __LINE__);
+            }
+        }
+        else
+        {
+            ephem_ = new EphemerisLow();
+        }
+    }
 }
 
 Planet::~Planet()
@@ -879,12 +914,19 @@ Planet::calcHeliocentricEquatorial()
 void
 Planet::calcHeliocentricEquatorial(const bool relativeToSun)
 {
+    if (ephemerisSpice_)
+    {
+        ephem_->GetHeliocentricXYZ(index_, julianDay_, X_, Y_, Z_);
+        return;
+    }
+    
     if (primary_ == SUN)
     {
         ephem_->GetHeliocentricXYZ(index_, julianDay_, X_, Y_, Z_);
     }
-    else if (primary_ == EARTH && !ephemerisLow_)
+    else if (primary_ == EARTH && ephemerisHigh_)
     {
+        // Lunar ephemeris is part of JPL's Digital Ephemeris
         ephem_->GetHeliocentricXYZ(index_, julianDay_, X_, Y_, Z_);
         if (!relativeToSun)
         {
@@ -1028,9 +1070,9 @@ Planet::XYZToPlanetocentric(const double X, const double Y, const double Z,
 
     rad = sqrt(sx * sx + sy*sy);
     if (rad > 0)
-	lat = atan(sz/rad);
+        lat = atan(sz/rad);
     else
-	lat = 0;
+        lat = 0;
 
     if (cos(lat) > 1e-5)
         lon = atan2(sy, sx);

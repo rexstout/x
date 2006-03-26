@@ -37,10 +37,10 @@ drawStars(DisplayBase *display, View *view)
         magnitude[i] = 0;
     }
 
-    ifstream infile(starMap.c_str());
+    ifstream inFile(starMap.c_str());
 
-    char line[256];
-    while(infile.getline(line, 256))
+    char line[MAX_LINE_LENGTH];
+    while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
     {
         if (line[0] == '#') continue;
 
@@ -81,7 +81,7 @@ drawStars(DisplayBase *display, View *view)
             starPresent[ipos[i]] = true;
         }
     }
-    infile.close();
+    inFile.close();
 
     for (int i = 0; i < area; i++)
     {

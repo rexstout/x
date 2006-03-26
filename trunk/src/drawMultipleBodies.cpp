@@ -9,6 +9,7 @@ using namespace std;
 
 #include "body.h"
 #include "buildPlanetMap.h"
+#include "config.h"
 #include "createMap.h"
 #include "findFile.h"
 #include "keywords.h"
@@ -69,53 +70,62 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
     if (options->Verbosity() > 0)
     {
-        if (options->OriginMode() == BODY)
+        if (options->OriginMode() == BODY 
+            && options->TargetMode() != LOOKAT)
         {
-            stringstream msg;
+            ostringstream msg;
             msg << "Looking at "
                 << planetProperties[options->getTarget()]->Name()
                 << " from "
                 << planetProperties[options->getOrigin()]->Name()
                 << endl;
             xpMsg(msg.str(), __FILE__, __LINE__);
-        }
-        if (options->Verbosity() > 1)
-        {
-            char buffer[128];
-            snprintf(buffer, 128, 
-                     "target dist = %12.6f, in units of radius = %12.6f\n", 
-                     target_dist,
-                     target_dist / (planetProperties[target->Index()]->Magnify()
-                                    * target->Radius()));
-            xpMsg(buffer, __FILE__, __LINE__);
+
+            if (options->Verbosity() > 1)
+            {
+                char buffer[128];
+                snprintf(buffer, 128, 
+                         "target dist = %12.6f, in units of radius = %12.6f\n", 
+                         target_dist,
+                         target_dist / (planetProperties[target->Index()]->Magnify()
+                                        * target->Radius()));
+                xpMsg(buffer, __FILE__, __LINE__);
+            }
         }
     }
+
     // Find the pixel radius and angle subtended by the target.
     // This is used to get degrees per pixel.
-    const double target_angular_radius = target->Radius() / target_dist;
-    double target_pixel_radius;
     double pixels_per_radian;
-
     switch (options->FOVMode())
     {
     case RADIUS:
-        target_pixel_radius = (options->Radius() * height);
+    {
+        double target_pixel_radius = (options->Radius() * height);
         target_pixel_radius /= planetProperties[options->getTarget()]->Magnify();
 
         if (target->Index() == SATURN) target_pixel_radius /= 2.32166;
 
+        const double target_angular_radius = target->Radius() / target_dist;
         pixels_per_radian = target_pixel_radius / target_angular_radius;
         options->FieldOfView(width / pixels_per_radian);
-        break;
+    }
+    break;
     case FOV:
     {
         pixels_per_radian = width / options->FieldOfView();
-        target_pixel_radius = target_angular_radius * pixels_per_radian;
-
-        double scale = 1.0;
-        if (target->Index() == SATURN) scale *= 2.32166;  
-
-        options->Radius(scale * target_pixel_radius / height);
+        
+        if (options->TargetMode() != LOOKAT)
+        {
+            const double target_angular_radius = target->Radius() / target_dist;
+            double target_pixel_radius = (target_angular_radius 
+                                          * pixels_per_radian);
+            
+            double scale = 1.0;
+            if (target->Index() == SATURN) scale *= 2.32166;  
+            
+            options->Radius(scale * target_pixel_radius / height);
+        }
     }
     break;
     default:
@@ -124,11 +134,11 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     }
 
     // Linear distance per pixel
-    const double dist_per_pixel = target->Radius()/target_pixel_radius;
+    const double dist_per_pixel = target_dist / pixels_per_radian;
 
     if (options->Verbosity() > 1)
     {
-        stringstream msg;
+        ostringstream msg;
         char buffer[128];
         snprintf(buffer, 128, "fov = %14.8f degrees\n", 
                  options->FieldOfView()/deg_to_rad);
@@ -174,17 +184,20 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         break;
     }
 
-    // Put the primary in the center of the field of view
-    if (options->OriginMode() == ABOVE
-        || options->OriginMode() == BELOW)
+    if (options->TargetMode() != LOOKAT)
     {
-        Planet *primary = findPlanetinMap(planetsFromSunMap, 
-                                          target->Primary());
-        primary->getPosition(tX, tY, tZ);
+        // Put the primary in the center of the field of view when looking
+        // from above or below
+        if (options->OriginMode() == ABOVE
+            || options->OriginMode() == BELOW)
+        {
+            Planet *primary = findPlanetinMap(planetsFromSunMap, 
+                                              target->Primary());
+            primary->getPosition(tX, tY, tZ);
+        }
     }
 
-    View *view = new View(oX, oY, oZ, 
-                          tX, tY, tZ, 
+    View *view = new View(oX, oY, oZ, tX, tY, tZ, 
                           upX*1e6, upY*1e6, upZ*1e6, 
                           dist_per_pixel, options->getRotate());
 
@@ -254,8 +267,8 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                            planetsFromSunMap, annotationMap);
             
             if (currentProperties->DrawSatellites())
-                addSatellites(currentProperties, current_planet, view, NULL, 
-                              annotationMap);
+                addSatellites(currentProperties, current_planet, 
+                              view, NULL, annotationMap);
         }
 
         // Even if the disk of the Sun or Saturn is off the
@@ -315,6 +328,11 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     }
 
     drawStars(display, view);
+
+#ifdef HAVE_CSPICE
+    if (!options->SpiceFiles().empty())
+        addSpiceObjects(planetsFromSunMap, view, NULL, annotationMap);
+#endif
 
     if (!options->ArcFiles().empty())
         addArcs(view, annotationMap);

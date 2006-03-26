@@ -52,7 +52,16 @@ for body are sun, mercury, venus, earth, moon, mars, phobos, deimos,
 jupiter, io, europa, ganymede, callisto, saturn, mimas, enceladus,
 tethys, dione, rhea, titan, hyperion, iapetus, phoebe, uranus,
 miranda, ariel, umbriel, titania, oberon, neptune, triton, nereid,
-pluto, charon, random, and major.  Earth is the default body.  This
+pluto, charon, random, and major.  The field of view can also be
+centered on a satellite location using "naif" or "norad", along with
+the satellite id.  For example, "-body naif-82" will center the field
+of view on NAIF ID -82, which is the Cassini orbiter.  Xplanet must be
+compiled with SPICE support and the required kernels must be present.
+See the README in the spice subdirectory for more details.  Using
+"-body norad20580" will center the field of view on NORAD ID 20580,
+which is the Hubble Space Telescope.  The appropriate TLE files must
+be present in this case.  See the README in the satellites
+subdirectory for more information.  Earth is the default body.  This
 option is the same as -target.
 
 .TP
@@ -413,6 +422,20 @@ subdirectories of DATADIR/xplanet
 .sp
 .fi
 DATADIR is set at compile time and defaults to /usr/local/share.
+
+.TP
+.B \-spice_ephemeris index
+Use SPICE kernels to compute the position of the named body.  The
+index is the naif ID code (e.g. 599 for Jupiter).  The -spice_file
+option must be used to supply the names of the kernel files.  This
+option may be used more than once for different bodies.
+
+.TP
+.B \-spice_file spice_file
+Specify a file containing a list of objects to display.  A file
+containing a list of SPICE kernels to read named spice_file.krn must exist
+along with spice_file.  See the README in the "spice" subdirectory for
+more information.
 
 .TP
 .B \-starfreq frequency

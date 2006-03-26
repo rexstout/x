@@ -17,10 +17,10 @@ buildColorMap()
     bool foundFile = findFile(RGBFile, "");
     if (!foundFile)
     {
-	stringstream errStr;
-	errStr << "Can't load RGB file " << RGBFile << "\n";
-	xpWarn(errStr.str(), __FILE__, __LINE__);
-	return;
+        stringstream errStr;
+        errStr << "Can't load RGB file " << RGBFile << "\n";
+        xpWarn(errStr.str(), __FILE__, __LINE__);
+        return;
     }
 
     char line[128], name[128];
@@ -72,7 +72,7 @@ parseColor(string color, unsigned char RGB[3])
         // There's a DarkSlateGray but no DarkSlateGrey
         string::size_type grey = color.find("grey");
         if (grey != string::npos && grey < color.size()) 
-	    color[grey+2] = 'a';
+            color[grey+2] = 'a';
         
         memset(RGB, 0, 3);
         
@@ -85,12 +85,12 @@ parseColor(string color, unsigned char RGB[3])
         else
         {
             if (color.compare(defaultcolor) != 0)
-	    {
-		stringstream errStr;
-		errStr << "Can't find color " << color << ", using "
-		       << defaultcolor << "\n";
-		xpWarn(errStr.str(), __FILE__, __LINE__);
-	    }
+            {
+                stringstream errStr;
+                errStr << "Can't find color " << color << ", using "
+                       << defaultcolor << "\n";
+                xpWarn(errStr.str(), __FILE__, __LINE__);
+            }
         }
     }
 

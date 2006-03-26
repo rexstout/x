@@ -107,6 +107,8 @@ class Options
 
     const std::vector<std::string> & getSearchDir() const { return(searchdir); };
     bool SaveDesktopFile() const { return(saveDesktopFile_); };
+    const std::vector<int> & SpiceEphemeris() const { return(spiceEphemeris_); };
+    const std::vector<std::string> & SpiceFiles() const { return(spiceFiles_); };
     double StarFreq() const        { return(starFreq_); };
     const std::string & getStarMap() const { return(star_map); };
 
@@ -114,6 +116,8 @@ class Options
     void SunLat(const double b) { sunLat_ = b; };
     double SunLon() const     { return(sunLon_); };
     void SunLon(const double l) { sunLon_ = l; };
+
+    int TargetMode() const { return(targetMode_); };
 
     double getTimeWarp() const      { return(timewarp); };
     time_t getTVSec() const         { return(tv_sec); };
@@ -133,6 +137,8 @@ class Options
     int getWindowY() const          { return(windowY_); };
 
     const std::string & WindowTitle() const { return(windowTitle_); };
+
+    unsigned long XID() const { return(xid_); };
 
     bool GeometrySelected() const   { return(geometrySelected_); };
     int GeometryMask() const     { return(geometryMask_); };
@@ -210,11 +216,15 @@ class Options
     bool oppositeSide_;
     body origin_;
     std::string originFile_;
+    int originID_;                // for NAIF or NORAD bodies
     int originMode_;                     // BODY, LBR, RANDOM, MAJOR,
                                          // SYSTEM, ABOVE, BELOW
+    double oX_, oY_, oZ_;   // heliocentric rectangular coordinates of
+                            // the observer
+
     bool pango_;
-    std::string post_command_;       // command to run after xplanet renders
-    std::string prev_command_;       // command to run before xplanet renders
+    std::string post_command_;    // command to run after xplanet renders
+    std::string prev_command_;    // command to run before xplanet renders
     body primary_;
     bool printEphemeris_;
     int projection_;     // type of map projection
@@ -230,17 +240,23 @@ class Options
     double rotate0;      // rotation angle specified on command line
 
     bool saveDesktopFile_;
+    std::vector<int> spiceEphemeris_;
+    std::vector<std::string> spiceFiles_;
     double starFreq_;
     std::string star_map;
     double sunLat_, sunLon_;    // these aren't options and shouldn't
                                 // be here, but it's a convenient way
                                 // to put them in the label
     body target_;
-    int target_mode;     // BODY, RANDOM, MAJOR
+    int targetMode_;     // BODY, RANDOM, MAJOR
+    int targetID_;                // for NAIF or NORAD bodies
     double timewarp;     // multiplication factor for the passage of time
     std::string tmpDir_;
     bool transparency_;
     bool transpng_;
+
+    double tX_, tY_, tZ_;   // heliocentric rectangular coordinates of
+                            // the target
 
     bool universalTime_;
     bool useCurrentTime_;
@@ -253,15 +269,13 @@ class Options
     int windowX_, windowY_;
     std::string windowTitle_;
 
+    unsigned long xid_;
+
     double center_x, center_y;
     double julianDay_;
 
-    double tX_, tY_, tZ_;   // heliocentric rectangular coordinates of
-                            // the target
-    double oX, oY, oZ;   // heliocentric rectangular coordinates of
-                         // the observer
 
-    std::vector<std::string> searchdir;  // check these directories for files
+    std::vector<std::string> searchdir; // check these directories for files
 
     time_t tv_sec;      // UNIX time (seconds from 00:00:00 UTC on
                         // January 1, 1970)

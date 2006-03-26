@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cstdio>
 #include <fstream>
 #include <map>
@@ -98,14 +97,13 @@ readMarkerFile(const char *line, Planet *planet,
             int r, g, b;
             if (sscanf(returnString, "%d,%d,%d", &r, &g, &b) == 3)
             {
-                color[0] = r & 0xff;
-                color[1] = g & 0xff;
-                color[2] = b & 0xff;
+                color[0] = static_cast<unsigned char> (r & 0xff);
+                color[1] = static_cast<unsigned char> (g & 0xff);
+                color[2] = static_cast<unsigned char> (b & 0xff);
             }
             else
             {
-                xpWarn("Need three values for color\n", 
-                       __FILE__, __LINE__);
+                xpWarn("Need three values for color\n", __FILE__, __LINE__);
                 syntaxError = true;
             }
         }
@@ -187,14 +185,13 @@ readMarkerFile(const char *line, Planet *planet,
             timezone.assign(returnString);
             break;
         case TRANSPARENT:
-            transparency = true;
-
+        {
             int r, g, b;
             if (sscanf(returnString, "%d,%d,%d", &r, &g, &b) == 3)
             {
-                transparent_pixel[0] = r & 0xff;
-                transparent_pixel[1] = g & 0xff;
-                transparent_pixel[2] = b & 0xff;
+                transparent_pixel[0] = static_cast<unsigned char> (r & 0xff);
+                transparent_pixel[1] = static_cast<unsigned char> (g & 0xff);
+                transparent_pixel[2] = static_cast<unsigned char> (b & 0xff);
             }
             else
             {
@@ -202,8 +199,9 @@ readMarkerFile(const char *line, Planet *planet,
                        __FILE__, __LINE__);
                 syntaxError = true;
             }
-
-            break;
+            transparency = true;
+        }
+        break;
         case UNKNOWN:
             syntaxError = true;
         default:
@@ -254,23 +252,26 @@ readMarkerFile(const char *line, Planet *planet,
         lat *= deg_to_rad;
         lon *= deg_to_rad;
 
-	if (radius < 0)
-	{
-	    if (planet != NULL)
-	    {
-		radius = planet->Radius(lat);
-	    }
-	    else
-	    {
-		radius = 1;
-	    }
-	}
+        if (radius < 0)
+        {
+            if (planet != NULL)
+            {
+                radius = planet->Radius(lat);
+            }
+            else
+            {
+                radius = 1;
+            }
+        }
 
         markerVisible = sphericalToPixel(lat, lon, radius * magnify, 
                                          X, Y, Z, planet, view, projection);
 
         // don't draw markers on the far side of the planet
-        if (planet != NULL && view != NULL && Z > pZ) 
+        if (planet != NULL 
+            && view != NULL 
+            && Z > pZ
+            && sqrt(X*X + Y*Y) < radius * magnify) 
             markerVisible = false;
     }
         
@@ -314,7 +315,7 @@ readMarkerFile(const char *line, Planet *planet,
 
             tzset();
 
-            char name_str[256];
+            char name_str[MAX_LINE_LENGTH];
             time_t tv_sec = options->getTVSec();
             strftime(name_str, sizeof(name_str), name.c_str(), 
                      localtime((time_t *) &tv_sec));
@@ -352,11 +353,6 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
     vector<string> markerfiles = planetProperties->MarkerFiles();
     vector<string>::iterator ii = markerfiles.begin();
 
-    unsigned char color[3];
-    memcpy(color, planetProperties->MarkerColor(), 3);
-
-    string font(planetProperties->MarkerFont());
-
     while (ii != markerfiles.end()) 
     {
         string markerFile(*ii);
@@ -364,13 +360,19 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
         if (foundFile)
         {
             ifstream inFile(markerFile.c_str());
-            char *line = new char[256];
-            while (inFile.getline (line, 256, '\n') != NULL)
+            char *line = new char[MAX_LINE_LENGTH];
+            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
+            {
+                unsigned char color[3];
+                memcpy(color, planetProperties->MarkerColor(), 3);
+                string font(planetProperties->MarkerFont());
+                
                 readMarkerFile(line, planet, X, Y, Z, 
                                view, projection, width, height, 
                                color, font,
                                planetProperties->Magnify(),
                                planetsFromSunMap, annotationMap);
+            }
             
             inFile.close();
             delete [] line;
@@ -395,11 +397,6 @@ addMarkers(View *view, const int width, const int height,
     vector<string> markerfiles = options->MarkerFiles();
     vector<string>::iterator ii = markerfiles.begin();
 
-    unsigned char color[3];
-    memcpy(color, options->Color(), 3);
-
-    string font(options->Font());
-
     while (ii != markerfiles.end()) 
     {
         string markerFile(*ii);
@@ -407,13 +404,18 @@ addMarkers(View *view, const int width, const int height,
         if (foundFile)
         {
             ifstream inFile(markerFile.c_str());
-            char *line = new char[256];
-            while (inFile.getline (line, 256, '\n') != NULL)
+            char *line = new char[MAX_LINE_LENGTH];
+            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
+            {
+                unsigned char color[3];
+                memcpy(color, options->Color(), 3);
+                string font(options->Font());
+                
                 readMarkerFile(line, NULL, 0, 0, 0,
                                view, NULL, width, height, 
                                color, font, 1.0, 
                                planetsFromSunMap, annotationMap);
-            
+            }            
             inFile.close();
             delete [] line;
         }

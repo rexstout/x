@@ -157,7 +157,7 @@ EphemerisLow::GetHeliocentricXYZ(const body b, const double tjd,
 
     double Vx = 0, Vy = 0, Vz = 0;
 
-    int index;
+    int index = -1;
     switch (b)
     {
     case SUN:

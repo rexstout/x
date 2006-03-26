@@ -35,8 +35,8 @@ drawProjection(DisplayBase *display, Planet *target,
 extern void
 readConfigFile(string configFile, PlanetProperties *planetProperties[]);
 
-void
-xplanet_main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
 
@@ -49,6 +49,11 @@ xplanet_main(int argc, char **argv)
 
     // Load up the drawing info for each planet
     readConfigFile(options->ConfigFile(), planetProperties);
+
+#ifdef HAVE_CSPICE
+    // Load up any SPICE kernels
+    loadSpiceKernels();
+#endif
 
     // Load up artificial satellite orbital elements
     if (!planetProperties[EARTH]->SatelliteFiles().empty())
@@ -81,8 +86,9 @@ xplanet_main(int argc, char **argv)
         {
             if (system(options->PrevCommand().c_str()) != 0)
             {
-                stringstream errStr;
-                errStr << "Can't execute " << options->PrevCommand() << "\n";
+                ostringstream errStr;
+                errStr << "Can't execute " << options->PrevCommand() 
+                       << "\n";
                 xpWarn(errStr.str(), __FILE__, __LINE__);
             }
         }
@@ -113,8 +119,8 @@ xplanet_main(int argc, char **argv)
                 interpolateOriginFile(options->getJulianDay(), 
                                       originVector, thisRad, 
                                       thisLat, thisLon, thisLocalTime);
-                options->setRange (thisRad);
-                options->Latitude (thisLat);
+                options->setRange(thisRad);
+                options->Latitude(thisLat);
                 options->Longitude(thisLon);
                 options->LocalTime(thisLocalTime);
             }
@@ -152,35 +158,43 @@ xplanet_main(int argc, char **argv)
         // easier.
         map<double, Planet *> planetsFromSunMap;
         buildPlanetMap(options->getJulianDay(), oX, oY, oZ, 
-                       options->LightTime(), 
-                       planetsFromSunMap);
+                       options->LightTime(), planetsFromSunMap);
 
         // Find the target body in the list
         body target_body = options->getTarget();
-        Planet *target = findPlanetinMap(planetsFromSunMap, 
-                                         target_body);
-        if (target == NULL)
-            xpExit("Can't find target body?\n", __FILE__, __LINE__);
+        Planet *target = findPlanetinMap(planetsFromSunMap, target_body);
 
-        if (options->LightTime())
+        // LOOKAT mode is where the target isn't a planetary body.
+        // The Cassini spacecraft, for example.
+        if (options->TargetMode() == LOOKAT)
         {
-            double tX, tY, tZ;
-            target->getPosition(tX, tY, tZ);
-            options->setTarget(tX, tY, tZ);
+            if (options->LightTime()) options->setTarget(planetProperties);
         }
+        else
+        {
+            if (target == NULL)
+                xpExit("Can't find target body?\n", __FILE__, __LINE__);
 
-        // Find the sub-observer lat & lon
-        double obs_lat, obs_lon;
-        target->XYZToPlanetographic(oX, oY, oZ, obs_lat, obs_lon);
-        options->Latitude(obs_lat);
-        options->Longitude(obs_lon);
+            if (options->LightTime())
+            {
+                double tX, tY, tZ;
+                target->getPosition(tX, tY, tZ);
+                options->setTarget(tX, tY, tZ);
+            }
 
-        // Find the sub-solar lat & lon.  This is used for the image
-        // label
-        double sunLat, sunLon;
-        target->XYZToPlanetographic(0, 0, 0, sunLat, sunLon);
-        options->SunLat(sunLat);
-        options->SunLon(sunLon);
+            // Find the sub-observer lat & lon
+            double obs_lat, obs_lon;
+            target->XYZToPlanetographic(oX, oY, oZ, obs_lat, obs_lon);
+            options->Latitude(obs_lat);
+            options->Longitude(obs_lon);
+
+            // Find the sub-solar lat & lon.  This is used for the image
+            // label
+            double sunLat, sunLon;
+            target->XYZToPlanetographic(0, 0, 0, sunLat, sunLon);
+            options->SunLat(sunLat);
+            options->SunLon(sunLon);
+        }
 
         // delete the markerbounds file, since we'll create a new one
         string markerBounds(options->MarkerBounds());
@@ -191,11 +205,15 @@ xplanet_main(int argc, char **argv)
         DisplayBase *display = getDisplay(times_run);
 
         if (options->Projection() == MULTIPLE)
+        {
             drawMultipleBodies(display, target, planetsFromSunMap,
                                planetProperties);
+        }
         else
+        {
             drawProjection(display, target, planetsFromSunMap, 
                            planetProperties[target->Index()]);
+        }
 
         display->renderImage(planetProperties);
         delete display;
@@ -208,8 +226,9 @@ xplanet_main(int argc, char **argv)
         {
             if (system(options->PostCommand().c_str()) != 0)
             {
-                stringstream errStr;
-                errStr << "Can't execute " << options->PostCommand() << "\n";
+                ostringstream errStr;
+                errStr << "Can't execute " << options->PostCommand()
+                       << "\n";
                 xpWarn(errStr.str(), __FILE__, __LINE__);
             }
         }
@@ -240,11 +259,6 @@ xplanet_main(int argc, char **argv)
     delete timer;
 
     for (int i = 0; i < RANDOM_BODY; i++) delete planetProperties[i];
-}
 
-int
-main(int argc, char **argv)
-{
-    xplanet_main(argc, argv);
     return(EXIT_SUCCESS);
 }

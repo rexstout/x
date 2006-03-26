@@ -50,6 +50,7 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CSPICE_LIBS = @CSPICE_LIBS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -67,6 +68,8 @@ FREETYPE_LIBS = @FREETYPE_LIBS@
 GRAPHICS_LIBS = @GRAPHICS_LIBS@
 HAVE_AQUA_FALSE = @HAVE_AQUA_FALSE@
 HAVE_AQUA_TRUE = @HAVE_AQUA_TRUE@
+HAVE_CSPICE_FALSE = @HAVE_CSPICE_FALSE@
+HAVE_CSPICE_TRUE = @HAVE_CSPICE_TRUE@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
 HAVE_LIBFREETYPE_FALSE = @HAVE_LIBFREETYPE_FALSE@
@@ -171,6 +174,10 @@ AM_CPPFLAGS = @FREETYPE_CFLAGS@ -I@top_srcdir@/src
 @USE_AR_TRUE@libannotate_a_AR = $(AR) cru
 @USE_AR_FALSE@libannotate_a_AR = $(CXX) @xplanet_ARFLAGS@
 
+@HAVE_CSPICE_TRUE@spiceFiles = addSpiceObjects.cpp
+
+EXTRA_libannotate_a_SOURCES = addSpiceObjects.cpp
+
 libannotate_a_SOURCES = \
 	Annotation.h 		\
 	Annotation.cpp 		\
@@ -190,7 +197,8 @@ libannotate_a_SOURCES = \
 	Symbol.cpp 		\
 	Text.h 			\
 	Text.cpp 		\
-	libannotate.h
+	libannotate.h		\
+	$(spiceFiles)
 
 subdir = src/libannotate
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -200,11 +208,17 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 
 libannotate_a_LIBADD =
+am__libannotate_a_SOURCES_DIST = Annotation.h Annotation.cpp addArcs.cpp \
+	addMarkers.cpp addSatellites.cpp arrangeMarkers.cpp drawArc.h \
+	drawArc.cpp drawCircle.h drawCircle.cpp Icon.h Icon.cpp \
+	LineSegment.h LineSegment.cpp Symbol.h Symbol.cpp Text.h \
+	Text.cpp libannotate.h addSpiceObjects.cpp
+@HAVE_CSPICE_TRUE@am__objects_1 = addSpiceObjects.$(OBJEXT)
 am_libannotate_a_OBJECTS = Annotation.$(OBJEXT) addArcs.$(OBJEXT) \
 	addMarkers.$(OBJEXT) addSatellites.$(OBJEXT) \
 	arrangeMarkers.$(OBJEXT) drawArc.$(OBJEXT) drawCircle.$(OBJEXT) \
 	Icon.$(OBJEXT) LineSegment.$(OBJEXT) Symbol.$(OBJEXT) \
-	Text.$(OBJEXT)
+	Text.$(OBJEXT) $(am__objects_1)
 libannotate_a_OBJECTS = $(am_libannotate_a_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
@@ -215,6 +229,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Text.Po ./$(DEPDIR)/addArcs.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/addMarkers.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/addSatellites.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/addSpiceObjects.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/arrangeMarkers.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/drawArc.Po ./$(DEPDIR)/drawCircle.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -226,9 +241,10 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libannotate_a_SOURCES)
+DIST_SOURCES = $(am__libannotate_a_SOURCES_DIST) \
+	$(EXTRA_libannotate_a_SOURCES)
 DIST_COMMON = $(srcdir)/Makefile.in Makefile.am
-SOURCES = $(libannotate_a_SOURCES)
+SOURCES = $(libannotate_a_SOURCES) $(EXTRA_libannotate_a_SOURCES)
 
 all: all-am
 
@@ -263,6 +279,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addArcs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addMarkers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addSatellites.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addSpiceObjects.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arrangeMarkers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawArc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawCircle.Po@am__quote@

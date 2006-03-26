@@ -4,7 +4,9 @@ man_MANS = xplanet.1
 
 nobase_dist_data_DATA = \
 	xplanet/rgb.txt			\
+	xplanet/arcs/README		\
 	xplanet/arcs/constellations	\
+	xplanet/config/README		\
 	xplanet/config/default		\
 	xplanet/config/earth_markers	\
 	xplanet/config/moon_orbit	\
@@ -14,13 +16,16 @@ nobase_dist_data_DATA = \
 	xplanet/fonts/FreeMonoBold.ttf	\
 	xplanet/images/README		\
 	xplanet/images/earth.jpg	\
-	xplanet/images/night.jpg	\
 	xplanet/images/hubble.png       \
-	xplanet/images/shuttle.png      \
-	xplanet/images/sublunar.png	\
 	xplanet/images/iss.png          \
+	xplanet/images/mgs.png		\
+	xplanet/images/night.jpg	\
+	xplanet/images/odyssey.png	\
+	xplanet/images/shuttle.png      \
 	xplanet/images/smile.png        \
+	xplanet/images/sublunar.png	\
 	xplanet/images/subsolar.png	\
+	xplanet/markers/README		\
 	xplanet/markers/brightStars	\
 	xplanet/markers/earth		\
 	xplanet/markers/mars		\
@@ -28,8 +33,18 @@ nobase_dist_data_DATA = \
 	xplanet/origin/README		\
 	xplanet/origin/cassini		\
 	xplanet/origin/galileo		\
+	xplanet/satellites/README	\
 	xplanet/satellites/iss		\
 	xplanet/satellites/iss.tle	\
+	xplanet/spice/README		\
+	xplanet/spice/asteroids		\
+	xplanet/spice/asteroids.krn	\
+	xplanet/spice/cassini		\
+	xplanet/spice/cassini.krn	\
+	xplanet/spice/mgs		\
+	xplanet/spice/mgs.krn		\
+	xplanet/spice/voyager		\
+	xplanet/spice/voyager.krn	\
 	xplanet/stars/BSC
 
 sources = \
@@ -42,4 +57,4 @@ derived = \
 
 nobase_pkgdata_SCRIPTS = $(derived)
 
-EXTRA_DIST = README.config xplanet.1 $(sources)
+EXTRA_DIST = xplanet.1 $(sources)
