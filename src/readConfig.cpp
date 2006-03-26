@@ -97,11 +97,11 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         case CLOUD_GAMMA:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double cloudGamma;
             sscanf(returnString, "%lf", &cloudGamma);
             currentProperties->CloudGamma(cloudGamma);
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case CLOUD_MAP:
@@ -112,10 +112,10 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             currentProperties->CloudMap(cloudMap);
         }
         break;
-	case CLOUD_SSEC:
-	  currentProperties->SSECMap(returnString[0] == 't' 
-				     || returnString[0] == 'T');
-	  break;
+        case CLOUD_SSEC:
+          currentProperties->SSECMap(returnString[0] == 't' 
+                                     || returnString[0] == 'T');
+          break;
         case CLOUD_THRESHOLD:
         {
             int t;
@@ -200,17 +200,17 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         case MAGNIFY:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double value;
             sscanf(returnString, "%lf", &value);
             if (value < 0) value = 1;
             currentProperties->Magnify(value);
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case MAP_BOUNDS:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double uly, ulx, lry, lrx;
             int numRead = sscanf(returnString, "%lf,%lf,%lf,%lf", 
                                  &uly, &ulx, &lry, &lrx);
@@ -223,7 +223,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
                 xpWarn("Need four values for mapbounds\n",
                        __FILE__, __LINE__);
             }
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case MARKER_COLOR:
@@ -247,31 +247,46 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         case MARKER_FONT:
             currentProperties->MarkerFont(returnString);
             break;
+        case MARKER_FONTSIZE:
+        { 
+            int fontSize;
+            sscanf(returnString, "%d", &fontSize);
+            if (fontSize > 0)
+            {
+                currentProperties->MarkerFontSize(fontSize);
+            }
+            else
+            {
+                xpWarn("fontSize must be positive.\n", 
+                       __FILE__, __LINE__);
+            }
+        }
+        break;
         case MAX_RAD_FOR_LABEL:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double value;
             sscanf(returnString, "%lf", &value);
             currentProperties->MaxRadiusForLabel(value);
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case MIN_RAD_FOR_LABEL:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double value;
             sscanf(returnString, "%lf", &value);
             currentProperties->MinRadiusForLabel(value);
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case MIN_RAD_FOR_MARKERS:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double value;
             sscanf(returnString, "%lf", &value);
             currentProperties->MinRadiusForMarkers(value);
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case NAME:
@@ -282,7 +297,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             break;
         case ORBIT:
         {
-	    checkLocale(LC_NUMERIC, "C");
+            checkLocale(LC_NUMERIC, "C");
             double start, stop, delta;
             int numRead = sscanf(returnString, "%lf,%lf,%lf", 
                                  &start, &stop, &delta);
@@ -297,7 +312,7 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
                 xpWarn("Need three values for orbit\n", 
                        __FILE__, __LINE__);
             }
-	    checkLocale(LC_NUMERIC, "");
+            checkLocale(LC_NUMERIC, "");
         }
         break;
         case ORBIT_COLOR:

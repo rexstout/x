@@ -50,9 +50,11 @@ readOriginFile(string filename, vector<LBRPoint> &originVector)
         if (line[0] == '#') continue;
 
         long int yyyymmdd, hhmmss;
-        double r, lat, lon, localTime = -1;
-        sscanf(line, "%ld.%ld %lf %lf %lf %lf", &yyyymmdd, &hhmmss,
-               &r, &lat, &lon, &localTime);
+        double r, lat, lon, localTime;
+
+        int numRead = sscanf(line, "%ld.%ld %lf %lf %lf %lf", 
+                             &yyyymmdd, &hhmmss,
+                             &r, &lat, &lon, &localTime);
         int yyyymm = yyyymmdd / 100;
         int year = yyyymm/100;
         int month = abs(yyyymm - year * 100);
@@ -64,6 +66,12 @@ readOriginFile(string filename, vector<LBRPoint> &originVector)
         int sec = hhmmss - hhmm * 100;
         
         const double julian_day = toJulian(year, month, day, hour, min, sec);
+
+        // If only the date has been specified, set range to 0
+        if (numRead < 3) r = 0;
+
+        // If localTime isn't specified, set it to -1
+        if (numRead < 6) localTime = -1;
 
         lat *= deg_to_rad;
         lon *= deg_to_rad;

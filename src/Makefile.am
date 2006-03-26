@@ -41,6 +41,7 @@ xplanet_SOURCES = \
 	keywords.h		\
 	parse.h			\
 	parse.cpp  		\
+	parseColor.h		\
 	parseColor.cpp		\
 	printVersion.cpp	\
 	readConfig.cpp		\

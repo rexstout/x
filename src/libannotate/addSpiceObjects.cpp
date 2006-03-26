@@ -385,7 +385,7 @@ readSpiceFile(const char *line,
             char shortName[10];
             memcpy(shortName, name.c_str(), 9);
             shortName[9] = '\0';
-            snprintf(buffer, 256, "%10s%14.4f%14.4f%14.4f\n",
+            snprintf(buffer, 256, "%10s%10.4f%8.1f%8.1f\n",
                      shortName, dist, pX, pY);
             msg << buffer;
             xpMsg(msg.str(), __FILE__, __LINE__);

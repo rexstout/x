@@ -59,7 +59,8 @@ drawProjection(DisplayBase *display, Planet *target,
     {
         double X, Y, Z;
         target->getPosition(X, Y, Z);
-        ring = new Ring(inner_radius, outer_radius, saturn_radius, 
+        ring = new Ring(inner_radius/saturn_radius, 
+			outer_radius/saturn_radius, 
                         ring_brightness, LIT, ring_transparency, TRANSP,
                         sLon, sLat, 
                         planetProperties->Shade(), 

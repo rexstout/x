@@ -47,7 +47,7 @@ object is computed relative to the Sun.  Normally the best thing to do
 is to compute the position of the object relative to the planet it
 orbits.  The index must be the NAIF id.  When using "relative_to",
 the right kernel files must be loaded to properly calculate the
-objects position relative to the desired body.  
+object's position relative to the desired body.  
 
 For example, the kernel file 971103_SCEPH_LP0_SP0.bsp contains values
 to compute the position of the Cassini orbiter relative to the Sun.

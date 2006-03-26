@@ -1,7 +1,6 @@
 #include <cmath>
 using namespace std;
 
-#include "Options.h"
 #include "ProjectionLambert.h"
 #include "xpUtil.h"
 

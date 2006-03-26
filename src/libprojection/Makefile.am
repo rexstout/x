@@ -15,6 +15,10 @@ libprojection_a_SOURCES = 	\
 		ProjectionAzimuthal.h		\
 		ProjectionBase.cpp		\
 		ProjectionBase.h		\
+		ProjectionBonne.h		\
+		ProjectionBonne.cpp		\
+		ProjectionGnomonic.cpp		\
+		ProjectionGnomonic.h		\
 		ProjectionHemisphere.cpp	\
 		ProjectionHemisphere.h		\
 		ProjectionLambert.cpp		\
@@ -27,7 +31,11 @@ libprojection_a_SOURCES = 	\
 		ProjectionOrthographic.h	\
 		ProjectionPeters.cpp		\
 		ProjectionPeters.h		\
+		ProjectionPolyconic.cpp		\
+		ProjectionPolyconic.h		\
 		ProjectionRectangular.cpp	\
 		ProjectionRectangular.h		\
+		ProjectionTSC.cpp		\
+		ProjectionTSC.h			\
 		getProjection.cpp		\
 		libprojection.h

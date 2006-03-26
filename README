@@ -10,7 +10,8 @@ option has no effect if -projection is specified.
 -background background_file
 Use background_file as the background image, with the planet to be
 superimposed upon it.  This option is only meaningful with the
-azimuthal, mollweide, orthographic, and peters projections.
+-projection option.  A color may also be supplied (e.g. -background
+"navy blue" or -background 0xff00ff).
 
 -base_magnitude magnitude
 A star of the specified magnitude will have a pixel brightness of 1.
@@ -71,15 +72,15 @@ representation.
 Specify an observer location.  The location is relative to the body
 specified with -origin (by default, this is the Sun).  The last line
 of the file must be of the form
-YYYYMMDD.HHMMSS range lat lon [localtime]
+YYYYMMDD.HHMMSS range lat lon localtime
 For example,
 19951207.120000     10.328   -3.018   97.709    9.595
 The specified time is ignored and the current time is used.  The range
-is in planetary radii, and lat and lon are in degrees.  As with
-origin_file, localtime (in hours) is optional, but if present, it will
-be used in place of the longitude.  Only the last line of the file is
-used.  This file may be updated between renderings using a script
-executed with the -prev_command or -post_command options.
+is in planetary radii, and lat and lon are in degrees.  Localtime (in
+hours) is optional, but if present, it will be used in place of the
+longitude.  Only the last line of the file is used.  This file may be
+updated between renderings using a script executed with the
+-prev_command or -post_command options.
 
 -ephemeris_file filename
 Specify a JPL digital ephemeris file (DE200, DE405, or DE406) to use
@@ -251,16 +252,16 @@ AU farther from the sun than the earth.
 Specify a list of observer positions in origin_file.  The positions
 are relative to the body specified with -origin (by default, this is
 the Sun).  Each line should be of the form
-YYYYMMDD.HHMMSS range lat lon [localtime]
+YYYYMMDD.HHMMSS range lat lon localtime
 For example,
 19951207.120000     10.328   -3.018   97.709    9.595
-Range is in planetary radii, and lat and lon are in degrees.  The
-localtime (in hours) is optional, but if supplied, it will be used in
-place of the longitude.  For each line in the origin file, the
-observer is placed at the specified position, relative to the body
-specified with -origin.  This option is useful for showing spacecraft
-flybys or orbiting around a planet.  Any line with a # in the first
-column is ignored.
+Range is in planetary radii, and lat and lon are in degrees.  The date
+is the only required value.  If the localtime (in hours) is supplied,
+it will be used in place of the longitude.  For each line in the
+origin file, the observer is placed at the specified position,
+relative to the body specified with -origin.  This option is useful
+for showing spacecraft flybys or orbiting around a planet.  Any line
+with a # in the first column is ignored.
 
 -output filename
 Output to a file instead of rendering to a window.  The file format is
@@ -301,6 +302,17 @@ The projection type may be one of ancient, azimuthal, hemisphere,
 lambert, mercator, mollweide, peters, orthographic, or rectangular.
 The default is no projection.  Multiple bodies will not be shown if
 this options is specified, although shadows will still be drawn.
+
+-proj_param value
+Pass additional parameters for some projections.  The only projections
+that use this option at present are the Bonne, Gnomonic, and Mercator
+projections.  The Bonne projection is conformal at the specified
+latitude.  Higher values lead to a thinner heart shape.  The default
+is 50 degrees.  The Gnomonic and Mercator projections use the
+specified latitude as the boundaries of the projection.  The defaults
+are 45 and 80 degrees, respectively.  This option may be used more
+than once for future projections that require additional parameters.
+Only the first value is used at present.
 
 -quality quality
 This option is only used when creating JPEG images.  The quality can
@@ -411,13 +423,13 @@ transparent when writing a PNG file.
 Same as -gmtlabel.
 
 -verbosity level
-level	   output
-< 0	   only fatal error messages
-0	   non-fatal warning messages
-1	   basic information         
-2	   basic diagnostics         
-3	   more detailed diagnostics 
-4	   very detailed diagnostics 
+level      output
+< 0        only fatal error messages
+0          non-fatal warning messages
+1          basic information         
+2          basic diagnostics         
+3          more detailed diagnostics 
+4          very detailed diagnostics 
 The default value is 0.
 
 -version

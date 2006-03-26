@@ -50,7 +50,7 @@ buildColorMap()
 }
 
 void
-parseColor(string color, unsigned char RGB[3])
+parseColor(string color, unsigned char RGB[3], string &failed)
 {
     if (RGBColors.empty()) buildColorMap();
 
@@ -89,7 +89,7 @@ parseColor(string color, unsigned char RGB[3])
                 ostringstream errStr;
                 errStr << "Can't find color " << color << ", using "
                        << defaultcolor << "\n";
-                xpWarn(errStr.str(), __FILE__, __LINE__);
+                failed.assign(errStr.str());
             }
         }
     }
@@ -99,3 +99,12 @@ parseColor(string color, unsigned char RGB[3])
     RGB[2] = (unsigned char)  (value & 0x0000ff);
 }
 
+void
+parseColor(string color, unsigned char RGB[3])
+{
+    string failed;
+    parseColor(color, RGB, failed);
+
+    if (!failed.empty())
+        xpWarn(failed, __FILE__, __LINE__);
+}

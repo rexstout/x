@@ -93,6 +93,7 @@ class Options
     int Projection() const       { return(projection_); };
     void Projection(const int p)     { projection_ = p; };
     int ProjectionMode() const       { return(projectionMode_); };
+    const std::vector<double> & ProjectionParameters() const { return(projectionParameters_); };
 
     double Radius() const        { return(radius_); };
     void Radius(const double r)  { radius_ = r; };
@@ -235,6 +236,8 @@ class Options
     bool printEphemeris_;
     int projection_;         // type of map projection
     int projectionMode_;         // type of map projection
+    std::vector<double> projectionParameters_; // extra parameters
+                                               // used for projection
 
     int quality_;        // For JPEG images
 

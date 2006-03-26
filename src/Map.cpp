@@ -264,12 +264,12 @@ Map::OverlayClouds(const unsigned char *clouds)
     int ipos = 0;
     for (int i = 0; i < area_; i++)
     {
-        const unsigned char cloudVal = new_clouds[ipos];
         if ((int) new_clouds[ipos] >= targetProperties_->CloudThreshold()) 
         {
-            const double opacity = ((double) cloudVal) / 255;
             for (int j = ipos; j < ipos + 3; j++)
             {
+                const unsigned char cloudVal = new_clouds[j];
+                const double opacity = ((double) cloudVal) / 255;
                 double color = (opacity * cloudVal 
                                 + (1-opacity) * dayData_[j]);
                 dayData_[j] = (unsigned char) color;

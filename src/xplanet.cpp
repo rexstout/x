@@ -185,12 +185,20 @@ main(int argc, char **argv)
             }
             else
             {
-                // Use the next time and position in the origin file
+                // Use the next time in the origin file
                 options->setTime(iterOriginVector->time);
-                options->Range(iterOriginVector->radius);
-                options->Latitude(iterOriginVector->latitude);
-                options->Longitude(iterOriginVector->longitude);
-                options->LocalTime(iterOriginVector->localTime);
+
+                // Use the position, if specified, in the origin file
+                if (iterOriginVector->radius > 0)
+                {
+                    options->Range(iterOriginVector->radius);
+                    options->Latitude(iterOriginVector->latitude);
+                    options->Longitude(iterOriginVector->longitude);
+
+                    // Use the local time, if specified, in the origin file
+                    if (iterOriginVector->localTime > 0)
+                        options->LocalTime(iterOriginVector->localTime);
+                }
             }
         }
 

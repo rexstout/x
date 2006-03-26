@@ -27,8 +27,8 @@ static void
 readMarkerFile(const char *line, Planet *planet, const double pR, 
                const double pX, const double pY, const double pZ,
                View *view, ProjectionBase *projection,
-               const int width, const int height, 
-               unsigned char *color, string &font, const double magnify,
+               const int width, const int height, unsigned char *color, 
+               string &font, int fontSize, const double magnify,
                map<double, Planet *> &planetsFromSunMap, 
                multimap<double, Annotation *> &annotationMap)
 {
@@ -43,7 +43,6 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
     Options *options = Options::getInstance();
 
     int align = AUTO;
-    int fontSize = -1;
     bool haveLat = false;
     double lat, lon;
     string image;
@@ -359,6 +358,7 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
     }
 }
 
+// Used for labeling planets/moons
 void
 addMarkers(PlanetProperties *planetProperties, Planet *planet, 
            const double pixel_radius,
@@ -384,10 +384,11 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
                 unsigned char color[3];
                 memcpy(color, planetProperties->MarkerColor(), 3);
                 string font(planetProperties->MarkerFont());
+                int fontSize(planetProperties->MarkerFontSize());
                 
                 readMarkerFile(line, planet, pixel_radius, X, Y, Z, 
                                view, projection, width, height, 
-                               color, font,
+                               color, font, fontSize, 
                                planetProperties->Magnify(),
                                planetsFromSunMap, annotationMap);
             }
@@ -405,6 +406,7 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
     }
 }
 
+// Used for labeling star fields
 void
 addMarkers(View *view, const int width, const int height, 
            map<double, Planet *> &planetsFromSunMap, 
@@ -428,10 +430,11 @@ addMarkers(View *view, const int width, const int height,
                 unsigned char color[3];
                 memcpy(color, options->Color(), 3);
                 string font(options->Font());
+                int fontSize(options->FontSize());
                 
                 readMarkerFile(line, NULL, 0, 0, 0, 0,
                                view, NULL, width, height, 
-                               color, font, 1.0, 
+                               color, font, fontSize, 1.0, 
                                planetsFromSunMap, annotationMap);
             }            
             inFile.close();

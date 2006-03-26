@@ -6,17 +6,22 @@ using namespace std;
 #include "DisplayBase.h"
 #include "TextRendererPangoFT2.h"
 
+PangoFontMap* TextRendererPangoFT2::fontMap_ = NULL;
+
 TextRendererPangoFT2::TextRendererPangoFT2(DisplayBase *display) 
     : TextRenderer(display), direction_(PANGO_DIRECTION_LTR)
 {
     g_type_init();
-
-    fontMap_ = pango_ft2_font_map_new();
+    
+    // There is a memory leak in the pango library.  This can be
+    // minimized by making the fontMap_ member static.
+    // See http://bugzilla.gnome.org/show_bug.cgi?id=143542
+    if (fontMap_ == NULL) fontMap_ = pango_ft2_font_map_new();
     int dpiX = 100;
     int dpiY = 100;
     pango_ft2_font_map_set_resolution(PANGO_FT2_FONT_MAP(fontMap_), 
                                       dpiX, dpiY);
-
+    
     context_ = pango_ft2_font_map_create_context(PANGO_FT2_FONT_MAP(fontMap_));
 
     pango_context_set_language(context_,
@@ -38,7 +43,7 @@ TextRendererPangoFT2::~TextRendererPangoFT2()
     g_object_unref(layout_);
     pango_font_description_free(fontDescription_);
     g_object_unref(context_);
-    g_object_unref(fontMap_);
+//    g_object_unref(fontMap_);
     pango_ft2_shutdown_display();
 }
 
@@ -52,7 +57,6 @@ TextRendererPangoFT2::Font(const string &font)
     pango_font_description_set_weight(fontDescription_, PANGO_WEIGHT_NORMAL);
     pango_font_description_set_stretch(fontDescription_, 
                                        PANGO_STRETCH_NORMAL);
-
 }
 
 void

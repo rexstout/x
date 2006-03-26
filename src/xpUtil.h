@@ -7,6 +7,9 @@
 
 #ifndef M_PI
 #define M_PI           3.14159265358979323846  /* pi */
+#endif
+
+#ifndef M_PI_2
 #define M_PI_2         1.57079632679489661923  /* pi/2 */
 #endif
 
@@ -52,13 +55,11 @@ extern void removeFromEnvironment(const char *name);
 
 extern void unlinkFile(const char *name);
 
-extern void
-getWeights(const double t, const double u, double weights[4]);
+extern void getWeights(const double t, const double u, double weights[4]);
 
-extern void
-calcGreatArc(const double lat1, const double lon1,
-             const double lat2, const double lon2,
-             double &trueCourse, double &dist);
+extern void calcGreatArc(const double lat1, const double lon1,
+                         const double lat2, const double lon2,
+                         double &trueCourse, double &dist);
 
 extern double kepler(const double e, double M);
 
@@ -73,10 +74,8 @@ extern void xpWarn(const std::string &message, const char *file,
 extern void xpMsg(const std::string &message, const char *file, 
                   const int line);
 
-extern void
-strftimeUTF8(std::string &timeString);
+extern void strftimeUTF8(std::string &timeString);
 
-extern char *
-checkLocale(const int category, const char *locale);
+extern char * checkLocale(const int category, const char *locale);
 
 #endif

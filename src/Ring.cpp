@@ -9,7 +9,6 @@ using namespace std;
 #include "libplanet/Planet.h"
 
 Ring::Ring(const double inner_radius, const double outer_radius, 
-           const double planet_radius, 
            const double *ring_brightness, const int num_bright,
            const double *ring_transparency, const int num_trans,
            const double sunlon, const double sunlat,
@@ -19,9 +18,9 @@ Ring::Ring(const double inner_radius, const double outer_radius,
                         sunLat_(sunlat),
                         sunLon_(sunlon)
 {
-    r_out = outer_radius/planet_radius;
-    dr_b = (outer_radius - inner_radius) / (num_bright * planet_radius);
-    dr_t = (outer_radius - inner_radius) / (num_trans * planet_radius);
+    r_out = outer_radius * 1.01; // fudge to agree better with Cassini
+    dr_b = (outer_radius - inner_radius) / num_bright;
+    dr_t = (outer_radius - inner_radius) / num_trans;
 
     const int innerPadding = 100;
     const int outerPadding = 20;

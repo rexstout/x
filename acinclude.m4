@@ -1,4 +1,4 @@
-AC_DEFUN(AC_FIND_LOCALE_CHARSET,
+AC_DEFUN([AC_FIND_LOCALE_CHARSET],
 [
 have_locale_charset='no'
 have_localcharset_h='no'
@@ -20,7 +20,7 @@ if test "$have_langinfo_h" = 'yes'; then
 fi
 ])
 
-AC_DEFUN(AC_FIND_CSPICE,
+AC_DEFUN([AC_FIND_CSPICE],
 [
 
 AC_ARG_WITH(cspice,AC_HELP_STRING([--with-cspice],[Use JPL's SPICE toolkit (YES)]))
@@ -46,7 +46,7 @@ if test "$with_cspice" != 'no'; then
 fi
 ])
 
-AC_DEFUN(AC_FIND_FREETYPE,
+AC_DEFUN([AC_FIND_FREETYPE],
 [
 
 AC_ARG_WITH(freetype,AC_HELP_STRING([--with-freetype],[Enable Freetype support for TrueType fonts (YES)]))
@@ -67,7 +67,7 @@ if test "$with_freetype" != 'no'; then
 fi
 ])
 
-AC_DEFUN(AC_FIND_PANGO,
+AC_DEFUN([AC_FIND_PANGO],
 [
 AC_ARG_WITH(pango,AC_HELP_STRING([--with-pango],[Enable Pango (YES)]))
 
@@ -92,7 +92,7 @@ fi
 dnl Autoconf stuff to check for graphics libraries is adapted from 
 dnl imagemagick's configure.in
 
-AC_DEFUN(AC_FIND_GRAPHICS_LIBS,
+AC_DEFUN([AC_FIND_GRAPHICS_LIBS],
 
 [
 
@@ -238,7 +238,7 @@ AC_SUBST(GRAPHICS_LIBS)
 # Check for X11
 #
 
-AC_DEFUN(AC_FIND_X11,
+AC_DEFUN([AC_FIND_X11],
 [
 
 have_libx11='no'
@@ -260,7 +260,7 @@ dnl Locate X include files and libraries
 fi
 ])
 
-AC_DEFUN(AC_FIND_XSS,
+AC_DEFUN([AC_FIND_XSS],
 [
 dnl Check for XScreenSaver
 AC_ARG_WITH(xscreensaver,AC_HELP_STRING([--with-xscreensaver],[compile with X screensaver extension (YES)]))
@@ -288,7 +288,7 @@ fi
 fi
 ])
 
-AC_DEFUN(AC_USE_MACAQUA,
+AC_DEFUN([AC_USE_MACAQUA],
 [
 AC_ARG_WITH(aqua,AC_HELP_STRING([--with-aqua],[For Mac OS X Aqua (NO)]))
 AC_ARG_WITH(quicktime,AC_HELP_STRING([--with-quicktime],[On Aqua, use Quicktime library to read/write image files (YES)]))
