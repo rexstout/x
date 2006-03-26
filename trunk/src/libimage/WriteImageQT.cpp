@@ -7,7 +7,6 @@ using namespace std;
 
 #include <Quicktime/Quicktime.h>
 
-#include "config.h"
 #include "xpUtil.h"
 
 typedef struct {

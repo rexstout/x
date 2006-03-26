@@ -257,6 +257,7 @@ nobase_dist_data_DATA = \
 	xplanet/images/smile.png        \
 	xplanet/images/sublunar.png	\
 	xplanet/images/subsolar.png	\
+	xplanet/images/sun.jpg		\
 	xplanet/markers/README		\
 	xplanet/markers/brightStars	\
 	xplanet/markers/earth		\

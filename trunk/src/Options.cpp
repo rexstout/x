@@ -55,6 +55,7 @@ Options::~Options()
 }
 
 Options::Options() :
+    arcSpacing_(0.1),
     background_(""),
     baseMag_(10.0),
     centerSelected_(false),
@@ -71,6 +72,9 @@ Options::Options() :
     fovMode_(RADIUS),
     geometryMask_(NoValue),
     geometrySelected_(false),
+    glare_(28),
+    grsLon_(94),
+    grsSet_(false),
     hibernate_(0),
     idleWait_(0),
     interpolateOriginFile_(false),
@@ -184,6 +188,7 @@ Options::parseArgs(int argc, char **argv)
     static struct option long_options[] =
         {
             {"arc_file",       required_argument, NULL, ARC_FILE},
+            {"arc_spacing",    required_argument, NULL, ARC_SPACING},
             {"background",     required_argument, NULL, BACKGROUND},
             {"base_magnitude", required_argument, NULL, BASEMAG},
             {"body",           required_argument, NULL, TARGET},
@@ -199,7 +204,9 @@ Options::parseArgs(int argc, char **argv)
             {"fork",           no_argument,       NULL, FORK},
             {"fov",            required_argument, NULL, FOV},
             {"geometry",       required_argument, NULL, GEOMETRY},
+            {"glare",          required_argument, NULL, GLARE},
             {"gmtlabel",       no_argument,       NULL, UTCLABEL},
+            {"grs_longitude",  required_argument, NULL, GRS_LON},
             {"hibernate",      required_argument, NULL, HIBERNATE},
             {"idlewait",       required_argument, NULL, IDLEWAIT},
             {"interpolate_origin_file",          no_argument,       NULL, INTERPOLATE_ORIGIN_FILE},
@@ -268,6 +275,16 @@ Options::parseArgs(int argc, char **argv)
         {
         case ARC_FILE:
             arcFiles_.push_back(optarg);
+            break;
+        case ARC_SPACING:
+            sscanf(optarg, "%lf", &arcSpacing_);
+            if (arcSpacing_ < 0)
+            {
+                ostringstream errMsg;
+                errMsg << "Arc spacing must be > 0\n";
+                xpWarn(errMsg.str(), __FILE__, __LINE__);
+                arcSpacing_ = 0.1;
+            }
             break;
         case BACKGROUND:
             background_ = optarg;
@@ -375,6 +392,18 @@ Options::parseArgs(int argc, char **argv)
                                  && (geometryMask_ & HeightValue));
         }
         break;
+        case GLARE:
+        { 
+            double g;
+            sscanf(optarg, "%lf", &g);
+            if (g > 0) glare_ = g;
+        }
+        break;
+        case GRS_LON:
+            sscanf(optarg, "%lf", &grsLon_);
+            grsLon_ = fmod(grsLon_, 360);
+            grsSet_ = true;
+            break;
         case HIBERNATE:
             sscanf(optarg, "%lu", &hibernate_);
             hibernate_ *= 1000;
@@ -667,6 +696,22 @@ Options::parseArgs(int argc, char **argv)
         case RANDOM:
             random_ = true;
             originMode_ = LBR;
+
+            // This block is repeated in setOrigin(), but this way the
+            // user can use -random to set a random rotation and then
+            // set the sub-observer point another way, like with
+            // -origin sun
+            longitude_ = random() % 360;
+            longitude_ *= deg_to_rad;
+
+            // Weight random latitudes towards the equator
+            latitude_ = (random() % 2000)/1000.0 - 1;
+            latitude_ = asin(latitude_);
+
+            rotate0_ = random() % 360;
+            rotate0_ *= deg_to_rad;
+            rotate_ = rotate0_;
+
             break;
         case RANGE:
             sscanf(optarg, "%lf", &range_);

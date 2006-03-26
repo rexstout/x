@@ -358,107 +358,105 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         {
             display->setPixel(pX, pY, currentProperties->Color());
             if (current_planet->Index() == SUN) 
-                drawSun(display, pX, pY, 1, currentProperties->Color());
+                drawSunGlare(display, pX, pY, 1, currentProperties->Color());
 
             continue;
         }
 
-        if (current_planet->Index() == SUN) 
+        double X, Y, Z;
+        current_planet->getPosition(X, Y, Z);
+        
+        Ring *ring = NULL;
+        // Draw the far side of Saturn's rings
+        if (current_planet->Index() == SATURN) 
         {
-            drawSun(display, pX, pY, pR, currentProperties->Color());
+            const double r_in = (currentProperties->Magnify() 
+                                 * inner_radius/saturn_radius);
+            const double r_out = (currentProperties->Magnify() 
+                                  * outer_radius/saturn_radius);
+            ring = new Ring(r_in, r_out, 
+                            ring_brightness, LIT, ring_transparency, 
+                            TRANSP, sLon, sLat,
+                            currentProperties->Shade(), 
+                            current_planet);
+
+            const bool lit_side = (sLat * oLat > 0);
+            drawRings(current_planet, display, view, ring, pX, pY, pR, 
+                      oLat, oLon, lit_side, true);
+        }
+
+        Map *m = NULL;
+        m = createMap(sLat, sLon, oLat, oLon, width, height, pR,
+                      current_planet, ring, planetsFromSunMap,
+                      currentProperties);
+        if (current_planet->Index() == JUPITER
+            || current_planet->Index() == SATURN)
+        {
+            drawEllipsoid(pX, pY, pR, oX, oY, oZ, 
+                          X, Y, Z, display, view, m,
+                          current_planet, 
+                          currentProperties->Magnify());
         }
         else
         {
-            double X, Y, Z;
-            current_planet->getPosition(X, Y, Z);
-        
-            Ring *ring = NULL;
-            // Draw the far side of Saturn's rings
-            if (current_planet->Index() == SATURN) 
-            {
-		const double r_in = (currentProperties->Magnify() 
-				     * inner_radius/saturn_radius);
-		const double r_out = (currentProperties->Magnify() 
-				     * outer_radius/saturn_radius);
-		ring = new Ring(r_in, r_out, 
-                                ring_brightness, LIT, ring_transparency, 
-                                TRANSP, sLon, sLat,
-                                currentProperties->Shade(), 
-                                current_planet);
+            drawSphere(pX, pY, pR, oX, oY, oZ, 
+                       X, Y, Z, display, view, m,
+                       current_planet, 
+                       current_planet->Radius() 
+                       * currentProperties->Magnify());
+        }
+        delete m;
 
-                const bool lit_side = (sLat * oLat > 0);
-                drawRings(current_planet, display, view, ring, pX, pY, pR, 
-                          oLat, oLon, lit_side, true);
-            }
+        // Draw the grid
+        if (currentProperties->Grid())
+        {
+            const double grid1 = currentProperties->Grid1();
+            const double grid2 = currentProperties->Grid2();
+            const unsigned char *color = currentProperties->GridColor();
+            for (double lat = -M_PI_2; lat <= M_PI_2; lat += M_PI_2/grid1)
+            {
+                const double radius = current_planet->Radius(lat);
 
-            Map *m = NULL;
-            m = createMap(sLat, sLon, oLat, oLon, width, height, pR,
-                          current_planet, ring, planetsFromSunMap,
-                          currentProperties);
-            if (current_planet->Index() == JUPITER
-                || current_planet->Index() == SATURN)
-            {
-                drawEllipsoid(pX, pY, pR, oX, oY, oZ, 
-                              X, Y, Z, display, view, m,
-                              current_planet, 
-                              currentProperties->Magnify());
-            }
-            else
-            {
-                drawSphere(pX, pY, pR, oX, oY, oZ, 
-                           X, Y, Z, display, view, m,
-                           current_planet, 
-                           current_planet->Radius() 
-                           * currentProperties->Magnify());
-            }
-            delete m;
-
-            // Draw the grid
-            if (currentProperties->Grid())
-            {
-                const double grid1 = currentProperties->Grid1();
-                const double grid2 = currentProperties->Grid2();
-                const unsigned char *color = currentProperties->GridColor();
-                for (double lat = -M_PI_2; lat <= M_PI_2; lat += M_PI_2/grid1)
+                for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/(grid1 * grid2))
                 {
-                    const double radius = current_planet->Radius(lat);
-
-                    for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/(grid1 * grid2))
-                    {
-                        double X, Y, Z;
-                        sphericalToPixel(lat, lon, 
-                                         radius * currentProperties->Magnify(),
-                                         X, Y, Z, current_planet, view, NULL);
-                        if (Z < dist_to_planet) display->setPixel(X, Y, color);
-                    }
+                    double X, Y, Z;
+                    sphericalToPixel(lat, lon, 
+                                     radius * currentProperties->Magnify(),
+                                     X, Y, Z, current_planet, view, NULL);
+                    if (Z < dist_to_planet) display->setPixel(X, Y, color);
                 }
+            }
                 
-                for (double lat = -M_PI_2; lat <= M_PI_2; lat += M_PI_2/(grid1 * grid2))
-                {
-                    const double radius = current_planet->Radius(lat);
+            for (double lat = -M_PI_2; lat <= M_PI_2; lat += M_PI_2/(grid1 * grid2))
+            {
+                const double radius = current_planet->Radius(lat);
 
-                    for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/grid1)
-                    {
-                        double X, Y, Z;
-                        sphericalToPixel(lat, lon, 
-                                         radius * currentProperties->Magnify(),
-                                         X, Y, Z, current_planet, view, NULL);
-                        if (Z < dist_to_planet) display->setPixel(X, Y, color);
-                    }
+                for (double lon = -M_PI; lon <= M_PI; lon += M_PI_2/grid1)
+                {
+                    double X, Y, Z;
+                    sphericalToPixel(lat, lon, 
+                                     radius * currentProperties->Magnify(),
+                                     X, Y, Z, current_planet, view, NULL);
+                    if (Z < dist_to_planet) display->setPixel(X, Y, color);
                 }
             }
+        }
             
-            // Draw the near side of Saturn's rings
-            if (current_planet->Index() == SATURN) 
-            {
-                const bool lit_side = (sLat * oLat > 0);
-                drawRings(current_planet, display, view, ring, pX, pY, pR, 
-                          oLat, oLon, lit_side, false);
-            }
-
-            delete ring;
+        if (current_planet->Index() == SUN) 
+        {
+            drawSunGlare(display, pX, pY, pR, currentProperties->Color());
         }
 
+        // Draw the near side of Saturn's rings
+        if (current_planet->Index() == SATURN) 
+        {
+            const bool lit_side = (sLat * oLat > 0);
+            drawRings(current_planet, display, view, ring, pX, pY, pR, 
+                      oLat, oLon, lit_side, false);
+        }
+
+        delete ring;
+ 
         // draw all of the annotations in front of this body
         if (!annotationMap.empty())
         {

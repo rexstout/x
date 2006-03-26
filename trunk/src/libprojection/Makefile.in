@@ -54,7 +54,8 @@ libprojection_a_LIBADD =
 am_libprojection_a_OBJECTS = ProjectionAncient.$(OBJEXT) \
 	ProjectionAzimuthal.$(OBJEXT) ProjectionBase.$(OBJEXT) \
 	ProjectionBonne.$(OBJEXT) ProjectionGnomonic.$(OBJEXT) \
-	ProjectionHemisphere.$(OBJEXT) ProjectionLambert.$(OBJEXT) \
+	ProjectionHemisphere.$(OBJEXT) \
+	ProjectionIcosagnomonic.$(OBJEXT) ProjectionLambert.$(OBJEXT) \
 	ProjectionMercator.$(OBJEXT) ProjectionMollweide.$(OBJEXT) \
 	ProjectionOrthographic.$(OBJEXT) ProjectionPeters.$(OBJEXT) \
 	ProjectionPolyconic.$(OBJEXT) ProjectionRectangular.$(OBJEXT) \
@@ -233,6 +234,8 @@ libprojection_a_SOURCES = \
 		ProjectionGnomonic.h		\
 		ProjectionHemisphere.cpp	\
 		ProjectionHemisphere.h		\
+		ProjectionIcosagnomonic.cpp	\
+		ProjectionIcosagnomonic.h	\
 		ProjectionLambert.cpp		\
 		ProjectionLambert.h		\
 		ProjectionMercator.cpp		\
@@ -305,6 +308,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionBonne.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionGnomonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionHemisphere.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionIcosagnomonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionLambert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionMercator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionMollweide.Po@am__quote@

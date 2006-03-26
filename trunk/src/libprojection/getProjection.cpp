@@ -13,6 +13,7 @@ using namespace std;
 #include "ProjectionBonne.h"
 #include "ProjectionGnomonic.h"
 #include "ProjectionHemisphere.h"
+#include "ProjectionIcosagnomonic.h"
 #include "ProjectionLambert.h"
 #include "ProjectionMercator.h"
 #include "ProjectionMollweide.h"
@@ -34,6 +35,7 @@ setProjectionTypes()
         projectionTypes.push_back(BONNE);
         projectionTypes.push_back(GNOMONIC);
         projectionTypes.push_back(HEMISPHERE);
+        projectionTypes.push_back(ICOSAGNOMONIC);
         projectionTypes.push_back(LAMBERT);
         projectionTypes.push_back(MERCATOR);
         projectionTypes.push_back(MOLLWEIDE);
@@ -71,6 +73,8 @@ getProjectionType(char *proj_string)
         projection = GNOMONIC;
     else if (strncmp(lowercase, "hemisphere", 1) == 0)
         projection = HEMISPHERE;
+    else if (strncmp(lowercase, "icosagnomonic", 1) == 0)
+        projection = ICOSAGNOMONIC;
     else if (strncmp(lowercase, "lambert", 1) == 0)
         projection = LAMBERT;
     else if (strncmp(lowercase, "mercator", 2) == 0)
@@ -125,6 +129,9 @@ getProjection(const int projection, const int flipped,
         break;
     case HEMISPHERE:
         thisProjection = new ProjectionHemisphere(flipped, width, height);
+        break;
+    case ICOSAGNOMONIC:
+        thisProjection = new ProjectionIcosagnomonic(flipped, width, height);
         break;
     case LAMBERT:
         thisProjection = new ProjectionLambert(flipped, width, height);

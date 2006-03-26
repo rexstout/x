@@ -21,6 +21,8 @@ libprojection_a_SOURCES = 	\
 		ProjectionGnomonic.h		\
 		ProjectionHemisphere.cpp	\
 		ProjectionHemisphere.h		\
+		ProjectionIcosagnomonic.cpp	\
+		ProjectionIcosagnomonic.h	\
 		ProjectionLambert.cpp		\
 		ProjectionLambert.h		\
 		ProjectionMercator.cpp		\

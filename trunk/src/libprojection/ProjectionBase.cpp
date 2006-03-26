@@ -2,12 +2,27 @@
 using namespace std;
 
 #include "Options.h"
+#include "xpUtil.h"
+
 #include "ProjectionBase.h"
 
 ProjectionBase::ProjectionBase(const int flipped, const int w, const int h) 
     : flipped_(flipped), width_(w), height_(h)
 {
     Options *options = Options::getInstance();
+    init(flipped, w, h, options);
+}
+
+ProjectionBase::ProjectionBase(const int flipped, const int w, const int h,
+                               const Options* o) 
+    : flipped_(flipped), width_(w), height_(h)
+{
+    init(flipped, w, h, o);
+}
+
+void ProjectionBase::init(const int flipped, const int w, const int h,
+                          const Options* options) 
+{
     centerLat_ = options->Latitude();
     centerLon_ = options->Longitude() * flipped_;
     const double rotAngle = options->Rotate();
@@ -160,7 +175,7 @@ ProjectionBase::buildPhotoTable()
     for (int i = 0; i < tableSize_; i++)
     {
         cosAngle_[i] = i / (tableSize_ - 1.);
-        photoFunction_[i] = sqrt(cosAngle_[i]);
+        photoFunction_[i] = photoFunction(cosAngle_[i]);
     }
 }
 

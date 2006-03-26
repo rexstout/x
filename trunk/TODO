@@ -1,3 +1,7 @@
+Bug with range in origin file?
+
+use -random to set rotation, then set lat/lon other ways
+
 Use gettext for date string
 
 Java gui
@@ -14,4 +18,3 @@ add spice objects to planet list, not annotation map
 
 multiple line markers
 
-marker_fontsize in config file

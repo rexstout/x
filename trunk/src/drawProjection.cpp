@@ -60,21 +60,19 @@ drawProjection(DisplayBase *display, Planet *target,
         double X, Y, Z;
         target->getPosition(X, Y, Z);
         ring = new Ring(inner_radius/saturn_radius, 
-			outer_radius/saturn_radius, 
+                        outer_radius/saturn_radius, 
                         ring_brightness, LIT, ring_transparency, TRANSP,
                         sLon, sLat, 
                         planetProperties->Shade(), 
                         target);
     }
 
-    const bool isSun = (target->Index() == SUN);
     Map *m = NULL;
-    if (!isSun)
-        m = createMap(sLat, sLon,
-                      options->Latitude(), options->Longitude(), 
-                      width, height, options->Radius() * height,
-                      target, ring, planetsFromSunMap,
-                      planetProperties);
+    m = createMap(sLat, sLon,
+                  options->Latitude(), options->Longitude(), 
+                  width, height, options->Radius() * height,
+                  target, ring, planetsFromSunMap,
+                  planetProperties);
 
     if (target->Index() == SATURN) 
     {
@@ -137,10 +135,7 @@ drawProjection(DisplayBase *display, Planet *target,
             if (projection->pixelToSpherical(i, j, lon, lat))
             {
                 unsigned char color[3];
-                if (isSun) 
-                    memcpy(color, planetProperties->Color(), 3);
-                else
-                    m->GetPixel(lat, lon * target->Flipped(), color);
+                m->GetPixel(lat, lon * target->Flipped(), color);
 
                 if (limbDarkening)
                 {

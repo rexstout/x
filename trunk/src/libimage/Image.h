@@ -27,6 +27,7 @@ class Image
     bool Crop(const int x0, const int y0, const int x1, const int y1);
     void Reduce(const int factor);
     void Resize(const int w, const int h);
+    void Shift(const int x);
 
  private:
     int width_, height_, area_;

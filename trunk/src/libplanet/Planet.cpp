@@ -116,8 +116,8 @@ Planet::parseBodyName(char *name)
 }
 
 /*
-  Rotational parameters are from Davies et al. (1996), Celestial
-  Mechanics 63, 127--148.
+  Rotational parameters are from Seidelmann et al. (2002), Celestial
+  Mechanics 82, 83--110.
 */
 Planet::Planet(const double jd, const body this_body) 
     : index_(this_body), 
@@ -157,7 +157,7 @@ Planet::Planet(const double jd, const body this_body)
         alpha0_ = 281.01 - 0.033 * T2000_;
         delta0_ = 61.45 - 0.005 * T2000_;
 
-        nullMeridian0_ = 329.68;
+        nullMeridian0_ = 329.548;
         wdot_ = 6.1385025;
 
         flipped_ = -1; 
@@ -191,7 +191,7 @@ Planet::Planet(const double jd, const body this_body)
         alpha0_ = 0 - 0.641 * T2000_;
         delta0_ = 90 - .557 * T2000_;
         
-        nullMeridian0_ = 190.16;
+        nullMeridian0_ = 190.147;
         wdot_ = 360.9856235;
         
         flipped_ = 1;
@@ -206,7 +206,7 @@ Planet::Planet(const double jd, const body this_body)
     case MOON:
     {
         primary_ = EARTH;
-        
+
         const double E1 = (125.045 -  0.0529921 * d2000_) * deg_to_rad;
         const double E2 = (250.089 -  0.1059842 * d2000_) * deg_to_rad;
         const double E3 = (260.008 + 13.0120009 * d2000_) * deg_to_rad;
@@ -270,11 +270,11 @@ Planet::Planet(const double jd, const body this_body)
         case MARS:
             primary_ = SUN;
             
-            alpha0_ = 317.681 - 0.108 * T2000_;
-            delta0_ = 52.886 - 0.061 * T2000_;
+            alpha0_ = 317.68143 - 0.1061 * T2000_;
+            delta0_ = 52.88650 - 0.0609 * T2000_;
             
-            nullMeridian0_ = 176.901;
-            wdot_ = 350.891983;
+            nullMeridian0_ = 176.630;
+            wdot_ = 350.89198226;
             
             period_ = 686.980;
             
@@ -340,10 +340,17 @@ Planet::Planet(const double jd, const body this_body)
 
             alpha0_ = 268.05 - 0.009 * T2000_;
             delta0_ = 64.49 + 0.003 * T2000_;
-          
+
             // System III (magnetic field rotation)
             nullMeridian0_ = 284.95;
-            wdot_ = 870.536;
+            wdot_ = 870.5366420;
+
+            if (options->GRSSet())
+            {
+                // System II
+                nullMeridian0_ = 43.3;
+                wdot_ = 870.270;
+            }
 
             period_ = 4332.589;
 

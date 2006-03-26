@@ -49,7 +49,7 @@ DisplayOutput::renderImage(PlanetProperties *planetProperties[])
     Options *options = Options::getInstance();
     string outputFilename = options->OutputBase();
     int startIndex = options->OutputStartIndex();
-    int stopIndex = options->NumTimes() + startIndex;
+    int stopIndex = options->NumTimes() + startIndex - 1;
     if (stopIndex > 1)
     {
         const int digits = (int) (log10((double) stopIndex) + 1);
@@ -68,7 +68,7 @@ DisplayOutput::renderImage(PlanetProperties *planetProperties[])
         xpExit(errStr.str(), __FILE__, __LINE__);
     }
 
-    if (options->Verbosity() > 1)
+    if (options->Verbosity() > 0)
     {
         ostringstream msg;
         msg << "Created image file " << outputFilename << "\n";

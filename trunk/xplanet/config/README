@@ -28,6 +28,15 @@ Specify a great arc file for this planet.  This option may be used
 more than once.  See the README and sample files in the xplanet/arcs
 directory for more information.  The default is no arc files.
 
+bump_map
+Specify a bump map to use for relief shading.  This is assumed to be
+an greyscale image file representing a digital elevation map with
+elevations ranging from 0 to 255.  The default is no bump map.
+
+bump_scale
+Exaggerate the vertical relief for computing the shading.  The default
+value is 1.
+
 cloud_gamma
 Apply a gamma correction to the cloud image before overlaying.  Each
 pixel's brightness is adjusted according to:

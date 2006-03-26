@@ -17,6 +17,12 @@ class PlanetProperties
     const unsigned char * ArcColor() const { return(arcColor_); };
     void ArcColor(unsigned char color[3]) { memcpy(arcColor_, color, 3); };
 
+    const std::string & BumpMap() const           { return(bumpMap_); };
+    void BumpMap(const std::string &b) { bumpMap_ = b; };
+
+    double BumpScale() const { return(bumpScale_); };
+    void BumpScale(double b) { bumpScale_ = b; };
+
     double CloudGamma() const { return(cloudGamma_); };
     void CloudGamma(double c) { cloudGamma_ = c; };
 
@@ -132,6 +138,9 @@ class PlanetProperties
     unsigned char arcColor_[3];
 
     std::vector<std::string> arcFiles_;
+
+    std::string bumpMap_;
+    double bumpScale_;
 
     double cloudGamma_;
     std::string cloudMap_;

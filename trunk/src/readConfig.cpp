@@ -95,6 +95,32 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             }
         }
         break;
+        case BUMP_MAP:
+        {
+	    // This is one that doesn't belong in [default]
+	    if (currentProperties == defaultProperties)
+	    {
+		ostringstream errStr;
+		errStr << "bump_map specified in [default] section.  "
+		       << "You probably want to put it in a specific "
+		       << "planet's section (like [earth]).\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+	    }
+            string bumpMap(returnString);
+            if (bumpMap.find('.') == string::npos)
+                bumpMap += defaultMapExt;
+            currentProperties->BumpMap(bumpMap);
+        }
+        break;
+        case BUMP_SCALE:
+        {
+            checkLocale(LC_NUMERIC, "C");
+            double bumpScale;
+            sscanf(returnString, "%lf", &bumpScale);
+            currentProperties->BumpScale(bumpScale);
+            checkLocale(LC_NUMERIC, "");
+        }
+        break;
         case CLOUD_GAMMA:
         {
             checkLocale(LC_NUMERIC, "C");
@@ -106,6 +132,15 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         case CLOUD_MAP:
         {
+	    // This is one that doesn't belong in [default]
+	    if (currentProperties == defaultProperties)
+	    {
+		ostringstream errStr;
+		errStr << "cloud_map specified in [default] section.  "
+		       << "You probably want to put it in a specific "
+		       << "planet's section (like [earth]).\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+	    }
             string cloudMap(returnString);
             if (cloudMap.find('.') == string::npos)
                 cloudMap += defaultMapExt;
@@ -144,6 +179,15 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         case DAY_MAP:
         case IMAGE:
+	    // This is one that doesn't belong in [default]
+	    if (currentProperties == defaultProperties)
+	    {
+		ostringstream errStr;
+		errStr << "image or map specified in [default] section.  "
+		       << "You probably want to put it in a specific "
+		       << "planet's section (like [earth]).\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+	    }
             currentProperties->DayMap(returnString);
             break;
         case DELIMITER:
@@ -210,6 +254,15 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         break;
         case MAP_BOUNDS:
         {
+	    // This is one that doesn't belong in [default]
+	    if (currentProperties == defaultProperties)
+	    {
+		ostringstream errStr;
+		errStr << "map_bounds specified in [default] section.  "
+		       << "You probably want to put it in a specific "
+		       << "planet's section (like [earth]).\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+	    }
             checkLocale(LC_NUMERIC, "C");
             double uly, ulx, lry, lrx;
             int numRead = sscanf(returnString, "%lf,%lf,%lf,%lf", 
@@ -290,9 +343,27 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         }
         break;
         case NAME:
+	    // This is one that doesn't belong in [default]
+	    if (currentProperties == defaultProperties)
+	    {
+		ostringstream errStr;
+		errStr << "name specified in [default] section.  "
+		       << "You probably want to put it in a specific "
+		       << "planet's section (like [earth]).\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+	    }
             currentProperties->Name(returnString);
             break;
         case NIGHT_MAP:
+	    // This is one that doesn't belong in [default]
+	    if (currentProperties == defaultProperties)
+	    {
+		ostringstream errStr;
+		errStr << "night_map specified in [default] section.  "
+		       << "You probably want to put it in a specific "
+		       << "planet's section (like [earth]).\n";
+		xpWarn(errStr.str(), __FILE__, __LINE__);
+	    }
             currentProperties->NightMap(returnString);
             break;
         case ORBIT:
