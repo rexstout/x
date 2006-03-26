@@ -49,7 +49,14 @@ Timer::SleepForTime(time_t sleep_time)
             xpMsg(msg.str(), __FILE__, __LINE__);
         }
     }
-    sleep(sleep_time);
+
+    // Check every second if we've reached the time for the next
+    // update.
+    while (currentTime_.tv_sec < nextUpdate_)
+    {
+        sleep(1);
+        gettimeofday(&currentTime_, NULL);
+    }
     
     return(true);
 }

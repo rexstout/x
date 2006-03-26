@@ -30,7 +30,7 @@ skipPastToken(int &i, const char *line, const char endChar)
     {
         if (isEndOfLine(line[i])) 
         {
-            stringstream errStr;
+            ostringstream errStr;
             errStr << "Malformed line:\n\t" << line << "\n";
             xpWarn(errStr.str(), __FILE__, __LINE__);
 

@@ -189,13 +189,13 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         double jd = options->getJulianDay();
         fromJulian(jd, year, month, day, hour, min, sec);
 
-	char timeBuffer[MAX_LINE_LENGTH];
-	memset(timeBuffer, 0, MAX_LINE_LENGTH);
+        char timeBuffer[MAX_LINE_LENGTH];
+        memset(timeBuffer, 0, MAX_LINE_LENGTH);
         snprintf(timeBuffer, MAX_LINE_LENGTH, 
                  "%4.4d/%2.2d/%2.2d %2.2d:%2.2d:%2.2d UTC",
                  year, month, day, 
                  hour, min, static_cast<int> (floor(sec)));
-	timeString.assign(timeBuffer);
+        timeString.assign(timeBuffer);
     }
     else
     {
@@ -212,10 +212,10 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
             tzset();
         }
 
-	timeString.assign(options->DateFormat());
+        timeString.assign(options->DateFormat());
 
-	// run date string through strftime() and convert to UTF-8
-	strftimeUTF8(timeString);
+        // run date string through strftime() and convert to UTF-8
+        strftimeUTF8(timeString);
 
         if (options->DrawUTCLabel())
         {
@@ -286,19 +286,19 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         {
             fov *= 60;
             snprintf(fovCString, MAX_LINE_LENGTH, 
-		     "fov %.1f arc minutes", fov);
+                     "fov %.1f arc minutes", fov);
         }
         else if (fov * 3600 > 1)
         {
             fov *= 3600;
             snprintf(fovCString, MAX_LINE_LENGTH, 
-		     "fov %.1f arc seconds", fov);
+                     "fov %.1f arc seconds", fov);
         }
         else
         {
             fov *= 3600000;
             snprintf(fovCString, MAX_LINE_LENGTH, 
-		     "fov %.1f milliarc seconds", fov);
+                     "fov %.1f milliarc seconds", fov);
         }
         
         double oX, oY, oZ;
@@ -317,7 +317,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         if (targetDist < 1e6)
         {
             snprintf(distString, MAX_LINE_LENGTH, "dist %.0f km", 
-		     targetDist);
+                     targetDist);
         }
         else if (targetDist < 1e9)
         {
@@ -354,7 +354,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     if (options->LabelMask() & YNegative)
     {
         labelY += (height_ - labelLines.size() 
-		   * textRenderer_->FontHeight());
+                   * textRenderer_->FontHeight());
     }
 
     for (unsigned int i = 0; i < labelLines.size(); i++)

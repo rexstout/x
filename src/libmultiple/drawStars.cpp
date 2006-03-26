@@ -20,7 +20,7 @@ drawStars(DisplayBase *display, View *view)
     string starMap = options->getStarMap();
     if (!findFile(starMap, "stars"))
     {
-        stringstream errMsg;
+        ostringstream errMsg;
         errMsg << "Can't open star map " << starMap << endl;
         xpWarn(errMsg.str(), __FILE__, __LINE__);
         return;

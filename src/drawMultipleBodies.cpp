@@ -317,7 +317,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
     if (options->Verbosity() > 0)
     {
-        stringstream msg;
+        ostringstream msg;
         char buffer[256];
         snprintf(buffer, 256, "%10s%14s%14s%14s%14s%14s%14s%14s%14s\n", 
                  "Name", "Dist", "X", "Y", "radius",
@@ -376,7 +376,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
         if (options->Verbosity() > 0)
         {
-            stringstream msg;
+            ostringstream msg;
             char buffer[256];
             snprintf(buffer, 256, 
                      "%10s%14.4f%14.4f%14.4f%14.4f%14.4f%14.4f%14.4f%14.4f\n", 

@@ -391,7 +391,7 @@ DisplayX11::createPixmap(const unsigned char *rgb,
     break;
     default:
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "createPixmap: visual = " << visual_info->c_class << endl
                << "Visual should be either PseudoColor or TrueColor\n";
         xpWarn(errStr.str(), __FILE__, __LINE__);
@@ -499,7 +499,7 @@ DisplayX11::decomposePixmap(const Pixmap p, unsigned char *rgb)
     break;
     default:
     {
-        stringstream errStr;
+        ostringstream errStr;
         errStr << "decomposePixmap: visual = " << visual_info->c_class << endl
                << "Visual should be either PseudoColor or TrueColor\n";
         xpWarn(errStr.str(), __FILE__, __LINE__);
