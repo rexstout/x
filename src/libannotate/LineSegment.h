@@ -6,9 +6,9 @@
 class LineSegment : public Annotation
 {
  public:
-    LineSegment(const unsigned char color[3],		
-		const double X0, const double Y0,
-		const double X1, const double Y1);
+    LineSegment(const unsigned char color[3], const int thickness,
+                const double X0, const double Y0,
+                const double X1, const double Y1);
 
     virtual ~LineSegment();
 
@@ -18,6 +18,7 @@ class LineSegment : public Annotation
  private:
 
     double X0_, Y0_, X1_, Y1_;
+    double thickness_;
 
 };
 

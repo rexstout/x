@@ -14,7 +14,7 @@ using namespace std;
 static void
 addArc(const double startTime, const double stopTime, 
        const int numTimes, const unsigned char color[3],
-       const View *view, 
+       const int thickness, const View *view, 
        const int width, const int height, 
        const double Prx, const double Pry, const double Prz,
        Planet *p, multimap<double, Annotation *> &annotationMap)
@@ -77,7 +77,7 @@ addArc(const double startTime, const double stopTime,
 
             if (!skip || (i == 1 && isTarget)) 
             {
-                LineSegment *ls = new LineSegment(color, 
+                LineSegment *ls = new LineSegment(color, thickness, 
                                                   farX, farY,
                                                   nearX, nearY);
                 annotationMap.insert(pair<const double, Annotation*>(farZ, ls));
@@ -105,6 +105,7 @@ addOrbits(const double jd0, const View *view,
     const double stopOrbit = currentProperties->StopOrbit();
     const double delOrbit = currentProperties->DelOrbit();
     const unsigned char *color = currentProperties->OrbitColor();
+    const int thickness = currentProperties->ArcThickness();
 
     double Prx=0, Pry=0, Prz=0;
     if (p->Primary() != SUN)
@@ -119,8 +120,8 @@ addOrbits(const double jd0, const View *view,
 
     const int numTimes = (int) (180/delOrbit + 0.5);
 
-    addArc(startTime, jd0, numTimes, color, view, width, height, 
+    addArc(startTime, jd0, numTimes, color, thickness, view, width, height, 
            Prx, Pry, Prz, p, annotationMap);
-    addArc(jd0, stopTime, numTimes, color, view, width, height, 
+    addArc(jd0, stopTime, numTimes, color, thickness, view, width, height, 
            Prx, Pry, Prz, p, annotationMap);
 }

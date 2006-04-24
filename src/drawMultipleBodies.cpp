@@ -72,8 +72,11 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
     if (options->Verbosity() > 0)
     {
-        if (options->OriginMode() == BODY 
-            && options->TargetMode() != LOOKAT)
+        if (options->TargetMode() != XYZ
+            && (options->OriginMode() == BODY 
+                || options->OriginMode() == MAJOR
+                || options->OriginMode() == RANDOM
+                || options->OriginMode() == SYSTEM))
         {
             ostringstream msg;
             msg << "Looking at "
@@ -118,7 +121,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     {
         pixels_per_radian = width / options->FieldOfView();
         
-        if (options->TargetMode() != LOOKAT)
+        if (options->TargetMode() != XYZ)
         {
             const double target_angular_radius = target->Radius()/target_dist;
             double target_pixel_radius = (target_angular_radius 
@@ -143,7 +146,24 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     {
         ostringstream msg;
         char buffer[128];
-        snprintf(buffer, 128, "fov = %14.8f degrees\n", 
+
+        snprintf(buffer, 128, "Julian Date = %14.6f\n",
+                 options->JulianDay());
+        msg << buffer;
+
+        snprintf(buffer, 128, "origin XYZ  = %14.8f %14.8f %14.8f\n",
+                 oX, oY, oZ);
+        msg << buffer;
+
+        snprintf(buffer, 128, "target XYZ  = %14.8f %14.8f %14.8f\n",
+                 tX, tY, tZ);
+        msg << buffer;
+
+        snprintf(buffer, 128, "up XYZ      = %14.8f %14.8f %14.8f\n",
+                 upX, upY, upZ);
+        msg << buffer;
+
+        snprintf(buffer, 128, "fov         = %14.8f degrees\n", 
                  options->FieldOfView()/deg_to_rad);
         msg << buffer;
         snprintf(buffer, 128, "dist_per_pixel = %14.8f\n", dist_per_pixel);

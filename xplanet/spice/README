@@ -37,10 +37,10 @@ the earth:
 xplanet -spice_file mgs -origin earth -body mars
 
 Valid keywords are "align", "color", "font", "fontsize", "image",
-"relative_to", "trail", and "transparent".  In addition, a string
-to be plotted with the marker may be enclosed in either double quotes
-(""), or braces ({}).  If a string is not supplied, the marker will
-take the name of the object from the SPICE kernel.
+"relative_to", "thickness", "trail", and "transparent".  In addition,
+a string to be plotted with the marker may be enclosed in either
+double quotes (""), or braces ({}).  If a string is not supplied, the
+marker will take the name of the object from the SPICE kernel.
 
 If the "relative_to" keyword is not supplied, the position of the
 object is computed relative to the Sun.  Normally the best thing to do

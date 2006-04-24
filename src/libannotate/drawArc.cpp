@@ -11,8 +11,8 @@ using namespace std;
 void
 drawArc(const double lat1, const double lon1, const double rad1,
         const double lat2, const double lon2, const double rad2,
-        const unsigned char color[3], const double spacing, 
-        const double magnify,
+        const unsigned char color[3], const int thickness, 
+        const double spacing, const double magnify,
         Planet *planet, View *view, ProjectionBase *projection,
         multimap<double, Annotation *> &annotationMap)
 {
@@ -73,7 +73,8 @@ drawArc(const double lat1, const double lon1, const double rad1,
                                         + (Y2-Y1) * (Y2-Y1));
                 if (length2 < 10*prevLength2)
                 {
-                    LineSegment *ls = new LineSegment(color, X2, Y2, X1, Y1);
+                    LineSegment *ls = new LineSegment(color, thickness, 
+                                                      X2, Y2, X1, Y1);
                     annotationMap.insert(pair<const double, Annotation*>(Z, ls));
                 }
                 prevLength2 = length2;

@@ -56,6 +56,7 @@ Options::~Options()
 
 Options::Options() :
     arcSpacing_(0.1),
+    arcThickness_(1),
     background_(""),
     baseMag_(10.0),
     centerSelected_(false),
@@ -97,7 +98,6 @@ Options::Options() :
     originFile_(""),
     originID_(0),
     originMode_(LBR),
-    originSet_(false),
     outputBase_(""),
     outputExt_(defaultMapExt),
     outputStartIndex_(0),
@@ -146,7 +146,8 @@ Options::Options() :
     windowX_(0),
     windowY_(0),
     windowTitle_(""),
-    xid_(0)
+    xid_(0),
+    XYZFile_("")
 {
     memset(color_, 0, 3);
     color_[0] = 255;          // default label color is red
@@ -189,6 +190,7 @@ Options::parseArgs(int argc, char **argv)
         {
             {"arc_file",       required_argument, NULL, ARC_FILE},
             {"arc_spacing",    required_argument, NULL, ARC_SPACING},
+            {"arc_thickness",  required_argument, NULL, THICKNESS},
             {"background",     required_argument, NULL, BACKGROUND},
             {"base_magnitude", required_argument, NULL, BASEMAG},
             {"body",           required_argument, NULL, TARGET},
@@ -209,7 +211,7 @@ Options::parseArgs(int argc, char **argv)
             {"grs_longitude",  required_argument, NULL, GRS_LON},
             {"hibernate",      required_argument, NULL, HIBERNATE},
             {"idlewait",       required_argument, NULL, IDLEWAIT},
-            {"interpolate_origin_file",          no_argument,       NULL, INTERPOLATE_ORIGIN_FILE},
+            {"interpolate_origin_file", no_argument, NULL, INTERPOLATE_ORIGIN_FILE},
             {"jdate",          required_argument, NULL, JDATE},
             {"label",          no_argument,       NULL, LABEL},
             {"labelpos",       required_argument, NULL, LABELPOS},
@@ -262,6 +264,7 @@ Options::parseArgs(int argc, char **argv)
             {"window_title",   required_argument, NULL, WINDOWTITLE},
             {"XID",            required_argument, NULL, XWINID},
             {"xscreensaver",   no_argument,       NULL, VROOT},
+	    {"XYZ_file",       required_argument, NULL, XYZFILE},
             {NULL,             0,                 NULL, 0}
         };
 
@@ -777,7 +780,7 @@ Options::parseArgs(int argc, char **argv)
             switch (target_)
             {
             case ALONG_PATH:
-                targetMode_ = LOOKAT;
+                targetMode_ = XYZ;
                 break;
             case MAJOR_PLANET:
                 targetMode_ = MAJOR;
@@ -793,7 +796,7 @@ Options::parseArgs(int argc, char **argv)
                 else
                 {
                     sscanf(optarg+4, "%d", &targetID_);
-                    targetMode_ = LOOKAT;
+                    targetMode_ = XYZ;
                 }
                 break;
             case NORAD:
@@ -807,7 +810,7 @@ Options::parseArgs(int argc, char **argv)
                 else
                 {
                     sscanf(optarg+5, "%d", &targetID_);
-                    targetMode_ = LOOKAT;
+                    targetMode_ = XYZ;
                 }
                 break;
             case RANDOM_BODY:
@@ -828,6 +831,21 @@ Options::parseArgs(int argc, char **argv)
         case TERRESTRIAL:
             universalTime_ = false;
             break;
+        case THICKNESS:
+        {
+            int thickness;
+            sscanf(optarg, "%d", &thickness);
+            if (thickness > 0)
+            {
+                arcThickness_ = thickness;
+            }
+            else
+            {
+                xpWarn("thickness must be positive.\n", 
+                       __FILE__, __LINE__);
+            }
+        }
+        break;
         case TIMEWARP:
             sscanf(optarg, "%lf", &timewarp);
             useCurrentTime_ = false;
@@ -863,7 +881,6 @@ Options::parseArgs(int argc, char **argv)
             displayMode_ = WINDOW;
             geometrySelected_ = true;
             break;
-        default:
         case XWINID:
         {
             if (optarg[0] == '0'
@@ -878,6 +895,11 @@ Options::parseArgs(int argc, char **argv)
             displayMode_ = WINDOW;
         }
         break;
+	case XYZFILE:
+	{
+	    XYZFile_ = optarg;
+	}
+        default:
         case UNKNOWN:
         {
             cout << "Valid options to Xplanet are:\n";
@@ -932,7 +954,7 @@ Options::parseArgs(int argc, char **argv)
 
     // A number of options are meaningless if we're not looking at a
     // planetary body.
-    if (targetMode_ == LOOKAT)
+    if (targetMode_ == XYZ)
     {
         if (projectionMode_ != MULTIPLE)
         {
@@ -1129,6 +1151,14 @@ Options::setOrigin(PlanetProperties *planetProperties[])
     {
         if (!targetSet_)
             xpExit("Target body not set!\n", __FILE__, __LINE__);
+        
+        if (target_ == SUN)
+        {
+            ostringstream errMsg;
+            errMsg << "-origin above or below not applicable for SUN. "
+                   << "Use -latitude 90 or -90 instead\n";
+            xpExit(errMsg.str(), __FILE__, __LINE__);
+        }
 
         double pX, pY, pZ;
         findBodyXYZ(julianDay_, primary_, -1, pX, pY, pZ);
@@ -1173,7 +1203,7 @@ Options::setOrigin(PlanetProperties *planetProperties[])
     break;
     }
 
-    if (rangeSpecified_ && targetMode_ != LOOKAT)
+    if (rangeSpecified_ && targetMode_ != XYZ)
     {
         Planet p2(julianDay_, target_);
         p2.calcHeliocentricEquatorial(); 
@@ -1182,7 +1212,6 @@ Options::setOrigin(PlanetProperties *planetProperties[])
         p2.PlanetographicToXYZ(oX_, oY_, oZ_, latitude_, longitude_, 
                                range_);
     }
-    originSet_ = true;
 }
 
 void
@@ -1232,15 +1261,14 @@ Options::setTarget(PlanetProperties *planetProperties[])
         primary_ = t.Primary();
     }
     break;
-    case LOOKAT:
-        if (target_ == NAIF
-            || target_ == ALONG_PATH)
-        {
-            primary_ = SUN;
-        }
-        else if (target_ == NORAD)
+    case XYZ:
+        if (target_ == NORAD)
         {
             primary_ = EARTH;
+        }
+        else
+        {
+            primary_ = SUN;
         }
         break;
     default:
@@ -1279,15 +1307,3 @@ Options::setTime(const double jd)
     tv_sec = get_tv_sec(julianDay_);
 }
 
-int
-Options::OriginMode() const
-{ 
-    int returnVal = originMode_;
-    
-    if (originMode_ == MAJOR
-        || originMode_ == RANDOM
-        || originMode_ == SYSTEM)
-        returnVal = BODY;
-    
-    return(returnVal);
-}

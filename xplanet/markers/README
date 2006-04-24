@@ -3,11 +3,12 @@ in the example below:
 
 33.943 -118.408 "Los Angeles" # USA 
 
-Anything after a # is ignored.  
+Anything after a # is ignored.
 
 In addition, Xplanet supports the "align", "color", "font",
-"fontsize", "image", "position", "radius", and "transparent" keywords.
-If used, keywords must follow the text string.
+"fontsize", "image", "max_radius", "min_radius", "position", "radius",
+and "transparent" keywords.  If used, keywords must follow the text
+string.
 
 The "align" keyword is used to place the marker string in relation to
 the marker itself.  Valid "align" values are "right", "left", "above",
@@ -22,6 +23,13 @@ Valid values for "image" are either "none" or the name of an image
 file.  If the "image" keyword is not specified, Xplanet will draw a
 circular marker.  Xplanet looks for image files in the same places it
 looks for map files.
+
+The keywords "max_radius" and "min_radius" allow the user to specify a
+size for the body where the marker will not be drawn.  For example,
+max_radius=0.40 means that this marker will not be drawn if the
+planet's radius is larger than 40% of the screen height.  Similarly,
+min_radius=0.25 means that this marker will not be drawn if the
+planet's radius is less than 25% of the screen height.
 
 Valid values for "position" are "absolute", "pixel", or a body name
 (e.g. position=moon).  Using "pixel" means that the given coordinates

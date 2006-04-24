@@ -109,7 +109,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     string lookAt;
     if (options->LabelString().empty())
     {
-        if (options->TargetMode() != LOOKAT)
+        if (options->TargetMode() != XYZ)
         {
             lookAt.assign("Looking at ");
             string viewTarget;
@@ -127,6 +127,9 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
                     viewOrigin.assign(" from below");
                     break;
                 case BODY:
+                case MAJOR:
+                case RANDOM:
+                case SYSTEM:
                     if (options->OppositeSide())
                     {
                         viewTarget.assign(planetProperties[origin]->Name());
@@ -231,7 +234,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     if (!lookAt.empty()) labelLines.push_back(lookAt);
     labelLines.push_back(timeString);
 
-    if (options->TargetMode() != LOOKAT)
+    if (options->TargetMode() != XYZ)
     {
         char obsString[MAX_LINE_LENGTH];
         double obsLatDeg = options->Latitude() / deg_to_rad;
@@ -337,8 +340,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         if (options->getTarget() != ALONG_PATH) 
             labelLines.push_back(distString);
 
-        if (options->TargetMode() != LOOKAT 
-            && target != SUN)
+        if (options->TargetMode() != XYZ && target != SUN)
         {
             char illumString[MAX_LINE_LENGTH];
             const double illumination = 50 * (ndot(tX, tY, tZ, 

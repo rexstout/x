@@ -26,11 +26,10 @@ class View;
 static void
 readArcFile(const char *line, Planet *planet, 
             View *view, ProjectionBase *projection,
-            unsigned char *color,
-            const double magnify,
+            PlanetProperties *planetProperties, 
             multimap<double, Annotation *> &annotationMap)
 {
-    int i = 0, j = 0, k = 0;
+    int i = 0;
     while (isDelimiter(line[i]))
     {
         i++;
@@ -40,7 +39,25 @@ readArcFile(const char *line, Planet *planet,
 
     Options *options = Options::getInstance();
 
+    unsigned char color[3];
+    double magnify;
+    int thickness;
+    if (planetProperties != NULL)
+    {
+        memcpy(color, planetProperties->ArcColor(), 3);
+        magnify = planetProperties->Magnify();
+        thickness = planetProperties->ArcThickness();
+    }
+    else
+    {
+        memset(color, 128, 3);
+        magnify = 1.0;
+        thickness = options->ArcThickness();
+    }
+
     double coords[4];
+    int numCoords = 0;
+    int numRad = 0;
     double radius[2] = { -1, -1 };
     double spacing = options->ArcSpacing();
     bool syntaxError = false;
@@ -70,12 +87,12 @@ readArcFile(const char *line, Planet *planet,
         break;
         case LATLON:
             checkLocale(LC_NUMERIC, "C");
-            if (j < 4)
+            if (numCoords < 4)
             {
-                sscanf(returnString, "%lf", &coords[j]);
-                if (j%2 == 0)
+                sscanf(returnString, "%lf", &coords[numCoords]);
+                if (numCoords % 2 == 0)
                 {
-                    if (coords[j] < -90 || coords[j] > 90)
+                    if (coords[numCoords] < -90 || coords[numCoords] > 90)
                     {
                         ostringstream errMsg;
                         errMsg << "Latitude value must be between -90 "
@@ -86,7 +103,7 @@ readArcFile(const char *line, Planet *planet,
                 }
                 else 
                 {
-                    if (coords[j] < -360 || coords[j] > 360)
+                    if (coords[numCoords] < -360 || coords[numCoords] > 360)
                     {
                         ostringstream errMsg;
                         errMsg << "Longitude value must be between -360 "
@@ -95,8 +112,8 @@ readArcFile(const char *line, Planet *planet,
                         syntaxError = true;
                     }
                 }
-                coords[j] *= deg_to_rad;
-                j++;
+                coords[numCoords] *= deg_to_rad;
+                numCoords++;
             }
             else
             {
@@ -106,19 +123,19 @@ readArcFile(const char *line, Planet *planet,
             break;
         case RADIUS:
             checkLocale(LC_NUMERIC, "C");
-            if (k < 2)
+            if (numRad < 2)
             {
-                sscanf(returnString, "%lf", &radius[k]);
-                if (radius[k] < 0) 
+                sscanf(returnString, "%lf", &radius[numRad]);
+                if (radius[numRad] < 0) 
                 {
                     xpWarn("Radius value must be positive\n",
                            __FILE__, __LINE__);
-                    radius[k] = -1;
+                    radius[numRad] = -1;
                     syntaxError = true;
                 }
                 else
                 {
-                    k++;
+                    numRad++;
                 }
             }
             checkLocale(LC_NUMERIC, "");
@@ -133,6 +150,15 @@ readArcFile(const char *line, Planet *planet,
                 syntaxError = true;
             }
             checkLocale(LC_NUMERIC, "");
+            break;
+        case THICKNESS:
+            sscanf(returnString, "%d", &thickness);
+            if (thickness < 1)
+            {
+                xpWarn("thickness must be positive.\n", 
+                       __FILE__, __LINE__);
+                syntaxError = true;
+            }
             break;
         case UNKNOWN:
             syntaxError = true;
@@ -165,7 +191,7 @@ readArcFile(const char *line, Planet *planet,
         if (val == ENDOFLINE) break;
     }
     
-    if (j != 4)
+    if (numCoords != 4)
     {
         ostringstream errStr;
         errStr << "Incomplete entry in arc file\n"
@@ -174,7 +200,7 @@ readArcFile(const char *line, Planet *planet,
         return;
     }
 
-    if (k == 0) radius[1] = radius[0];
+    if (numRad == 0) radius[1] = radius[0];
 
     for (i = 0; i < 2; i++)
     {
@@ -200,7 +226,7 @@ readArcFile(const char *line, Planet *planet,
         sphericalToPixel(coords[2], coords[3], 1.0,
                          X2, Y2, Z2, NULL, view, NULL);
 
-        LineSegment *ls = new LineSegment(color, X2, Y2, X1, Y1);
+        LineSegment *ls = new LineSegment(color, thickness, X2, Y2, X1, Y1);
         double avgZ = 0.5 * (Z1 + Z2);
         if (Z1 > 0 && Z2 > 0)
             annotationMap.insert(pair<const double, Annotation*>(avgZ, ls));
@@ -208,11 +234,13 @@ readArcFile(const char *line, Planet *planet,
     else
     {
         drawArc(coords[0], coords[1], radius[0], coords[2], coords[3], 
-                radius[1], color, spacing * deg_to_rad,
-                magnify, planet, view, projection, annotationMap);
+                radius[1], color, thickness, spacing * deg_to_rad,
+                magnify, planet, view, 
+                projection, annotationMap);
     }
 }
 
+// read an arc file to be plotted on a planet
 void
 addArcs(PlanetProperties *planetProperties, Planet *planet, 
         View *view, ProjectionBase *projection, 
@@ -220,9 +248,6 @@ addArcs(PlanetProperties *planetProperties, Planet *planet,
 {
     vector<string> arcfiles = planetProperties->ArcFiles();
     vector<string>::iterator ii = arcfiles.begin();
-
-    unsigned char color[3];
-    memcpy(color, planetProperties->ArcColor(), 3);
 
     while (ii != arcfiles.end()) 
     {
@@ -234,8 +259,7 @@ addArcs(PlanetProperties *planetProperties, Planet *planet,
             char *line = new char[MAX_LINE_LENGTH];
             while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
                 readArcFile(line, planet, view, projection,
-                            color, planetProperties->Magnify(),
-                            annotationMap);
+                            planetProperties, annotationMap);
             
             inFile.close();
             delete [] line;
@@ -250,15 +274,14 @@ addArcs(PlanetProperties *planetProperties, Planet *planet,
     }
 }
 
+// Read an arc file to be plotted against the background stars (like
+// constellation lines)
 void
 addArcs(View *view, multimap<double, Annotation *> &annotationMap)
 {
     Options *options = Options::getInstance();
     vector<string> arcfiles = options->ArcFiles();
     vector<string>::iterator ii = arcfiles.begin();
-
-    unsigned char color[3];
-    memset(color, 128, 3);
 
     while (ii != arcfiles.end()) 
     {
@@ -269,9 +292,8 @@ addArcs(View *view, multimap<double, Annotation *> &annotationMap)
             ifstream inFile(arcFile.c_str());
             char *line = new char[256];
             while (inFile.getline (line, 256, '\n') != NULL)
-                readArcFile(line, NULL, view, NULL,
-                            color, 1.0, annotationMap);
-            
+                readArcFile(line, NULL, view, NULL, NULL, annotationMap);
+
             inFile.close();
             delete [] line;
         }

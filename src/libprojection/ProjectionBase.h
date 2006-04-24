@@ -20,6 +20,8 @@ class ProjectionBase
 
     bool IsWrapAround() const { return(isWrapAround_); };
 
+    double Radius() const { return(radius_); };
+
     void RotateXYZ(double &lat, double &lon) const;
     void RotateZYX(double &lat, double &lon) const;
 

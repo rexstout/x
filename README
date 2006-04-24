@@ -12,10 +12,14 @@ When drawing an arc, draw line segments that are spacing degrees
 apart.  The default is 0.1 degrees.  Line segments shorter than
 spacing will not be drawn.
 
+-arc_thickness thickness
+Specify the thickness of arcs.  The default is 1 pixel.  When drawing
+arcs on a planet using the arc_file option in the configuration file,
+use the arc_thickness option there too.
+
 -background background_file
 Use background_file as the background image, with the planet to be
-superimposed upon it.  This option is only meaningful with the
--projection option.  A color may also be supplied (e.g. -background
+superimposed upon it.  A color may also be supplied (e.g. -background
 "navy blue" or -background 0xff00ff).
 
 -base_magnitude magnitude
@@ -95,7 +99,7 @@ little endian binary files.  The ephemeris files found at
 ftp://ssd.jpl.nasa.gov/pub/eph/export/unix are big endian files, but
 you do not need to do any additional byte-swapping to use them.  See
 the description of -searchdir to see where xplanet looks in order to
-find the star map.
+find the ephemeris file.
 
 -font fontname 
 Set the font for the label.  Only TrueType fonts are supported.  If

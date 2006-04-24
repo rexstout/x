@@ -17,6 +17,7 @@ using namespace std;
 #include "Options.h"
 #include "PlanetProperties.h"
 #include "readOriginFile.h"
+#include "setPositions.h"
 #include "xpUtil.h"
 
 #include "libannotate/libannotate.h"
@@ -157,65 +158,21 @@ main(int argc, char **argv)
             struct timeval time;
             gettimeofday(&time, NULL);
             
-            time_t t = time.tv_sec;
-            const double julianDay = toJulian(gmtime(static_cast<time_t *> (&t))->tm_year + 1900,
-                                              gmtime(static_cast<time_t *> (&t))->tm_mon + 1,
-                                              gmtime(static_cast<time_t *> (&t))->tm_mday,
-                                              gmtime(static_cast<time_t *> (&t))->tm_hour,
-                                              gmtime(static_cast<time_t *> (&t))->tm_min,
-                                              gmtime(static_cast<time_t *> (&t))->tm_sec);
+            time_t t  = time.tv_sec;
+            int year  = gmtime(static_cast<time_t *> (&t))->tm_year + 1900;
+            int month = gmtime(static_cast<time_t *> (&t))->tm_mon + 1;
+            int day   = gmtime(static_cast<time_t *> (&t))->tm_mday;
+            int hour  = gmtime(static_cast<time_t *> (&t))->tm_hour;
+            int min   = gmtime(static_cast<time_t *> (&t))->tm_min;
+            int sec   = gmtime(static_cast<time_t *> (&t))->tm_sec;
+            const double julianDay = toJulian(year, month, day, 
+                                              hour, min, sec);
             options->setTime(julianDay);
         }
-        
-        // if an origin file is specified, set observer position from it
-        if (origin_file)
-        {
-            if (options->InterpolateOriginFile())
-            {
-                // interpolate positions in the origin file to the
-                // current time
-                double thisRad, thisLat, thisLon, thisLocalTime = -1;
-                interpolateOriginFile(options->JulianDay(), 
-                                      originVector, thisRad, 
-                                      thisLat, thisLon, thisLocalTime);
-                options->Range(thisRad);
-                options->Latitude(thisLat);
-                options->Longitude(thisLon);
-                options->LocalTime(thisLocalTime);
-            }
-            else
-            {
-                // Use the next time in the origin file
-                options->setTime(iterOriginVector->time);
 
-                // Use the position, if specified, in the origin file
-                if (iterOriginVector->radius > 0)
-                {
-                    options->Range(iterOriginVector->radius);
-                    options->Latitude(iterOriginVector->latitude);
-                    options->Longitude(iterOriginVector->longitude);
-
-                    // Use the local time, if specified, in the origin file
-                    if (iterOriginVector->localTime > 0)
-                        options->LocalTime(iterOriginVector->localTime);
-                }
-            }
-        }
-
-        // if -dynamic_origin was specified, set observer position
-        // from it.
-        if (!options->DynamicOrigin().empty())
-        {
-            LBRPoint originPoint;
-            readDynamicOrigin(options->DynamicOrigin(), originPoint);
-            options->Range(originPoint.radius);
-            options->Latitude(originPoint.latitude);
-            options->Longitude(originPoint.longitude);
-            options->LocalTime(originPoint.localTime);
-        }
-    
-        options->setTarget(planetProperties);
-        options->setOrigin(planetProperties);
+        // set the observer's XYZ coordinates if an origin file has
+        // been specified
+        setOriginXYZFromFile(originVector, iterOriginVector);
 
         // Rectangular coordinates of the observer
         double oX, oY, oZ;
@@ -224,7 +181,8 @@ main(int argc, char **argv)
         // Calculate the positions of the planets & moons.  The map
         // container sorts on the key, so the bodies will be ordered
         // by heliocentric distance.  This makes calculating shadows
-        // easier.
+        // easier.  The observer position is used to account for light
+        // time.
         map<double, Planet *> planetsFromSunMap;
         buildPlanetMap(options->JulianDay(), oX, oY, oZ, 
                        options->LightTime(), planetsFromSunMap);
@@ -233,90 +191,18 @@ main(int argc, char **argv)
         body target_body = options->getTarget();
         Planet *target = findPlanetinMap(planetsFromSunMap, target_body);
 
-        // LOOKAT mode is where the target isn't a planetary body.
-        // (e.g. the Cassini spacecraft)
-        if (options->TargetMode() == LOOKAT)
-        {
-            if (options->LightTime()) 
-                options->setTarget(planetProperties);
-        }
-        else
-        {
-            if (target == NULL)
-                xpExit("Can't find target body?\n", __FILE__, __LINE__);
+        // Set the target's XYZ coordinates.
+        setTargetXYZ(planetProperties);
 
-            if (options->LightTime())
-            {
-                double tX, tY, tZ;
-                target->getPosition(tX, tY, tZ);
-                options->setTarget(tX, tY, tZ);
-            }
+        // Set the origin's XYZ coordinates.
+        setOriginXYZ(planetProperties);
 
-            // Find the sub-observer lat & lon
-            double obs_lat, obs_lon;
-            target->XYZToPlanetographic(oX, oY, oZ, obs_lat, obs_lon);
-            options->Latitude(obs_lat);
-            options->Longitude(obs_lon);
-
-            // Find the sub-solar lat & lon.  This is used for the image
-            // label
-            double sunLat, sunLon;
-            target->XYZToPlanetographic(0, 0, 0, sunLat, sunLon);
-            options->SunLat(sunLat);
-            options->SunLon(sunLon);
-        }
+	// Now find the observer's lat/lon
+	getObsLatLon(target, planetProperties);
 
         // Set the "up" vector.  This points to the top of the screen.
         double upX, upY, upZ;
-        switch (options->North())
-        {
-        default:
-            xpWarn("Unknown value for north, using body\n", 
-                   __FILE__, __LINE__);
-        case BODY:
-            target->getBodyNorth(upX, upY, upZ);
-            break;
-        case GALACTIC:
-            target->getGalacticNorth(upX, upY, upZ);
-            break;
-        case ORBIT:
-        {
-            // if it's a moon, pretend its orbital north is the same as
-            // its primary, although in most cases it's the same as its
-            // primary's rotational north
-            if (target->Primary() == SUN)
-            {
-                target->getOrbitalNorth(upX, upY, upZ);
-            }
-            else
-            {
-                Planet *primary = findPlanetinMap(planetsFromSunMap, 
-                                                  target->Primary());
-                primary->getOrbitalNorth(upX, upY, upZ);
-            }
-        }
-        break;
-        case PATH:
-        {
-            double vX, vY, vZ;
-            findBodyVelocity(options->JulianDay(), 
-                             options->getOrigin(), 
-                             options->OriginID(),
-                             options->PathRelativeTo(), 
-                             options->PathRelativeToID(), 
-                             vX, vY, vZ);
-            
-            upX = vX * FAR_DISTANCE;
-            upY = vY * FAR_DISTANCE;
-            upZ = vZ * FAR_DISTANCE;
-        }
-        break;
-        case TERRESTRIAL:
-            upX = 0;
-            upY = 0;
-            upZ = FAR_DISTANCE;
-            break;
-        }
+        setUpXYZ(target, planetsFromSunMap, upX, upY, upZ);
 
         // Initialize display device
         DisplayBase *display = getDisplay(times_run);

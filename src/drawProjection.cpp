@@ -116,8 +116,8 @@ drawProjection(DisplayBase *display, Planet *target,
                 annotationMap);
 
     if (planetProperties->DrawMarkers())
-        addMarkers(planetProperties, target, 0, 0, 0, 0, 
-                   NULL, projection, width, height, 
+        addMarkers(planetProperties, target, projection->Radius() * height,
+                   0, 0, 0, NULL, projection, width, height, 
                    planetsFromSunMap, annotationMap);
 
     if (planetProperties->DrawSatellites())

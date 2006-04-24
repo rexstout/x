@@ -1,3 +1,21 @@
+Version 1.2.1 (released ???)
+
+	* Fixed a bug where arcs were sometimes not drawn if they were
+	vertical or horizontal lines.
+
+	* A thickness value may now be specified for arcs.
+
+	* Added max_radius and min_radius keywords to marker files.  This
+	disables drawing of the marker if the planet radius is larger than
+	or smaller than the specified value, respectively.
+
+	* Fixed a bug where the arc color was not reset to the default
+	color for subsequent arcs in the file.
+
+	* Check that -origin above or below is not specified for the Sun.
+
+	* Added a definition for signbit() in ProjectionIcosagnomonic.cpp
+
 Version 1.2.0 (released 16 Jun 2005)
 
 	* Added the -grs_longitude option, to specify the longitude of

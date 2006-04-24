@@ -118,6 +118,8 @@ parse(int &i, const char *line, char *&returnString)
     }
     else if (getValue(line, i, "arc_file=", returnString))
         returnVal = ARC_FILE;
+    else if (getValue(line, i, "arc_thickness=", returnString))
+        returnVal = THICKNESS;
     else if (getValue(line, i, "[", ']', returnString))
         returnVal = BODY;
     else if (getValue(line, i, "altcirc=", returnString))
@@ -194,6 +196,10 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = MIN_RAD_FOR_LABEL;
     else if (getValue(line, i, "min_radius_for_markers=", returnString))
         returnVal = MIN_RAD_FOR_MARKERS;
+    else if (getValue(line, i, "max_radius=", returnString))
+        returnVal = MAX_RAD_FOR_MARKERS;
+    else if (getValue(line, i, "min_radius=", returnString))
+        returnVal = MIN_RAD_FOR_MARKERS;
     else if (getValue(line, i, "\"", '"', returnString))
         returnVal = NAME;
     else if (getValue(line, i, "{", '}', returnString))
@@ -204,6 +210,15 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = ORBIT;
     else if (getValue(line, i, "orbit_color={", '}', returnString))
         returnVal = ORBIT_COLOR;
+    else if (getValue(line, i, "orbit_color=", returnString))
+    {
+        unsigned char RGB[3];
+        parseColor(returnString, RGB);
+        delete [] returnString;
+        returnString = new char[32];
+        snprintf(returnString, 32, "%d,%d,%d", RGB[0], RGB[1], RGB[2]);
+        returnVal = ORBIT_COLOR;
+    }
     else if (getValue(line, i, "relative_to=", returnString))
         returnVal = ORIGIN;
     else if (getValue(line, i, "position=", returnString))
@@ -226,6 +241,8 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = SYMBOLSIZE;
     else if (getValue(line, i, "text_color={", '}', returnString))
         returnVal = TEXT_COLOR;
+    else if (getValue(line, i, "thickness=", returnString))
+        returnVal = THICKNESS;
     else if (strncmp(line+i, "timezone=", 9) == 0)
     {
         i += 9;

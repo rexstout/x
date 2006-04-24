@@ -44,6 +44,7 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
 
     int align = AUTO;
     bool haveLat = false;
+    bool haveLon = false;
     double lat, lon;
     string image;
 
@@ -132,9 +133,14 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
             break;
         case LATLON:
             checkLocale(LC_NUMERIC, "C");
-            if (haveLat)
+            if (haveLon)
+            {
+                syntaxError = true;
+            }
+            else if (haveLat)
             {
                 sscanf(returnString, "%lf", &lon);
+                haveLon = true;
             }
             else
             {
@@ -143,6 +149,22 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
             }
             checkLocale(LC_NUMERIC, "");
             break;
+        case MAX_RAD_FOR_MARKERS:
+        {
+            double maxRad;
+            sscanf(returnString, "%lf", &maxRad);
+            maxRad *= height;
+            if (pR > 0 && pR > maxRad) return;
+        }
+        break;
+        case MIN_RAD_FOR_MARKERS:
+        {
+            double minRad;
+            sscanf(returnString, "%lf", &minRad);
+            minRad *= height;
+            if (pR > 0 && pR < minRad) return;
+        }
+        break;
         case NAME:
             name.assign(returnString);
             break;

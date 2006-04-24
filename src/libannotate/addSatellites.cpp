@@ -101,6 +101,8 @@ readSatelliteFile(const char *line, Planet *planet,
     bool syntaxError = false;
     string timezone;
 
+    int thickness = planetProperties->ArcThickness();
+
     int trailType = ORBIT;
     int trailStart = 0;
     int trailEnd = 0;
@@ -226,6 +228,15 @@ readSatelliteFile(const char *line, Planet *planet,
                 syntaxError = true;
             }
             checkLocale(LC_NUMERIC, "");
+            break;
+        case THICKNESS:
+            sscanf(returnString, "%d", &thickness);
+            if (thickness < 1)
+            {
+                xpWarn("thickness must be positive.\n", 
+                       __FILE__, __LINE__);
+                syntaxError = true;
+            }
             break;
         case TRAIL:
         {
@@ -361,7 +372,7 @@ readSatelliteFile(const char *line, Planet *planet,
             prevRad = 1;
         }
 
-        drawArc(prevLat, prevLon, prevRad, lat, lon, rad, color,
+        drawArc(prevLat, prevLon, prevRad, lat, lon, rad, color, thickness, 
                 spacing * deg_to_rad, planetProperties->Magnify(),
                 planet, view, projection, annotationMap);
     }
@@ -411,7 +422,7 @@ readSatelliteFile(const char *line, Planet *planet,
         // compute the great arc distance from the sub-spacecraft
         // point
         const double r = *a - asin(sin(*a)/rad);
-        drawCircle(lat, lon, r, color, spacing * deg_to_rad, 
+        drawCircle(lat, lon, r, color, thickness, spacing * deg_to_rad, 
                    planetProperties->Magnify(), planet, view,
                    projection, annotationMap);
         a++;

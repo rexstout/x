@@ -9,12 +9,12 @@ Each line in satfile must begin with a satellite ID number (e.g. 25544
 for the ISS).  Each ID must exist in the associated TLE file. 
 
 Valid additional keywords are "align", "altcirc", "color", "font",
-"fontsize", "image", "position", "spacing", "trail", and
+"fontsize", "image", "position", "spacing", "thickness", "trail", and
 "transparent".  The usage for most of these is identical to the usage
-for the -greatarcfile and -markerfile options.  In addition, a string
-to be plotted with the marker may be enclosed in either double quotes
-(""), or braces ({}).  If a string is not supplied, the marker will
-take the name of the satellite supplied in the TLE file.
+for arc and marker files.  In addition, a string to be plotted with
+the marker may be enclosed in either double quotes (""), or braces
+({}).  If a string is not supplied, the marker will take the name of
+the satellite supplied in the TLE file.
 
 The "altcirc" keyword draws altitude circles on the surface of the
 earth.  The format is "altcirc=angle", where a circle is drawn
