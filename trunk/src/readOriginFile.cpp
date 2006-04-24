@@ -120,7 +120,7 @@ readDynamicOrigin(string filename, LBRPoint &originPoint)
 
 void
 interpolateOriginFile(const double julianDay, 
-                      vector<LBRPoint> &originVector, 
+                      const vector<LBRPoint> &originVector, 
                       double &rad, 
                       double &lat, double &lon, 
                       double &localTime)

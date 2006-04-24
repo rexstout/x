@@ -7,6 +7,7 @@
 
 arc_color=white
 #arc_file=
+arc_thickness=1
 
 #bump_map=
 bump_scale=1

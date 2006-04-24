@@ -60,8 +60,9 @@ am__xplanet_SOURCES_DIST = Map.cpp Map.h Options.cpp Options.h \
 	getopt1.c keywords.h parse.h parse.cpp parseColor.h \
 	parseColor.cpp printVersion.cpp readConfig.cpp \
 	readOriginFile.h readOriginFile.cpp satrings.h ssec.cpp \
-	sphericalToPixel.h sphericalToPixel.cpp xpGetopt.h xpUtil.cpp \
-	xpUtil.h xplanet.cpp ParseGeom.c ParseGeom.h
+	setPositions.h setPositions.cpp sphericalToPixel.h \
+	sphericalToPixel.cpp xpGetopt.h xpUtil.cpp xpUtil.h \
+	xplanet.cpp ParseGeom.c ParseGeom.h
 @HAVE_LIBX11_FALSE@am__objects_1 = ParseGeom.$(OBJEXT)
 am_xplanet_OBJECTS = Map.$(OBJEXT) Options.$(OBJEXT) \
 	PlanetProperties.$(OBJEXT) Ring.$(OBJEXT) Satellite.$(OBJEXT) \
@@ -70,7 +71,7 @@ am_xplanet_OBJECTS = Map.$(OBJEXT) Options.$(OBJEXT) \
 	findBodyXYZ.$(OBJEXT) findFile.$(OBJEXT) getopt.$(OBJEXT) \
 	getopt1.$(OBJEXT) parse.$(OBJEXT) parseColor.$(OBJEXT) \
 	printVersion.$(OBJEXT) readConfig.$(OBJEXT) \
-	readOriginFile.$(OBJEXT) ssec.$(OBJEXT) \
+	readOriginFile.$(OBJEXT) ssec.$(OBJEXT) setPositions.$(OBJEXT) \
 	sphericalToPixel.$(OBJEXT) xpUtil.$(OBJEXT) xplanet.$(OBJEXT) \
 	$(am__objects_1)
 xplanet_OBJECTS = $(am_xplanet_OBJECTS)
@@ -286,6 +287,8 @@ xplanet_SOURCES = \
 	readOriginFile.cpp	\
 	satrings.h		\
 	ssec.cpp		\
+	setPositions.h		\
+	setPositions.cpp	\
 	sphericalToPixel.h	\
 	sphericalToPixel.cpp	\
 	xpGetopt.h		\
@@ -394,6 +397,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printVersion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readConfig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readOriginFile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/setPositions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphericalToPixel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xpUtil.Po@am__quote@

@@ -26,6 +26,9 @@ ProjectionHemisphere::ProjectionHemisphere(const int f, const int w,
         dispScale_ = height_;
 #endif
 
+    radius_ /= 2;
+    dispScale_ *= 2;
+
     buildPhotoTable();
 }
 
@@ -44,7 +47,7 @@ ProjectionHemisphere::pixelToSpherical(const double x, const double y,
 #if VERTICAL
     if (Y<0) 
     {
-        Y += 0.5;
+        Y += 0.25;
         double arg = Y/radius_;
         if (fabs(arg) > 1) return(false);
         lat = asin(arg);
@@ -55,7 +58,7 @@ ProjectionHemisphere::pixelToSpherical(const double x, const double y,
     }
     else 
     {
-        Y -= 0.5;
+        Y -= 0.25;
         double arg = Y/radius_;
         if (fabs(arg) > 1) return(false);
         lat = asin(arg);
@@ -71,14 +74,14 @@ ProjectionHemisphere::pixelToSpherical(const double x, const double y,
 
     if (X<0) 
     {
-        X += 0.5;
+        X += 0.25;
         arg = -X / (radius_ * cos(lat));
         if (fabs(arg) > 1) return(false);
         lon = acos(arg) - M_PI;
     }
     else 
     {
-        X -= 0.5;
+        X -= 0.25;
         arg = -X / (radius_ * cos(lat));
         if (fabs(arg) > 1) return(false);
         lon = acos(arg);
@@ -113,22 +116,22 @@ ProjectionHemisphere::sphericalToPixel(double lon, double lat,
 #if VERTICAL
     if (lon < 0) 
     {
-        Y -= 0.5;
+        Y -= 0.25;
         X = radius_ * cos(lat) * sin(lon-3*M_PI/2);
     }
     else 
     {
-        Y += 0.5;
+        Y += 0.25;
         X = radius_ * cos(lat) * sin(lon-M_PI/2);
     }
 #else
     if (lon < 0) 
     {
-        X = radius_ * cos(lat) * sin(lon-3*M_PI/2) - 0.5;
+        X = radius_ * cos(lat) * sin(lon-3*M_PI/2) - 0.25;
     }
     else 
     {
-        X = radius_ * cos(lat) * sin(lon-M_PI/2) + 0.5;
+        X = radius_ * cos(lat) * sin(lon-M_PI/2) + 0.25;
     }
 #endif
 

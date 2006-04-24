@@ -17,6 +17,9 @@ class PlanetProperties
     const unsigned char * ArcColor() const { return(arcColor_); };
     void ArcColor(unsigned char color[3]) { memcpy(arcColor_, color, 3); };
 
+    const int ArcThickness() const { return(arcThickness_); };
+    void ArcThickness(const int thickness) { arcThickness_ = thickness; };
+
     const std::string & BumpMap() const           { return(bumpMap_); };
     void BumpMap(const std::string &b) { bumpMap_ = b; };
 
@@ -58,6 +61,7 @@ class PlanetProperties
 
     const unsigned char * OrbitColor() const { return(orbitColor_); };
     void OrbitColor(unsigned char color[3]) { memcpy(orbitColor_, color, 3); };
+
     const unsigned char * TextColor() const { return(textColor_); };
     void TextColor(unsigned char color[3]) { memcpy(textColor_, color, 3); };
 
@@ -75,13 +79,13 @@ class PlanetProperties
 
     bool MapBounds() const { return(mapBounds_); };
     void MapBounds(double &uly, double &ulx, 
-		   double &lry, double &lrx) const
+                   double &lry, double &lrx) const
         {
             uly = mapUly_; ulx = mapUlx_; lry = mapLry_; lrx = mapLrx_;
         };
     
     void MapBounds(bool b, double uly, double ulx, 
-		   double lry, double lrx)
+                   double lry, double lrx)
         {
             mapBounds_ = b; mapUly_ = uly; mapUlx_ = ulx; mapLry_ = lry; mapLrx_ = lrx;
         };
@@ -138,6 +142,7 @@ class PlanetProperties
     unsigned char arcColor_[3];
 
     std::vector<std::string> arcFiles_;
+    int arcThickness_;
 
     std::string bumpMap_;
     double bumpScale_;
@@ -192,8 +197,8 @@ class PlanetProperties
     unsigned char textColor_[3];
 
     double twilight_;    // if the sun is within twilight degrees of
-			 // the horizon, blend the day and night
-			 // images together
+                         // the horizon, blend the day and night
+                         // images together
 };
 
 #endif

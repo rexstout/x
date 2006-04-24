@@ -20,8 +20,8 @@ class Options
     void parseArgs(int argc, char **argv);
 
     const std::vector<std::string> & ArcFiles() const { return(arcFiles_); };
-    void ArcSpacing(const double a) { arcSpacing_ = a; };
     double ArcSpacing() const       { return(arcSpacing_); };
+    int ArcThickness() const       { return(arcThickness_); };
 
     const std::string & Background() const { return(background_); };
     double BaseMagnitude() const { return(baseMag_); };
@@ -82,7 +82,7 @@ class Options
     void NumTimes(const int n) { numTimes_ = n; };
 
     bool OppositeSide() const { return(oppositeSide_); };
-    int OriginMode() const;
+    int OriginMode() const { return(originMode_); };
     body getOrigin() const          { return(origin_); };
     const std::string & OriginFile() const { return(originFile_); };
     int OriginID() const { return(originID_); };
@@ -144,12 +144,12 @@ class Options
     const std::string & WindowTitle() const { return(windowTitle_); };
 
     unsigned long XID() const { return(xid_); };
+    const std::string & XYZFile() const { return(XYZFile_); };
 
     bool GeometrySelected() const   { return(geometrySelected_); };
     int GeometryMask() const     { return(geometryMask_); };
     int getWidth() const            { return((int) width); };
     int getHeight() const           { return((int) height); };
-
 
     body getPrimary() const { return(primary_); };
 
@@ -170,6 +170,7 @@ class Options
 
     std::vector<std::string> arcFiles_;
     double arcSpacing_;
+    int arcThickness_;
 
     std::string background_;
     double baseMag_;    // a star of this magnitude has a pixel
@@ -229,8 +230,6 @@ class Options
     int originID_;                // for NAIF or NORAD bodies
     int originMode_;                     // BODY, LBR, RANDOM, MAJOR,
                                          // SYSTEM, ABOVE, BELOW
-    bool originSet_;        // True if origin position has been set
-
     std::string outputBase_;
     std::string outputExt_;
     int outputStartIndex_;  // start numbering output files with this
@@ -292,6 +291,8 @@ class Options
     std::string windowTitle_;
 
     unsigned long xid_;
+    std::string XYZFile_; // file containing XYZ coordinates of
+			  // target, origin, and/or north
 
     std::vector<std::string> searchdir; // check these directories for files
 

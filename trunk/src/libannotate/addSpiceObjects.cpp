@@ -102,6 +102,8 @@ readSpiceFile(const char *line,
     int symbolSize = 2;
     bool syntaxError = false;
 
+    int thickness = 1;
+
     double trailStart = 0;
     double trailEnd = 0;
     double trailInterval = 1;
@@ -227,6 +229,15 @@ readSpiceFile(const char *line,
         case SYMBOLSIZE:
             sscanf(returnString, "%d", &symbolSize);
             if (symbolSize < 0) symbolSize = 2;
+            break;
+        case THICKNESS:
+            sscanf(returnString, "%d", &thickness);
+            if (thickness < 1)
+            {
+                xpWarn("thickness must be positive.\n", 
+                       __FILE__, __LINE__);
+                syntaxError = true;
+            }
             break;
         case TRAIL:
         {
@@ -482,7 +493,8 @@ readSpiceFile(const char *line,
             if (Z0 >= 0 && Z1 >= 0)
             {
                 double Z = 0.5 * (Z0 + Z1);
-                LineSegment *ls = new LineSegment(color, X1, Y1, X0, Y0);
+                LineSegment *ls = new LineSegment(color, thickness, 
+                                                  X1, Y1, X0, Y0);
                 annotationMap.insert(pair<const double, Annotation*>(Z, ls));
             }
             X0 = newX0;

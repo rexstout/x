@@ -49,6 +49,8 @@ xplanet_SOURCES = \
 	readOriginFile.cpp	\
 	satrings.h		\
 	ssec.cpp		\
+	setPositions.h		\
+	setPositions.cpp	\
 	sphericalToPixel.h	\
 	sphericalToPixel.cpp	\
 	xpGetopt.h		\

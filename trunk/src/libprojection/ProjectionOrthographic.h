@@ -18,6 +18,7 @@ class ProjectionOrthographic : public ProjectionBase
 
  private:
     double P, Psq, Pm1, Pp1, PPm1, Pm1sq;
+    double dispScale_;
 };
 
 #endif

@@ -28,6 +28,10 @@ Specify a great arc file for this planet.  This option may be used
 more than once.  See the README and sample files in the xplanet/arcs
 directory for more information.  The default is no arc files.
 
+arc_thickness
+Specify the default thickness for arcs.  This also applies to the
+planet's orbit.  This can be overridden in the arc file itself.
+
 bump_map
 Specify a bump map to use for relief shading.  This is assumed to be
 an greyscale image file representing a digital elevation map with

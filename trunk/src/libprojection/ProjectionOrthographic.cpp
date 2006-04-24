@@ -13,7 +13,7 @@ ProjectionOrthographic::ProjectionOrthographic(const int f, const int w, const i
 
     Options *options = Options::getInstance();
 
-    radius_ = options->Radius() * height_;
+    dispScale_ = radius_ * height_;
     setRange(options->Range());
 
     buildPhotoTable();
@@ -34,15 +34,15 @@ ProjectionOrthographic::setRange(const double range)
     PPm1 = P * Pm1;
     Pm1sq = Pm1 * Pm1;
 
-    radius_ *= sqrt(Pp1/Pm1);
+    dispScale_ *= sqrt(Pp1/Pm1);
 }
 
 bool
 ProjectionOrthographic::pixelToSpherical(const double x, const double y, 
                                          double &lon, double &lat)
 {
-    const double X = (x - centerX_)/radius_;
-    const double Y = (centerY_ - y)/radius_;
+    const double X = (x - centerX_)/dispScale_;
+    const double Y = (centerY_ - y)/dispScale_;
 
     const double rho2 = X*X + Y*Y;
     if (rho2 > 1) return(false);
@@ -107,16 +107,16 @@ ProjectionOrthographic::sphericalToPixel(double lon, double lat,
     const double X = k * cos(lat) * sin(lon);
     const double Y = k * sin(lat);
 
-    x = X * radius_ + centerX_;
+    x = X * dispScale_ + centerX_;
     if (x < 0 || x >= width_) return(false);
 
-    y = centerY_ - Y * radius_;
+    y = centerY_ - Y * dispScale_;
     if (y < 0 || y >= height_) return(false);
 
     if (P*cosc < 1) 
     {
         double dist = sqrt(x*x + y*y);
-        if (dist < radius_) return(false);
+        if (dist < dispScale_) return(false);
     }
 
     return(true);
