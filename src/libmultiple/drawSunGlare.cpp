@@ -10,6 +10,9 @@ drawSunGlare(DisplayBase *display, const double X, const double Y,
 {
     Options *options = Options::getInstance();
     const double glare = options->Glare() * R;
+
+    if (glare == 0) return;
+
     const double falloff = options->Glare() / log(256.0);
 
     const int height = display->Height();

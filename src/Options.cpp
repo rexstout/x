@@ -399,7 +399,7 @@ Options::parseArgs(int argc, char **argv)
         { 
             double g;
             sscanf(optarg, "%lf", &g);
-            if (g > 0) glare_ = g;
+            if (g >= 0) glare_ = g;
         }
         break;
         case GRS_LON:
