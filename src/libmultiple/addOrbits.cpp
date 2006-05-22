@@ -22,73 +22,57 @@ addArc(const double startTime, const double stopTime,
     Options *options = Options::getInstance();
 
     const body b = p->Index();
-    const bool isTarget = (b == options->getTarget());
-
     const double delTime = (stopTime - startTime) / numTimes;
-    bool firstTime = true;
-    double prevX = 0, prevY = 0, prevZ = 0;
+
     for (int i = 0; i <= numTimes; i++)
     {
-        const double jd = startTime + i * delTime;
+        bool skipThisArc = false;
+        double oldX, oldY, oldZ;
+        double newX, newY, newZ;
 
-        double X, Y, Z;
-        Planet planet(jd, b);
-        planet.calcHeliocentricEquatorial(false);
-        planet.getPosition(X, Y, Z);
-            
-        view->XYZToPixel(X + Prx, Y + Pry, Z + Prz,
-                         X, Y, Z);
-        X += options->CenterX();
-        Y += options->CenterY();
-
-        if (!firstTime)
+        for (int j = 0; j < 2; j ++)
         {
-            double nearX, nearY, nearZ;
-            double farX, farY, farZ;
+            const double jd = startTime + (i + j) * delTime;
 
-            if (prevZ > Z)
+            double X, Y, Z;
+            Planet planet(jd, b);
+            planet.calcHeliocentricEquatorial(false);
+            planet.getPosition(X, Y, Z);
+            
+            view->XYZToPixel(X + Prx, Y + Pry, Z + Prz,
+                             X, Y, Z);
+            X += options->CenterX();
+            Y += options->CenterY();
+            if (X < -width || X > 2*width 
+                || Y < -height || Y > 2*height
+                || Z < 0)
             {
-                nearX = X; 
-                nearY = Y; 
-                nearZ = Z;
-                farX = prevX; 
-                farY = prevY;
-                farZ = prevZ;
+                skipThisArc = true;
+                break;
+            }
+
+            if (j == 0)
+            {
+                oldX = X;
+                oldY = Y;
+                oldZ = Z;
             }
             else
             {
-                nearX = prevX; 
-                nearY = prevY;
-                nearZ = prevZ;
-                farX = X; 
-                farY = Y; 
-                farZ = Z;
-            }
-
-            const bool skip = ((prevX < 0 && X < 0)
-                               || (prevY < 0 && Y < 0)
-                               || (prevX >= width && X >= width)
-                               || (prevY >= height && Y >= height)
-                               || (fabs(X) > width*100)
-                               || (fabs(Y) > height*100)
-                               || (fabs(prevX) > width*100)
-                               || (fabs(prevY) > height*100)
-                               || (prevZ < 0 && Z < 0));
-
-            if (!skip || (i == 1 && isTarget)) 
-            {
-                LineSegment *ls = new LineSegment(color, thickness, 
-                                                  farX, farY,
-                                                  nearX, nearY);
-                annotationMap.insert(pair<const double, Annotation*>(farZ, ls));
+                newX = X;
+                newY = Y;
+                newZ = Z;
             }
         }
+        
+        if (skipThisArc) continue;
 
-        prevX = X;
-        prevY = Y;
-        prevZ = Z;
+        LineSegment *ls = new LineSegment(color, thickness, 
+                                          oldX, oldY,
+                                          newX, newY);
 
-        firstTime = false;
+        double midZ = 0.5 * (oldZ + newZ);
+        annotationMap.insert(pair<const double, Annotation*>(midZ, ls));
     }
 }
 
