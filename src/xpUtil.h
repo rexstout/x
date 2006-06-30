@@ -31,7 +31,9 @@ extern double ndot(const double A0, const double A1, const double A2,
 extern double dot(const double a[3], const double b[3]);
 extern double ndot(const double a[3], const double b[3]);
 
-extern void invertMatrix(double in[3][3], double out[3][3]);
+extern double normalize(double a[3]);
+
+extern void invertMatrix(const double in[3][3], double out[3][3]);
 
 extern time_t get_tv_sec(double jd);
 

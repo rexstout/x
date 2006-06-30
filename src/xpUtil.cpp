@@ -146,8 +146,18 @@ ndot(const double a[3], const double b[3])
     return(dot(a, b) / sqrt(len_a * len_b));
 }
 
+double
+normalize(double a[3])
+{
+    const double length = dot(a, a);
+    if (length > 0)
+        for (int i = 0; i < 3; i++) a[i] /= length;
+
+    return(length);
+}
+
 void
-invertMatrix(double in[3][3], double out[3][3])
+invertMatrix(const double in[3][3], double out[3][3])
 {
     double a1 = in[0][0];
     double a2 = in[0][1];
@@ -163,7 +173,7 @@ invertMatrix(double in[3][3], double out[3][3])
 
     double det = (a1*(b2*c3 - b3*c2) + a2*(b3*c1 - b1 * c3) 
                   + a3*(b1*c2 - b2*c1));
-    
+
     out[0][0] = (b2*c3 - b3*c2)/det;
     out[0][1] = (a3*c2 - a2*c3)/det;
     out[0][2] = (a2*b3 - a3*b2)/det;
@@ -175,6 +185,24 @@ invertMatrix(double in[3][3], double out[3][3])
     out[2][0] = (b1*c2 - b2*c1)/det;
     out[2][1] = (a2*c1 - a1*c2)/det;
     out[2][2] = (a1*b2 - a2*b1)/det;
+#if 0
+    printf("in:\n");
+    for (int i = 0; i < 3; i++)
+    {
+        printf("[%14.8e, %14.8e, %14.8e],\n", in[i][0], in[i][1], 
+               in[i][2]);
+    }
+    
+    printf("det = %14.8e\n", det);
+
+    printf("out:\n");
+    for (int i = 0; i < 3; i++)
+    {
+        printf("[%14.8e, %14.8e, %14.8e],\n", out[i][0], out[i][1], 
+               out[i][2]);
+    }
+#endif    
+
 }
 
 void
