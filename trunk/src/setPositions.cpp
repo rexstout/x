@@ -173,16 +173,22 @@ setUpXYZ(const Planet *target, map<double, Planet *> &planetsFromSunMap,
                          options->PathRelativeToID(), 
                          vX, vY, vZ);
             
-        upX = vX * FAR_DISTANCE;
-        upY = vY * FAR_DISTANCE;
-        upZ = vZ * FAR_DISTANCE;
+        upX = vX;
+        upY = vY;
+        upZ = vZ;
     }
     break;
     case TERRESTRIAL:
         upX = 0;
         upY = 0;
-        upZ = FAR_DISTANCE;
+        upZ = 1;
         break;
     }
 
+    double up[3] = {upX, upY, upZ};
+    const double length = normalize(up);
+
+    upX = up[0];
+    upY = up[1];
+    upZ = up[2];
 }
