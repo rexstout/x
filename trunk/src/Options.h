@@ -46,6 +46,7 @@ class Options
     int FontSize() const { return(fontSize_); };
     bool Fork() const { return(fork_); };
     int FOVMode() const          { return(fovMode_); };
+    void FOVMode(const int f)    { fovMode_ = f; };
 
     double Glare() const { return(glare_); };
     double GRSLon() const { return(grsLon_); };
@@ -67,6 +68,7 @@ class Options
     double Latitude() const      { return(latitude_); };
     void Latitude(const double b) { latitude_ = b; };
     bool LightTime() const       { return(lightTime_); };
+    double LocalTime() const { return(localTime_); };
     void LocalTime(const double l) { localTime_ = l; };
     double LogMagnitudeStep() const { return(logMagStep_); };
     double Longitude() const     { return(longitude_); };
@@ -83,7 +85,8 @@ class Options
 
     bool OppositeSide() const { return(oppositeSide_); };
     int OriginMode() const { return(originMode_); };
-    body getOrigin() const          { return(origin_); };
+    body Origin() const          { return(origin_); };
+    void Origin(const body b)    { origin_ = b; };
     const std::string & OriginFile() const { return(originFile_); };
     int OriginID() const { return(originID_); };
     const std::string & OutputBase() const      { return(outputBase_); };
@@ -95,6 +98,8 @@ class Options
     int PathRelativeToID() const { return(pathRelativeToID_); };
     const std::string & PostCommand() const { return(post_command_); };
     const std::string & PrevCommand() const { return(prev_command_); };
+    body Primary() const { return(primary_); };
+    void Primary(const body p) { primary_ = p; };
     bool PrintEphemeris() const { return(printEphemeris_); };
     int Projection() const       { return(projection_); };
     void Projection(const int p)     { projection_ = p; };
@@ -104,8 +109,11 @@ class Options
 
     double Radius() const        { return(radius_); };
     void Radius(const double r)  { radius_ = r; };
+    bool RandomLatLonRot() const { return(random_); };
     double Range() const         { return(range_); };
     void Range(const double r) { range_ = r; };
+    bool RangeSpecified() const { return(rangeSpecified_); };
+    double Rotate0(const double r) { rotate0_ = r; };
     double Rotate() const        { return(rotate_); };
     void Rotate(const double r) { rotate_ = rotate0_ + r; };
 
@@ -116,14 +124,18 @@ class Options
     double StarFreq() const        { return(starFreq_); };
     const std::string & getStarMap() const { return(star_map); };
 
+    double SeparationDist() const { return(separationDist_); };
+    body SeparationTarget() const { return(separationTarget_); };
     double SunLat() const      { return(sunLat_); };
     void SunLat(const double b) { sunLat_ = b; };
     double SunLon() const     { return(sunLon_); };
     void SunLon(const double l) { sunLon_ = l; };
 
+    body Target() const          { return(target_); };
+    void Target(const body b)    { target_ = b; };
     int TargetID() const { return(targetID_); };
     int TargetMode() const { return(targetMode_); };
-    
+
     double getTimeWarp() const      { return(timewarp); };
     time_t TVSec() const { return(tv_sec); };
 
@@ -151,13 +163,8 @@ class Options
     int getWidth() const            { return((int) width); };
     int getHeight() const           { return((int) height); };
 
-    body getPrimary() const { return(primary_); };
-
-    void setTarget(PlanetProperties *planetProperties[]);
-    void setOrigin(PlanetProperties *planetProperties[]);
     void getOrigin(double &X, double &Y, double &Z);
     void setOrigin(const double X, const double Y, const double Z);
-    body getTarget() const          { return(target_); };
     void getTarget(double &X, double &Y, double &Z);
     void setTarget(const double X, const double Y, const double Z);
     bool UseCurrentTime() const { return(useCurrentTime_); };
@@ -260,6 +267,8 @@ class Options
     double rotate0_;      // rotation angle specified on command line
 
     bool saveDesktopFile_;
+    double separationDist_; // separation from the primary target
+    body separationTarget_;     // secondary target
     std::vector<int> spiceEphemeris_;
     std::vector<std::string> spiceFiles_;
     double starFreq_;
@@ -270,7 +279,6 @@ class Options
     body target_;
     int targetID_;          // for NAIF or NORAD bodies
     int targetMode_;        // BODY, RANDOM, MAJOR
-    bool targetSet_;        // True if target position has been set
     double timewarp;        // multiplication factor for the passage of time
     std::string tmpDir_;
     bool transparency_;

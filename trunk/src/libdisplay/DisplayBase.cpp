@@ -103,8 +103,8 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 
     vector<string> labelLines;
 
-    const body target = options->getTarget();
-    const body origin = options->getOrigin();
+    const body target = options->Target();
+    const body origin = options->Origin();
 
     string lookAt;
     if (options->LabelString().empty())
@@ -337,7 +337,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         }
 
         labelLines.push_back(fovCString);
-        if (options->getTarget() != ALONG_PATH) 
+        if (options->Target() != ALONG_PATH) 
             labelLines.push_back(distString);
 
         if (options->TargetMode() != XYZ && target != SUN)
