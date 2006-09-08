@@ -4,12 +4,14 @@
 using namespace std;
 
 #include "body.h"
+#include "buildPlanetMap.h"
 #include "Options.h"
 #include "xpUtil.h"
 
 #include "libplanet/Planet.h"
 
 static Planet *p[RANDOM_BODY];
+static bool firstTime = true;
 
 Planet *
 findPlanetinMap(map<double, Planet *> &planetMap, body b)
@@ -30,11 +32,19 @@ findPlanetinMap(map<double, Planet *> &planetMap, body b)
 }
 
 void
+buildPlanetMap(const double jd, map<double, Planet *> &planetMap)
+{
+    buildPlanetMap(jd, 0, 0, 0, false, planetMap);
+}
+
+void
 buildPlanetMap(const double jd, 
                const double oX, const double oY, const double oZ, 
                const bool light_time, map<double, Planet *> &planetMap)
 {
     planetMap.clear();
+    if (!firstTime) destroyPlanetMap();
+    firstTime = false;
 
     Options *options = Options::getInstance();
     if (options->PrintEphemeris())
@@ -96,5 +106,9 @@ buildPlanetMap(const double jd,
 void
 destroyPlanetMap()
 {
-    for (int ibody = SUN; ibody < RANDOM_BODY; ibody++) delete p[ibody];
+    for (int ibody = SUN; ibody < RANDOM_BODY; ibody++) 
+    {
+        delete p[ibody];
+        p[ibody] = NULL;
+    }
 }

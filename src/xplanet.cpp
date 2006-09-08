@@ -41,6 +41,12 @@ drawProjection(DisplayBase *display, Planet *target,
 extern void
 readConfigFile(string configFile, PlanetProperties *planetProperties[]);
 
+extern void 
+setPositions(const vector<LBRPoint> &originVector, 
+             const vector<LBRPoint>::iterator &iterOriginVector,
+             Planet *&target, map<double, Planet *> &planetMap,
+             PlanetProperties *planetProperties[]);
+
 int
 main(int argc, char **argv)
 {
@@ -170,35 +176,17 @@ main(int argc, char **argv)
             options->setTime(julianDay);
         }
 
-        // set the observer's XYZ coordinates if an origin file has
-        // been specified
-        setOriginXYZFromFile(originVector, iterOriginVector);
-
-        // Rectangular coordinates of the observer
-        double oX, oY, oZ;
-        options->getOrigin(oX, oY, oZ);
-
         // Calculate the positions of the planets & moons.  The map
         // container sorts on the key, so the bodies will be ordered
         // by heliocentric distance.  This makes calculating shadows
-        // easier.  The observer position is used to account for light
-        // time.
+        // easier.
         map<double, Planet *> planetsFromSunMap;
-        buildPlanetMap(options->JulianDay(), oX, oY, oZ, 
-                       options->LightTime(), planetsFromSunMap);
+        buildPlanetMap(options->JulianDay(), planetsFromSunMap);
 
-        // Find the target body in the list
-        body target_body = options->getTarget();
-        Planet *target = findPlanetinMap(planetsFromSunMap, target_body);
-
-        // Set the target's XYZ coordinates.
-        setTargetXYZ(planetProperties);
-
-        // Set the origin's XYZ coordinates.
-        setOriginXYZ(planetProperties);
-
-	// Now find the observer's lat/lon
-	getObsLatLon(target, planetProperties);
+        // set the observer and target XYZ positions
+        Planet *target;
+        setPositions(originVector, iterOriginVector, target, planetsFromSunMap,
+                     planetProperties);
 
         // Set the "up" vector.  This points to the top of the screen.
         double upX, upY, upZ;

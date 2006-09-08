@@ -80,9 +80,9 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         {
             ostringstream msg;
             msg << "Looking at "
-                << planetProperties[options->getTarget()]->Name()
+                << planetProperties[options->Target()]->Name()
                 << " from "
-                << planetProperties[options->getOrigin()]->Name()
+                << planetProperties[options->Origin()]->Name()
                 << endl;
             xpMsg(msg.str(), __FILE__, __LINE__);
 
@@ -108,7 +108,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     case RADIUS:
     {
         double target_pixel_radius = (options->Radius() * height);
-        target_pixel_radius /= planetProperties[options->getTarget()]->Magnify();
+        target_pixel_radius /= planetProperties[options->Target()]->Magnify();
 
         if (target->Index() == SATURN) target_pixel_radius /= 2.32166;
 
@@ -176,8 +176,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
     if (options->OriginMode() == ABOVE
         || options->OriginMode() == BELOW)
     {
-        findBodyXYZ(options->JulianDay(), options->getPrimary(), 
-                    -1, tX, tY, tZ);
+        findBodyXYZ(options->JulianDay(), options->Primary(), -1, tX, tY, tZ);
     }
 
     View *view = new View(oX, oY, oZ, tX, tY, tZ, 
