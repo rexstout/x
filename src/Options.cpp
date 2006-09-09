@@ -245,6 +245,7 @@ Options::parseArgs(int argc, char **argv)
             {"rotate",         required_argument, NULL, ROTATE},
             {"save_desktop_file", no_argument,    NULL, SAVE_DESKTOP_FILE},
             {"searchdir",      required_argument, NULL, SEARCHDIR},
+	    {"separation",     required_argument, NULL, SEPARATION},
             {"spice_ephemeris", required_argument, NULL, SPICE_EPHEMERIS}, 
             {"spice_file",     required_argument, NULL, SPICE_FILE}, 
             {"starfreq",       required_argument, NULL, STARFREQ},
@@ -738,6 +739,10 @@ Options::parseArgs(int argc, char **argv)
         case SEARCHDIR:
             searchdir.push_back(optarg);        
             break;
+	case SEPARATION:
+	    separationTarget_ = Planet::parseBodyName(optarg);
+	    if (separationTarget_ >= RANDOM_BODY) 
+		separationTarget_ = RANDOM_BODY;
         case SPICE_EPHEMERIS:
         {
 #ifdef HAVE_CSPICE

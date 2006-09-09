@@ -8,6 +8,7 @@ using namespace std;
 #include "PlanetProperties.h"
 #include "Options.h"
 #include "readOriginFile.h"
+#include "Separation.h"
 #include "xpUtil.h"
 
 #include "libplanet/Planet.h"
@@ -378,6 +379,13 @@ setOriginXYZ(PlanetProperties *planetProperties[])
 
     if (options->SeparationTarget() < RANDOM_BODY) 
     {
+	double sX, sY, sZ;
+	findBodyXYZ(options->JulianDay(), options->SeparationTarget(), -1, 
+		    sX, sY, sZ);
+        double tX, tY, tZ;
+        options->getTarget(tX, tY, tZ);
+	Separation s(oX, oY, oZ, tX, tY, tZ, sX, sY, sZ);
+	s.getOrigin(oX, oY, oZ);
     }
 
     options->setOrigin(oX, oY, oZ);

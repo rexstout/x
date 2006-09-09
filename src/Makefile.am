@@ -22,6 +22,8 @@ xplanet_SOURCES = \
 	Ring.h			\
 	Satellite.h		\
 	Satellite.cpp		\
+	Separation.h		\
+	Separation.cpp		\
 	View.cpp		\
 	View.h			\
 	body.h			\
