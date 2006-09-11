@@ -385,6 +385,7 @@ setOriginXYZ(PlanetProperties *planetProperties[])
         double tX, tY, tZ;
         options->getTarget(tX, tY, tZ);
 	Separation s(oX, oY, oZ, tX, tY, tZ, sX, sY, sZ);
+	s.setSeparation(-3 * deg_to_rad);
 	s.getOrigin(oX, oY, oZ);
     }
 
@@ -485,6 +486,27 @@ setUpXYZ(const Planet *target, map<double, Planet *> &planetsFromSunMap,
         upZ = vZ;
     }
     break;
+    case SEPARATION:
+    {
+	double sX, sY, sZ;
+	double tX, tY, tZ;
+	double oX, oY, oZ;
+
+        findBodyXYZ(options->JulianDay(), options->SeparationTarget(), 
+                    options->TargetID(), sX, sY, sZ);
+        options->getOrigin(oX, oY, oZ);
+	options->getTarget(tX, tY, tZ);
+
+	double t[3] = {tX - oX, tY - oY, tZ - oZ};
+	double s[3] = {sX - oX, sY - oY, sZ - oZ};
+	double c[3];
+	cross(s, t, c);
+	
+	upX = c[0];
+	upY = c[1];
+	upZ = c[2];
+    }
+    break;
     case TERRESTRIAL:
         upX = 0;
         upY = 0;
@@ -493,8 +515,7 @@ setUpXYZ(const Planet *target, map<double, Planet *> &planetsFromSunMap,
     }
 
     double up[3] = {upX, upY, upZ};
-    const double length = normalize(up);
-
+    normalize(up);
     upX = up[0];
     upY = up[1];
     upZ = up[2];

@@ -503,6 +503,8 @@ Options::parseArgs(int argc, char **argv)
                 north_ = ORBIT;
             else if (strncmp(lowercase, "path", 1) == 0)
                 north_ = PATH;
+            else if (strncmp(lowercase, "separation", 1) == 0)
+                north_ = SEPARATION;
             else if (strncmp(lowercase, "terrestrial", 1) == 0)
                 north_ = TERRESTRIAL;
             else 

@@ -13,20 +13,19 @@ class Separation
     ~Separation();
 
     void getOrigin(double &oX, double &oY, double &oZ);
-    double getSeparation() const { return(separation_); };
-
-    void setAngle(const double angle);
-    double getAngle() const { return(angle_); };
+    void setSeparation(double sep);
 
  private:
     double tX_, tY_, tZ_;
     double sX_, sY_, sZ_;
     double oX_, oY_, oZ_;
 
-    double separation_;   // target 1 - observer - target 2
-    double angle_;        // observer - target 1 - target 2
+    double oR_;      // target 1 - observer distance
+    double sR_;      // target 1 - target 2 distance
 
     View *view_;
+
+    double calcSeparation(const double angle);
 
 };
 
