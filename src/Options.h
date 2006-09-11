@@ -113,7 +113,7 @@ class Options
     double Range() const         { return(range_); };
     void Range(const double r) { range_ = r; };
     bool RangeSpecified() const { return(rangeSpecified_); };
-    double Rotate0(const double r) { rotate0_ = r; };
+    void Rotate0(const double r) { rotate0_ = r; };
     double Rotate() const        { return(rotate_); };
     void Rotate(const double r) { rotate_ = rotate0_ + r; };
 

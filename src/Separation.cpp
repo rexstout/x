@@ -16,16 +16,8 @@ Separation::Separation(const double oX, const double oY, const double oZ,
     view_->RotateToViewCoordinates(tX, tY, tZ, tX_, tY_, tZ_);
     view_->RotateToViewCoordinates(sX, sY, sZ, sX_, sY_, sZ_);
 
-    separation_ = acos(ndot(tX_ - oX_, tY_ - oY_, tZ_ - oZ_,
-			    sX_ - oX_, sY_ - oY_, sZ_ - oZ_));
-    angle_ =  acos(ndot(oX_ - tX_, oY_ - tY_, oZ_ - tZ_, 
-			sX_ - tX_, sY_ - tY_, sZ_ - tZ_));
-
-    printf("Observer: (%14.6f, %14.6f, %14.6f)\n", oX_, oY_, oZ_);
-    printf("Target 1: (%14.6f, %14.6f, %14.6f)\n", tX_, tY_, tZ_);
-    printf("Target 2: (%14.6f, %14.6f, %14.6f)\n", sX_, sY_, sZ_);
-    printf("Separation = %14.6f, angle = %14.6f\n", separation_/deg_to_rad, 
-	   angle_/deg_to_rad);
+    oR_ = sqrt(oY_ * oY_ + oZ_ * oZ_);
+    sR_ = sqrt(sY_ * sY_ + sZ_ * sZ_);
 }
 
 Separation::~Separation()
@@ -36,15 +28,74 @@ Separation::~Separation()
 void
 Separation::getOrigin(double &oX, double &oY, double &oZ)
 {
-    oX = oX_;
-    oY = oY_;
-    oZ = oZ_;
+    view_->RotateToXYZ(oX_, oY_, oZ_, oX, oY, oZ);
 }
 
-// Assume observer is at (0, 0, z0), target 1 is at (0, 0, 0), and
-// target 2 is at (0, y2, z2).  Supply an angle, and calculate the new
-// observer location.
+// Given an angle sep, calculate the observer position
 void
-Separation::setAngle(const double angle)
+Separation::setSeparation(double sep)
 {
+    if (oR_ > sR_)
+    {
+	double max_sep = asin(sR_/oR_);
+	if (sep > max_sep)
+	{
+	    sep = max_sep;
+	    printf("Maximum separation is %14.6f\n", max_sep / deg_to_rad);
+	}
+    }
+
+    const double alpha0 = atan2(sY_, sZ_);
+
+#if 0
+    int numPts = 20;
+    for (int i = 0; i < numPts; i++)
+    {
+	double angle = alpha0 + i * TWO_PI / (numPts - 1.);
+	printf("%d) %14.6f %14.6f\n", i, angle, calcSeparation(angle));
+    }
+#endif
+
+    double x0 = alpha0;
+    double xmid = alpha0 + M_PI;
+    double x1 = alpha0 + TWO_PI;
+
+    if (calcSeparation(xmid) > sep)
+	x0 = xmid;
+    else
+	x1 = xmid;
+
+    for (int i = 0; i < 200; i++)
+    {
+	xmid = 0.5 * (x1 + x0);
+	if (calcSeparation(xmid) > sep)
+	    x0 = xmid;
+	else
+	    x1 = xmid;
+
+	if (fabs(x0 - x1) < 1e-8) break;
+    }    
+}
+
+// Assume target 1 is at (0, 0, 0) and target 2 is at (0, y2, z2).
+// Supply an angle, and calculate the new observer location (0, y, z)
+// and the separation between the two targets.
+double
+Separation::calcSeparation(const double alpha)
+{
+    oX_ = 0;
+    oY_ = oR_ * sin(alpha);
+    oZ_ = oR_ * cos(alpha);
+
+    const double t[3] = { tX_ - oX_, tY_ - oY_, tZ_ - oZ_ };
+    const double s[3] = { sX_ - oX_, sY_ - oY_, sZ_ - oZ_ };
+
+    double separation = acos(ndot(t, s));
+
+    double c[3];
+    cross(s, t, c);
+
+    if (c[0] < 0) separation *= -1;
+
+    return(separation);
 }
