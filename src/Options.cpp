@@ -245,7 +245,7 @@ Options::parseArgs(int argc, char **argv)
             {"rotate",         required_argument, NULL, ROTATE},
             {"save_desktop_file", no_argument,    NULL, SAVE_DESKTOP_FILE},
             {"searchdir",      required_argument, NULL, SEARCHDIR},
-	    {"separation",     required_argument, NULL, SEPARATION},
+            {"separation",     required_argument, NULL, SEPARATION},
             {"spice_ephemeris", required_argument, NULL, SPICE_EPHEMERIS}, 
             {"spice_file",     required_argument, NULL, SPICE_FILE}, 
             {"starfreq",       required_argument, NULL, STARFREQ},
@@ -266,7 +266,7 @@ Options::parseArgs(int argc, char **argv)
             {"window_title",   required_argument, NULL, WINDOWTITLE},
             {"XID",            required_argument, NULL, XWINID},
             {"xscreensaver",   no_argument,       NULL, VROOT},
-	    {"XYZ_file",       required_argument, NULL, XYZFILE},
+            {"XYZ_file",       required_argument, NULL, XYZFILE},
             {NULL,             0,                 NULL, 0}
         };
 
@@ -741,10 +741,18 @@ Options::parseArgs(int argc, char **argv)
         case SEARCHDIR:
             searchdir.push_back(optarg);        
             break;
-	case SEPARATION:
-	    separationTarget_ = Planet::parseBodyName(optarg);
-	    if (separationTarget_ >= RANDOM_BODY) 
-		separationTarget_ = RANDOM_BODY;
+        case SEPARATION:
+        {
+            const char *colon = strstr(optarg, ":");
+            if (colon != NULL)
+            {
+                sscanf(colon + 1, "%lf", &separationDist_);
+                separationTarget_ = Planet::parseBodyName(optarg);
+                if (separationTarget_ >= RANDOM_BODY) 
+                    separationTarget_ = RANDOM_BODY;
+            }
+        }
+        break;
         case SPICE_EPHEMERIS:
         {
 #ifdef HAVE_CSPICE
@@ -903,10 +911,10 @@ Options::parseArgs(int argc, char **argv)
             displayMode_ = WINDOW;
         }
         break;
-	case XYZFILE:
-	{
-	    XYZFile_ = optarg;
-	}
+        case XYZFILE:
+        {
+            XYZFile_ = optarg;
+        }
         default:
         case UNKNOWN:
         {

@@ -8,8 +8,8 @@
 using namespace std;
 
 Separation::Separation(const double oX, const double oY, const double oZ,
-		       const double tX, const double tY, const double tZ, 
-		       const double sX, const double sY, const double sZ) 
+                       const double tX, const double tY, const double tZ, 
+                       const double sX, const double sY, const double sZ) 
 {
     view_ = new View(tX, tY, tZ, oX, oY, oZ, sX, sY, sZ, 0, 0);
     view_->RotateToViewCoordinates(oX, oY, oZ, oX_, oY_, oZ_);
@@ -31,50 +31,114 @@ Separation::getOrigin(double &oX, double &oY, double &oZ)
     view_->RotateToXYZ(oX_, oY_, oZ_, oX, oY, oZ);
 }
 
-// Given an angle sep, calculate the observer position
+/*
+ Given an angle sep, calculate the observer position using the
+ bisection method.
+
+ If the observer is closer to the target than target 2, then any
+ separation angle is possible (e.g. observer = Venus, target = Sun,
+ target 2 = Earth).  The separation function increases monotonically
+ from -PI to PI as alpha0 increases.  At alpha0 + PI the separation
+ function is 0.
+
+ If the observer is farther from the target than target 1, there is a
+ maximum separation possible (e.g. observer = Earth, target = Sun,
+ target 2 = Venus).  In this case the separation function looks like
+ this:
+
+ angle - alpha0     sep
+ 0                  0
+ acos(sR/oR)       -max
+ PI                 0
+ 2 PI-acos(sR/oR)   max
+ 2 PI               0
+
+ In this case, look for the angle that gives the required separation
+ close to 0 or 2 PI, depending on the sign of the separation.
+*/
 void
 Separation::setSeparation(double sep)
 {
-    if (oR_ > sR_)
-    {
-	double max_sep = asin(sR_/oR_);
-	if (sep > max_sep)
-	{
-	    sep = max_sep;
-	    printf("Maximum separation is %14.6f\n", max_sep / deg_to_rad);
-	}
-    }
-
     const double alpha0 = atan2(sY_, sZ_);
 
+    double x0 = alpha0;
+    double x1 = alpha0 + TWO_PI;
+
+    if (sep < 0)
+        x1 = alpha0 + M_PI;
+    else
+        x0 = alpha0 + M_PI;
+
+    if (oR_ > sR_)
+    {
+        double max_sep = asin(sR_/oR_);
+        if (sep > max_sep)
+        {
+            sep = max_sep;
+            printf("sep = %14.6f, maximum separation is %14.6f\n", 
+                   sep/deg_to_rad, max_sep / deg_to_rad);
+            calcSeparation(alpha0 + M_PI_2);
+            return;
+        }
+
+        if (sep < 0)
+            x1 = alpha0 + acos(sR_/oR_);
+        else
+            x0 = alpha0 + TWO_PI - acos(sR_/oR_);
+    }
+
+    double f0 = calcSeparation(x0) - sep;
+    double f1 = calcSeparation(x1) - sep;
+
+    if (x0 == alpha0 && f0 > 0)
+        f0 = -calcSeparation(x0) - sep;
+
 #if 0
+    printf("f0(%14.6f) = %14.6f, f1(%14.6f) = %14.6f\n", x0/deg_to_rad, 
+           f0/deg_to_rad, x1/deg_to_rad, f1/deg_to_rad);
     int numPts = 20;
     for (int i = 0; i < numPts; i++)
     {
-	double angle = alpha0 + i * TWO_PI / (numPts - 1.);
-	printf("%d) %14.6f %14.6f\n", i, angle, calcSeparation(angle));
+        double angle = alpha0 + i * TWO_PI / (numPts - 1.);
+        printf("%d) %14.6f %14.6f\n", i, angle/deg_to_rad, 
+               calcSeparation(angle)/deg_to_rad);
     }
 #endif
 
-    double x0 = alpha0;
-    double xmid = alpha0 + M_PI;
-    double x1 = alpha0 + TWO_PI;
-
-    if (calcSeparation(xmid) > sep)
-	x0 = xmid;
-    else
-	x1 = xmid;
+    if (f0 > 0)
+    {
+        double tmp = x0;
+        x0 = x1;
+        x1 = tmp;
+    }
 
     for (int i = 0; i < 200; i++)
     {
-	xmid = 0.5 * (x1 + x0);
-	if (calcSeparation(xmid) > sep)
-	    x0 = xmid;
-	else
-	    x1 = xmid;
+        double xmid = 0.5 * (x0 + x1);
+        double fmid = calcSeparation(xmid) - sep;
 
-	if (fabs(x0 - x1) < 1e-8) break;
-    }    
+#if 0
+        printf("%d) %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f\n", i, 
+               x0/deg_to_rad, xmid/deg_to_rad, x1/deg_to_rad, 
+               (calcSeparation(x0) - sep)/deg_to_rad, fmid/deg_to_rad,
+               (calcSeparation(x1) - sep)/deg_to_rad);
+#endif
+        if (fmid > 0)
+            x1 = xmid;
+        else
+            x0 = xmid;
+
+        if (fabs(x0-x1) < 1e-10 || fmid == 0.0) 
+        {
+#if 0
+            printf("oX, oY, oZ = %14.6f %14.6f %14.6f\n", oX_, oY_, oZ_);
+            printf("angle = %14.6f, separation = %14.6f\n", xmid/deg_to_rad, 
+                   calcSeparation(xmid)/deg_to_rad);
+#endif
+            break;
+        }
+    }
+
 }
 
 // Assume target 1 is at (0, 0, 0) and target 2 is at (0, y2, z2).
@@ -90,12 +154,19 @@ Separation::calcSeparation(const double alpha)
     const double t[3] = { tX_ - oX_, tY_ - oY_, tZ_ - oZ_ };
     const double s[3] = { sX_ - oX_, sY_ - oY_, sZ_ - oZ_ };
 
-    double separation = acos(ndot(t, s));
+    double separation = 0;
+    const double cos_sep = ndot(t, s);
+    if (cos_sep >= 1.0)
+        separation = 0;
+    else if (cos_sep <= -1.0)
+        separation = M_PI;
+    else
+        separation = acos(cos_sep);
 
     double c[3];
     cross(s, t, c);
 
-    if (c[0] < 0) separation *= -1;
+    if (c[0] > 0) separation *= -1;
 
     return(separation);
 }

@@ -379,14 +379,14 @@ setOriginXYZ(PlanetProperties *planetProperties[])
 
     if (options->SeparationTarget() < RANDOM_BODY) 
     {
-	double sX, sY, sZ;
-	findBodyXYZ(options->JulianDay(), options->SeparationTarget(), -1, 
-		    sX, sY, sZ);
+        double sX, sY, sZ;
+        findBodyXYZ(options->JulianDay(), options->SeparationTarget(), -1, 
+                    sX, sY, sZ);
         double tX, tY, tZ;
         options->getTarget(tX, tY, tZ);
-	Separation s(oX, oY, oZ, tX, tY, tZ, sX, sY, sZ);
-	s.setSeparation(-3 * deg_to_rad);
-	s.getOrigin(oX, oY, oZ);
+        Separation s(oX, oY, oZ, tX, tY, tZ, sX, sY, sZ);
+        s.setSeparation(options->SeparationDist() * deg_to_rad);
+        s.getOrigin(oX, oY, oZ);
     }
 
     options->setOrigin(oX, oY, oZ);
@@ -452,8 +452,15 @@ setUpXYZ(const Planet *target, map<double, Planet *> &planetsFromSunMap,
         target->getBodyNorth(upX, upY, upZ);
         break;
     case GALACTIC:
-        target->getGalacticNorth(upX, upY, upZ);
-        break;
+    {
+        const double GN_LAT = 27.4 * deg_to_rad;
+        const double GN_LON = 192.25 * deg_to_rad;
+        
+        upX = cos(GN_LAT) * cos(GN_LON);
+        upY = cos(GN_LAT) * sin(GN_LON);
+        upZ = sin(GN_LAT);
+    }
+    break;
     case ORBIT:
     {
         // if it's a moon, pretend its orbital north is the same as
@@ -488,23 +495,32 @@ setUpXYZ(const Planet *target, map<double, Planet *> &planetsFromSunMap,
     break;
     case SEPARATION:
     {
-	double sX, sY, sZ;
-	double tX, tY, tZ;
-	double oX, oY, oZ;
-
-        findBodyXYZ(options->JulianDay(), options->SeparationTarget(), 
-                    options->TargetID(), sX, sY, sZ);
-        options->getOrigin(oX, oY, oZ);
-	options->getTarget(tX, tY, tZ);
-
-	double t[3] = {tX - oX, tY - oY, tZ - oZ};
-	double s[3] = {sX - oX, sY - oY, sZ - oZ};
-	double c[3];
-	cross(s, t, c);
-	
-	upX = c[0];
-	upY = c[1];
-	upZ = c[2];
+        if (options->SeparationTarget() < RANDOM_BODY)
+        {
+            double sX, sY, sZ;
+            double tX, tY, tZ;
+            double oX, oY, oZ;
+            
+            findBodyXYZ(options->JulianDay(), options->SeparationTarget(), 
+                        options->TargetID(), sX, sY, sZ);
+            options->getOrigin(oX, oY, oZ);
+            options->getTarget(tX, tY, tZ);
+            
+            double t[3] = {tX - oX, tY - oY, tZ - oZ};
+            double s[3] = {sX - oX, sY - oY, sZ - oZ};
+            double c[3];
+            cross(s, t, c);
+            
+            upX = c[0];
+            upY = c[1];
+            upZ = c[2];
+        }
+        else
+        {
+            xpWarn("No separation target given, using -north body\n", 
+                   __FILE__, __LINE__);
+            target->getBodyNorth(upX, upY, upZ);
+        }
     }
     break;
     case TERRESTRIAL:
@@ -563,4 +579,3 @@ setPositions(const vector<LBRPoint> &originVector,
     // Now find the observer's lat/lon
     getObsLatLon(target, planetProperties);
 }
-
