@@ -1124,18 +1124,6 @@ Planet::getOrbitalNorth(double &X, double &Y, double &Z) const
 }
 
 void
-Planet::getGalacticNorth(double &X, double &Y, double &Z) const
-{
-    // B1950.0 coordinates of the galactic north pole
-    const double GN_LAT = 27.4 * deg_to_rad;
-    const double GN_LON = 192.25 * deg_to_rad;
-
-    X = cos(GN_LAT) * cos(GN_LON);
-    Y = cos(GN_LAT) * sin(GN_LON);
-    Z = sin(GN_LAT);              
-}
-
-void
 Planet::getBodyNorth(double &X, double &Y, double &Z) const
 {
     // get direction of the rotational axis

@@ -51,7 +51,6 @@ class Planet
 
     void getBodyNorth(double &X, double &Y, double &Z) const;
     void getOrbitalNorth(double &X, double &Y, double &Z) const;
-    void getGalacticNorth(double &X, double &Y, double &Z) const;
 
     body Index() const { return(index_); };
     body Primary() const { return(primary_); };
