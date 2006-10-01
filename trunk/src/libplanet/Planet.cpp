@@ -979,7 +979,7 @@ Planet::XYZToPlanetocentric(const double X, const double Y, const double Z,
     else
         lat = 0;
 
-    if (cos(lat) > 1e-5)
+    if (cos(lat) > 0)
         lon = atan2(sy, sx);
     else
         lon = 0;

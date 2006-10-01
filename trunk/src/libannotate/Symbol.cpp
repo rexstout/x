@@ -25,6 +25,8 @@ void
 Symbol::DrawCircle(DisplayBase *display, const int r, 
                    const unsigned char color[3])
 {
+    if (r <= 0) return;
+
     int xx, yy;
     double r2 = r * r;
     double dd = 1 / (M_PI_2 * r);
@@ -47,6 +49,7 @@ Symbol::DrawCircle(DisplayBase *display, const int r,
 void
 Symbol::Draw(DisplayBase *display)
 {
+    if (r_ < 1) return;
     unsigned char black[3] = { 0, 0, 0 };
     DrawCircle(display, r_ - 1, black);
     DrawCircle(display, r_ + 1, black);

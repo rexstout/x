@@ -171,7 +171,7 @@ invertMatrix(const double in[3][3], double out[3][3])
     double c2 = in[2][1];
     double c3 = in[2][2];
 
-    double det = (a1*(b2*c3 - b3*c2) + a2*(b3*c1 - b1 * c3) 
+    double det = (a1*(b2*c3 - b3*c2) + a2*(b3*c1 - b1*c3) 
                   + a3*(b1*c2 - b2*c1));
 
     out[0][0] = (b2*c3 - b3*c2)/det;
@@ -201,6 +201,21 @@ invertMatrix(const double in[3][3], double out[3][3])
         printf("[%14.8e, %14.8e, %14.8e],\n", out[i][0], out[i][1], 
                out[i][2]);
     }
+
+    printf("product:\n");
+    double prod[3][3];
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++) 
+        {
+            prod[i][j] = 0;
+            for (int ii = 0; ii < 3; ii++)
+                prod[i][j] += in[i][ii] * out[ii][j];
+        }
+        printf("[%14.8e, %14.8e, %14.8e],\n", prod[i][0], prod[i][1], 
+               prod[i][2]);
+    }
+
 #endif    
 
 }
