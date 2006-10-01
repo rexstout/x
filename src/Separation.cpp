@@ -11,7 +11,27 @@ Separation::Separation(const double oX, const double oY, const double oZ,
                        const double tX, const double tY, const double tZ, 
                        const double sX, const double sY, const double sZ) 
 {
-    view_ = new View(tX, tY, tZ, oX, oY, oZ, sX, sY, sZ, 0, 0);
+    // The up vector switches direction every time the observer,
+    // target 1, and target 2 line up.  Fix the direction to be close
+    // to (0, 0, 1)
+    const double t[3] = { tX - oX, tY - oY, tZ - oZ };
+    const double s[3] = { sX - oX, sY - oY, sZ - oZ };
+
+    double c[3];
+    cross(s, t, c);
+    normalize(c);
+
+    double upX = sX;
+    double upY = sY;
+    double upZ = sZ;
+    if (acos(dot(c[0], c[1], c[2], 0., 0., 1.)) > M_PI_2)
+    {
+        upX = 2 * tX - sX;
+        upY = 2 * tY - sY;
+        upZ = 2 * tZ - sZ;
+    }
+
+    view_ = new View(tX, tY, tZ, oX, oY, oZ, upX, upY, upZ, 0, 0);
     view_->RotateToViewCoordinates(oX, oY, oZ, oX_, oY_, oZ_);
     view_->RotateToViewCoordinates(tX, tY, tZ, tX_, tY_, tZ_);
     view_->RotateToViewCoordinates(sX, sY, sZ, sX_, sY_, sZ_);
