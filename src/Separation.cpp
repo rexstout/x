@@ -11,27 +11,7 @@ Separation::Separation(const double oX, const double oY, const double oZ,
                        const double tX, const double tY, const double tZ, 
                        const double sX, const double sY, const double sZ) 
 {
-    // The up vector switches direction every time the observer,
-    // target 1, and target 2 line up.  Fix the direction to be close
-    // to (0, 0, 1)
-    const double t[3] = { tX - oX, tY - oY, tZ - oZ };
-    const double s[3] = { sX - oX, sY - oY, sZ - oZ };
-
-    double c[3];
-    cross(s, t, c);
-    normalize(c);
-
-    double upX = sX;
-    double upY = sY;
-    double upZ = sZ;
-    if (acos(dot(c[0], c[1], c[2], 0., 0., 1.)) > M_PI_2)
-    {
-        upX = 2 * tX - sX;
-        upY = 2 * tY - sY;
-        upZ = 2 * tZ - sZ;
-    }
-
-    view_ = new View(tX, tY, tZ, oX, oY, oZ, upX, upY, upZ, 0, 0);
+    view_ = new View(tX, tY, tZ, oX, oY, oZ, sX, sY, sZ, 0, 0);
     view_->RotateToViewCoordinates(oX, oY, oZ, oX_, oY_, oZ_);
     view_->RotateToViewCoordinates(tX, tY, tZ, tX_, tY_, tZ_);
     view_->RotateToViewCoordinates(sX, sY, sZ, sX_, sY_, sZ_);
@@ -111,19 +91,7 @@ Separation::setSeparation(double sep)
     double f1 = calcSeparation(x1) - sep;
 
     if (x0 == alpha0 && f0 > 0)
-        f0 = -calcSeparation(x0) - sep;
-
-#if 0
-    printf("f0(%14.6f) = %14.6f, f1(%14.6f) = %14.6f\n", x0/deg_to_rad, 
-           f0/deg_to_rad, x1/deg_to_rad, f1/deg_to_rad);
-    int numPts = 20;
-    for (int i = 0; i < numPts; i++)
-    {
-        double angle = alpha0 + i * TWO_PI / (numPts - 1.);
-        printf("%d) %14.6f %14.6f\n", i, angle/deg_to_rad, 
-               calcSeparation(angle)/deg_to_rad);
-    }
-#endif
+        f0 = -(calcSeparation(x0) + sep);
 
     if (f0 > 0)
     {
@@ -137,28 +105,13 @@ Separation::setSeparation(double sep)
         double xmid = 0.5 * (x0 + x1);
         double fmid = calcSeparation(xmid) - sep;
 
-#if 0
-        printf("%d) %14.6f %14.6f %14.6f %14.6f %14.6f %14.6f\n", i, 
-               x0/deg_to_rad, xmid/deg_to_rad, x1/deg_to_rad, 
-               (calcSeparation(x0) - sep)/deg_to_rad, fmid/deg_to_rad,
-               (calcSeparation(x1) - sep)/deg_to_rad);
-#endif
         if (fmid > 0)
             x1 = xmid;
         else
             x0 = xmid;
 
-        if (fabs(x0-x1) < 1e-10 || fmid == 0.0) 
-        {
-#if 0
-            printf("oX, oY, oZ = %14.6f %14.6f %14.6f\n", oX_, oY_, oZ_);
-            printf("angle = %14.6f, separation = %14.6f\n", xmid/deg_to_rad, 
-                   calcSeparation(xmid)/deg_to_rad);
-#endif
-            break;
-        }
+        if (fabs(x0-x1) < 1e-10 || fmid == 0.0) break;
     }
-
 }
 
 // Assume target 1 is at (0, 0, 0) and target 2 is at (0, y2, z2).
