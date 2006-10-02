@@ -238,10 +238,12 @@ image.
 This option rotates the image so that the top points to north_type.
 Valid values for north_type are:
 
-body:     body's north pole
-galactic: galactic north pole
-orbit:    body's orbital north pole (perpendicular to the orbit plane)
-path:     origin's velocity vector  (also see -path_relative_to option)
+body:        body's north pole
+galactic:    galactic north pole
+orbit:       body's orbital north pole (perpendicular to the orbit plane)
+path:        origin's velocity vector  (also see -path_relative_to option)
+separation:  perpendicular to the line of sight and the
+	     target-separation target line (see -separation option)
 
 The default value is "body".
 
@@ -383,6 +385,12 @@ subdirectories of ${HOME}/.xplanet on X11
 subdirectories of ${HOME}/Library/Xplanet on Mac OS X
 subdirectories of DATADIR/xplanet
 DATADIR is set at compile time and defaults to /usr/local/share.
+
+-separation body:dist
+Place the observer at a location where the target body and the
+separation body are dist degrees apart.  For example "-target earth
+-separation moon:-3" means place the observer at a location where the
+moon appears 3 degrees to the left of the earth. 
 
 -spice_ephemeris index
 Use SPICE kernels to compute the position of the named body.  The

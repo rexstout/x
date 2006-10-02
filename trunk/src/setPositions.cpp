@@ -379,14 +379,39 @@ setOriginXYZ(PlanetProperties *planetProperties[])
 
     if (options->SeparationTarget() < RANDOM_BODY) 
     {
+        // rectangular coordinates of the separation target
         double sX, sY, sZ;
         findBodyXYZ(options->JulianDay(), options->SeparationTarget(), -1, 
                     sX, sY, sZ);
+
+        // rectangular coordinates of the primary target
         double tX, tY, tZ;
-        options->getTarget(tX, tY, tZ);
-        Separation s(oX, oY, oZ, tX, tY, tZ, sX, sY, sZ);
-        s.setSeparation(options->SeparationDist() * deg_to_rad);
-        s.getOrigin(oX, oY, oZ);
+        Planet p(options->JulianDay(), options->Target());
+        p.calcHeliocentricEquatorial();
+        p.getPosition(tX, tY, tZ);
+
+        // Save the range
+        double latitude, longitude, range;
+        p.XYZToPlanetographic(oX, oY, oZ, latitude, longitude, range);
+
+        // place the observer 90 degrees from the separation target in
+        // the primary target's equatorial plane
+        double n[3];
+        p.getBodyNorth(n[0], n[1], n[2]);
+
+        double s[3] = { sX - tX, sY - tY, sZ - tZ };
+        double c[3];
+        cross(s, n, c);
+        c[0] += tX;
+        c[1] += tY;
+        c[2] += tZ;
+
+        p.XYZToPlanetographic(c[0], c[1], c[2], latitude, longitude);
+        p.PlanetographicToXYZ(oX, oY, oZ, latitude, longitude, range);
+
+        Separation sep(oX, oY, oZ, tX, tY, tZ, sX, sY, sZ);
+        sep.setSeparation(options->SeparationDist() * deg_to_rad);
+        sep.getOrigin(oX, oY, oZ);
     }
 
     options->setOrigin(oX, oY, oZ);
@@ -511,9 +536,18 @@ setUpXYZ(const Planet *target, map<double, Planet *> &planetsFromSunMap,
             double c[3];
             cross(s, t, c);
             
-            upX = c[0];
-            upY = c[1];
-            upZ = c[2];
+            if (sin(options->SeparationDist() * deg_to_rad) > 0)
+            {
+                upX = c[0];
+                upY = c[1];
+                upZ = c[2];
+            }
+            else
+            {
+                upX = -c[0];
+                upY = -c[1];
+                upZ = -c[2];
+            }
         }
         else
         {
