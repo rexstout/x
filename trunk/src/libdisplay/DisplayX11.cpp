@@ -91,6 +91,15 @@ DisplayX11::DisplayX11(const int tr) : DisplayBase(tr)
                 char *titlec = (char *) title.c_str();
                 XStringListToTextProperty(&titlec, 1, &windowName);
                 XSetWMName(display, window, &windowName);       
+
+		// Add X Class Hint
+		// contributed by Dragan Stanojevic - Nevidljivi <invisible@hidden-city.net>
+		XClassHint classHint;
+
+		classHint.res_name  = "xplanet";
+		classHint.res_class = "XPlanet";
+
+		XSetClassHint(display, window, &classHint);
             }
         }
         XGetWindowAttributes(display, window, &xgwa);
