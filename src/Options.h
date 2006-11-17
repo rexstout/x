@@ -61,6 +61,7 @@ class Options
     int JPEGQuality() const { return(quality_); };
     double JulianDay() const { return(julianDay_); };
 
+    body LabelBody() const          { return(labelBody_); };
     int LabelMask() const { return(labelMask_); };
     int LabelX() const { return(labelX_); };
     int LabelY() const { return(labelY_); };
@@ -216,6 +217,7 @@ class Options
     int labelMask_;
     int labelX_;
     int labelY_;
+    body labelBody_;      // print this body's info in the label
     std::string labelString_;
     double latitude_;
     bool lightTime_;

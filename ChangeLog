@@ -16,6 +16,12 @@ Version 1.2.1 (released ???)
 
 	* Added a definition for signbit() in ProjectionIcosagnomonic.cpp
 
+	* Added the -separation option.  This places the observer at a
+	point in space where two bodies have the specified separation.
+
+	* Added the -label_body option.  This is useful in conjunction
+	with -separation to specify which body the label should apply to.
+
 Version 1.2.0 (released 16 Jun 2005)
 
 	* Added the -grs_longitude option, to specify the longitude of

@@ -174,6 +174,11 @@ syntax.  The default position is "-15+15", or 15 pixels to the left
 and below the top right corner of the display.  This option implies
 -label. 
 
+-label_body body
+Use the specified body to calculate the sub-observer, sub-solar, and
+illumination values in the label.  This is useful with the -separation
+option. 
+
 -label_string
 Specify the text of the first line of the label.  By default, it says
 something like "Looking at Earth".  Any instances of %t will be
