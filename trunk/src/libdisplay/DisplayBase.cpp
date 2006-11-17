@@ -20,6 +20,7 @@ using namespace std;
 #include "DisplayBase.h"
 
 #include "libimage/Image.h"
+#include "libplanet/Planet.h"
 
 extern TextRenderer *getTextRenderer(DisplayBase *display);
 
@@ -103,7 +104,9 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
 
     vector<string> labelLines;
 
-    const body target = options->Target();
+    const body target = (options->LabelBody() == UNKNOWN_BODY 
+			 ? options->Target() 
+			 : options->LabelBody());
     const body origin = options->Origin();
 
     string lookAt;
@@ -111,7 +114,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     {
         if (options->TargetMode() != XYZ)
         {
-            lookAt.assign("Looking at ");
+            lookAt.assign("");
             string viewTarget;
             string viewOrigin;
 
@@ -138,7 +141,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
                     }
                     else
                     {
-                        viewOrigin.assign(" from ");
+                        viewOrigin.assign(" seen from ");
                         viewOrigin += planetProperties[origin]->Name();
                     }
                     break;
@@ -234,11 +237,47 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
     if (!lookAt.empty()) labelLines.push_back(lookAt);
     labelLines.push_back(timeString);
 
+    double oX, oY, oZ;
+    double targetDist;
+    
+    Planet *targetPlanet = NULL;
+
     if (options->TargetMode() != XYZ)
     {
+	options->getOrigin(oX, oY, oZ);
+	targetPlanet = new Planet(options->JulianDay(), target);
+	targetPlanet->calcHeliocentricEquatorial();
+
+	double tX, tY, tZ;
+	if (options->LightTime())
+	{
+	    targetPlanet->getPosition(tX, tY, tZ);
+	    
+	    const double deltX = tX - oX;
+	    const double deltY = tY - oY;
+	    const double deltZ = tZ - oZ;
+	    targetDist = AU_to_km * sqrt(deltX*deltX 
+					 + deltY*deltY + deltZ*deltZ);
+	    double lightTime = targetDist / (299792.458 * 86400);
+	    delete targetPlanet;
+	    targetPlanet = new Planet(options->JulianDay() - lightTime,
+				      target);
+	    targetPlanet->calcHeliocentricEquatorial();
+	}
+
+	targetPlanet->getPosition(tX, tY, tZ);
+	const double deltX = tX - oX;
+	const double deltY = tY - oY;
+	const double deltZ = tZ - oZ;
+	targetDist = AU_to_km * sqrt(deltX*deltX 
+				     + deltY*deltY + deltZ*deltZ);
+
+	double obsLat, obsLon;
+	targetPlanet->XYZToPlanetographic(oX, oY, oZ, obsLat, obsLon);
+
         char obsString[MAX_LINE_LENGTH];
-        double obsLatDeg = options->Latitude() / deg_to_rad;
-        double obsLonDeg = options->Longitude() / deg_to_rad;
+        double obsLatDeg = obsLat / deg_to_rad;
+        double obsLonDeg = obsLon / deg_to_rad;
 
         if (target == EARTH || target == MOON)
         {
@@ -256,12 +295,15 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         }
         labelLines.push_back(obsString);
 
+	double sunLat, sunLon;
+	targetPlanet->XYZToPlanetographic(0, 0, 0, sunLat, sunLon);
+
         if (target != SUN)
         {
             char sunString[MAX_LINE_LENGTH];
-            double sunLatDeg = options->SunLat() / deg_to_rad;
-            double sunLonDeg = options->SunLon() / deg_to_rad;
-        
+            double sunLatDeg = sunLat / deg_to_rad;
+            double sunLonDeg = sunLon / deg_to_rad;
+
             if (target == EARTH || target == MOON)
             {
                 if (sunLonDeg > 180) sunLonDeg -= 360;
@@ -305,18 +347,6 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
                      "fov %.1f milliarc seconds", fov);
         }
         
-        double oX, oY, oZ;
-        options->getOrigin(oX, oY, oZ);
-
-        double tX, tY, tZ;
-        options->getTarget(tX, tY, tZ);
-
-        const double deltX = tX - oX;
-        const double deltY = tY - oY;
-        const double deltZ = tZ - oZ;
-        double targetDist = AU_to_km * sqrt(deltX*deltX 
-                                            + deltY*deltY + deltZ*deltZ);
-        
         char distString[MAX_LINE_LENGTH];
         if (targetDist < 1e6)
         {
@@ -326,13 +356,13 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         else if (targetDist < 1e9)
         {
             targetDist /= 1e6;
-            snprintf(distString, MAX_LINE_LENGTH, "dist %.1f million km", 
+            snprintf(distString, MAX_LINE_LENGTH, "dist %.2f million km", 
                      targetDist);
         }
         else
         {
             targetDist /= 1e9;
-            snprintf(distString, MAX_LINE_LENGTH, "dist %.1f billion km", 
+            snprintf(distString, MAX_LINE_LENGTH, "dist %.2f billion km", 
                      targetDist);
         }
 
@@ -343,15 +373,15 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         if (options->TargetMode() != XYZ && target != SUN)
         {
             char illumString[MAX_LINE_LENGTH];
-            const double illumination = 50 * (ndot(tX, tY, tZ, 
-                                                   deltX, deltY, deltZ) + 1);
-            
+
             snprintf(illumString, MAX_LINE_LENGTH, "illumination %.1f %%", 
-                     illumination);
+                     targetPlanet->Illumination(oX, oY, oZ));
             labelLines.push_back(illumString);
         }
     }
     
+    delete targetPlanet;
+
     int labelX = options->LabelX();
     int labelY = options->LabelY() + textRenderer_->FontHeight()/2;
 

@@ -890,6 +890,12 @@ Planet::getPosition(double &X, double &Y, double &Z) const
     Z = Z_;
 }
 
+double
+Planet::Illumination(const double oX, const double oY, const double oZ)
+{
+    return(50 * (ndot(X_, Y_, Z_, X_ - oX, Y_ - oY, Z_ - oZ) + 1));
+}
+
 void
 Planet::CreateRotationMatrix()
 {

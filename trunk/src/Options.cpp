@@ -83,6 +83,7 @@ Options::Options() :
     labelMask_(XNegative),
     labelX_(-15),
     labelY_(15),
+    labelBody_(UNKNOWN_BODY), 
     labelString_(""), 
     latitude_(0),
     lightTime_(false),
@@ -216,6 +217,7 @@ Options::parseArgs(int argc, char **argv)
             {"jdate",          required_argument, NULL, JDATE},
             {"label",          no_argument,       NULL, LABEL},
             {"labelpos",       required_argument, NULL, LABELPOS},
+            {"label_body",     required_argument, NULL, LABEL_BODY},
             {"label_string",   required_argument, NULL, LABEL_STRING},
             {"latitude",       required_argument, NULL, LATITUDE},
             {"light_time",     no_argument,       NULL, LIGHT_TIME},
@@ -446,6 +448,17 @@ Options::parseArgs(int argc, char **argv)
             drawLabel_ = true;
         }
         break;
+	case LABEL_BODY:
+	{
+	    labelBody_ = Planet::parseBodyName(optarg);
+	    if (labelBody_ >= UNKNOWN_BODY)
+	    {
+		xpWarn("Unknown body specified for label_body\n", 
+                       __FILE__, __LINE__);
+		labelBody_ = UNKNOWN_BODY;
+	    }
+	}
+	break;
         case LABEL_STRING:
             labelString_ = optarg;
             drawLabel_ = true;
