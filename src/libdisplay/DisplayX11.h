@@ -1,7 +1,7 @@
 #ifndef DisplayX11_h
 #define DisplayX11_h
 
-#include <X11/Intrinsic.h>
+#include <X11/Xlib.h>
 
 #include "DisplayBase.h"
 
