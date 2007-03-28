@@ -51,6 +51,7 @@ skipPastToken(int &i, const char *line)
 static bool
 getValue(const char *line, int &i, const char *key, const char endChar, 
          char *&returnstring)
+// If the line contains 'key', return everything between 'key' and 'endChar'
 {
     const unsigned int length = strlen(key);
     if (strncmp(line + i, key, length) == 0)
@@ -58,6 +59,28 @@ getValue(const char *line, int &i, const char *key, const char endChar,
         i += length;
         int istart = i;
         skipPastToken(i, line, endChar);
+        returnstring = new char[i - istart + 1];
+        strncpy(returnstring, (line + istart), i - istart);
+        returnstring[i-istart] = '\0';
+        i++;
+        return(true);
+    }
+    return(false);
+}
+
+static bool
+getValueAfter(const char *line, int &i, const char *key, const char endChar,
+         char *&returnstring)
+// If the line contains the 'key', skip past 'endChar' and return
+// everything to the end of the line in 'returnString'
+{
+    const unsigned int length = strlen(key);
+    if (strncmp(line + i, key, length) == 0)
+    {
+        i += length;
+        skipPastToken(i, line, endChar); 	// Skips 'to' endChar
+        int istart = i + 1; 	// Add another to not include endChar
+        skipPastToken(i, line);
         returnstring = new char[i - istart + 1];
         strncpy(returnstring, (line + istart), i - istart);
         returnstring[i-istart] = '\0';
@@ -116,10 +139,12 @@ parse(int &i, const char *line, char *&returnString)
         snprintf(returnString, 32, "%d,%d,%d", RGB[0], RGB[1], RGB[2]);
         returnVal = ARC_COLOR;
     }
-    else if (getValue(line, i, "arc_file=", returnString))
-        returnVal = ARC_FILE;
     else if (getValue(line, i, "arc_thickness=", returnString))
         returnVal = THICKNESS;
+    // This line must be after all other "arc_" keywords, because it
+    // gobbles all forms
+    else if (getValueAfter(line, i, "arc_", '=', returnString))
+        returnVal = ARC_FILE;
     else if (getValue(line, i, "[", ']', returnString))
         returnVal = BODY;
     else if (getValue(line, i, "altcirc=", returnString))
@@ -182,12 +207,14 @@ parse(int &i, const char *line, char *&returnString)
         snprintf(returnString, 32, "%d,%d,%d", RGB[0], RGB[1], RGB[2]);
         returnVal = MARKER_COLOR;
     }
-    else if (getValue(line, i, "marker_file=", returnString))
-        returnVal = MARKER_FILE;
     else if (getValue(line, i, "marker_font=", returnString))
         returnVal = MARKER_FONT;
     else if (getValue(line, i, "marker_fontsize=", returnString))
         returnVal = MARKER_FONTSIZE;
+    // This line must be after all other "marker_" keywords, because
+    // it gobbles all forms
+    else if (getValueAfter(line, i, "marker_", '=', returnString))
+        returnVal = MARKER_FILE;
     else if (getValue(line, i, "map=", returnString))
         returnVal = DAY_MAP;
     else if (getValue(line, i, "max_radius_for_label=", returnString))
@@ -229,7 +256,9 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = RANDOM_ORIGIN;
     else if (getValue(line, i, "random_target=", returnString))
         returnVal = RANDOM_TARGET;
-    else if (getValue(line, i, "satellite_file=", returnString))
+    // Any 'new' satellite_* tokens must be before this, because it
+    // gobbles all forms
+    else if (getValueAfter(line, i, "satellite_", '=', returnString))
         returnVal = SATELLITE_FILE;
     else if (getValue(line, i, "shade=", returnString))
         returnVal = SHADE;
