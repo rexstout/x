@@ -1,3 +1,4 @@
+#include <iostream>
 #include <map>
 #include <sstream>
 using namespace std;
@@ -597,10 +598,11 @@ setPositions(const vector<LBRPoint> &originVector,
     {
         double oX, oY, oZ;
         options->getOrigin(oX, oY, oZ);
+
+        // Destroy the existing planet map and build a new one
         buildPlanetMap(options->JulianDay(), oX, oY, oZ, true, 
                        planetMap);
 
-        delete target;
         target = findPlanetinMap(planetMap, target_body);
             
         // Set the target's XYZ coordinates.
