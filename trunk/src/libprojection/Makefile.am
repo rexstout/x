@@ -13,6 +13,8 @@ libprojection_a_SOURCES = 	\
 		ProjectionAncient.h		\
 		ProjectionAzimuthal.cpp		\
 		ProjectionAzimuthal.h		\
+		ProjectionAzimutEqualArea.cpp	\
+		ProjectionAzimutEqualArea.h	\
 		ProjectionBase.cpp		\
 		ProjectionBase.h		\
 		ProjectionBonne.h		\

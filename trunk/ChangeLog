@@ -1,4 +1,5 @@
 Version 1.2.1 (released ???)
+	* Added Lambert Equal Area projection
 
 	* Fixed a bug where arcs were sometimes not drawn if they were
 	vertical or horizontal lines.

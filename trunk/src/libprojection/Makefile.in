@@ -51,7 +51,8 @@ AR = ar
 ARFLAGS = cru
 libprojection_a_LIBADD =
 am_libprojection_a_OBJECTS = ProjectionAncient.$(OBJEXT) \
-	ProjectionAzimuthal.$(OBJEXT) ProjectionBase.$(OBJEXT) \
+	ProjectionAzimuthal.$(OBJEXT) \
+	ProjectionAzimutEqualArea.$(OBJEXT) ProjectionBase.$(OBJEXT) \
 	ProjectionBonne.$(OBJEXT) ProjectionGnomonic.$(OBJEXT) \
 	ProjectionHemisphere.$(OBJEXT) \
 	ProjectionIcosagnomonic.$(OBJEXT) ProjectionLambert.$(OBJEXT) \
@@ -226,6 +227,8 @@ libprojection_a_SOURCES = \
 		ProjectionAncient.h		\
 		ProjectionAzimuthal.cpp		\
 		ProjectionAzimuthal.h		\
+		ProjectionAzimutEqualArea.cpp	\
+		ProjectionAzimutEqualArea.h	\
 		ProjectionBase.cpp		\
 		ProjectionBase.h		\
 		ProjectionBonne.h		\
@@ -303,6 +306,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionAncient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionAzimutEqualArea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionAzimuthal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionBase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProjectionBonne.Po@am__quote@

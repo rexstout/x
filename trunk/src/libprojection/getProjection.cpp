@@ -10,6 +10,7 @@ using namespace std;
 #include "ProjectionBase.h"
 #include "ProjectionAncient.h"
 #include "ProjectionAzimuthal.h"
+#include "ProjectionAzimutEqualArea.h"
 #include "ProjectionBonne.h"
 #include "ProjectionGnomonic.h"
 #include "ProjectionHemisphere.h"
@@ -33,6 +34,7 @@ setProjectionTypes()
         projectionTypes.push_back(ANCIENT);
         projectionTypes.push_back(AZIMUTHAL);
         projectionTypes.push_back(BONNE);
+        projectionTypes.push_back(EQUAL_AREA);
         projectionTypes.push_back(GNOMONIC);
         projectionTypes.push_back(HEMISPHERE);
         projectionTypes.push_back(ICOSAGNOMONIC);
@@ -69,6 +71,8 @@ getProjectionType(char *proj_string)
         projection = AZIMUTHAL;
     else if (strncmp(lowercase, "bonne", 1) == 0)
         projection = BONNE;
+    else if (strncmp(lowercase, "equal_area", 1) == 0)
+        projection = EQUAL_AREA;
     else if (strncmp(lowercase, "gnomonic", 1) == 0)
         projection = GNOMONIC;
     else if (strncmp(lowercase, "hemisphere", 1) == 0)
@@ -123,6 +127,10 @@ getProjection(const int projection, const int flipped,
         break;
     case BONNE:
         thisProjection = new ProjectionBonne(flipped, width, height);
+        break;
+    case EQUAL_AREA:
+        thisProjection = new ProjectionAzimutEqualArea(flipped, width, 
+						       height);
         break;
     case GNOMONIC:
         thisProjection = new ProjectionGnomonic(flipped, width, height);
