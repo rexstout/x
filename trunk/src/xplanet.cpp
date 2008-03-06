@@ -114,10 +114,6 @@ main(int argc, char **argv)
     processSpiceKernels(true);
 #endif
 
-    // Load artificial satellite orbital elements
-    if (!planetProperties[EARTH]->SatelliteFiles().empty())
-        loadSatelliteVector(planetProperties[EARTH]);
-
     // If an origin file has been specified, read it
     const bool origin_file = !options->OriginFile().empty();
     vector<LBRPoint> originVector;
@@ -152,6 +148,10 @@ main(int argc, char **argv)
                 xpWarn(errStr.str(), __FILE__, __LINE__);
             }
         }
+
+        // Load artificial satellite orbital elements
+        if (!planetProperties[EARTH]->SatelliteFiles().empty())
+            loadSatelliteVector(planetProperties[EARTH]);
 
         // delete the markerbounds file, since we'll create a new one
         string markerBounds(options->MarkerBounds());
