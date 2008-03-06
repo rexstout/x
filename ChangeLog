@@ -1,4 +1,8 @@
 Version 1.2.1 (released ???)
+
+	* Reload satellite files in case TLE files are updated between
+	renderings.  Suggested by Lutz Mändle.
+	
 	* Added Lambert Equal Area projection
 
 	* Fixed a bug where arcs were sometimes not drawn if they were
