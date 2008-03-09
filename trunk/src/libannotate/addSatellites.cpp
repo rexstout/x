@@ -2,7 +2,6 @@
 #include <cmath>
 #include <cstdio>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -441,8 +440,6 @@ loadSatelliteVector(PlanetProperties *planetProperties)
     while (ii != satfiles.end()) 
     {
         string tleFile = *ii + ".tle";
-
-	cout << "*** Looking for " << tleFile << endl;
 
         const bool foundFile = findFile(tleFile, "satellites");
         if (foundFile)
