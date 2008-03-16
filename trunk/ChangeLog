@@ -1,4 +1,6 @@
 Version 1.2.1 (released ???)
+	* Calculate eclipse shadows a little past the terminator so they
+	don't get cut of sharply.
 
 	* Reload satellite files in case TLE files are updated between
 	renderings.  Suggested by Lutz Mändle.

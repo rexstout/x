@@ -527,6 +527,8 @@ Map::AddShadow(Planet *p, const double sun_size)
     p->XYZToPlanetaryXYZ(0, 0, 0, sunX, sunY, sunZ);
     sunZ *= ratio;
 
+    const double border = sin(targetProperties_->Twilight() * deg_to_rad);
+
     for (int j = 0; j < height_; j++)
     {
         const double lat = latArray_[j];
@@ -539,10 +541,10 @@ Map::AddShadow(Planet *p, const double sun_size)
             double X, Y, Z;
             target_->PlanetographicToXYZ(X, Y, Z, lat, lon, radius);
 
-            const double sun_dist = sqrt(X*X + Y*Y + Z*Z);
-
             // if this point is on the night side, skip it
-            if (ndot(tX - X, tY - Y, tZ - Z, tX, tY, tZ) < -0.05) continue;
+            if (ndot(tX - X, tY - Y, tZ - Z, tX, tY, tZ) < -border) continue;
+
+            const double sun_dist = sqrt(X*X + Y*Y + Z*Z);
 
             const double p_dist = sqrt((pX - X) * (pX - X)
                                        + (pY - Y) * (pY - Y)
