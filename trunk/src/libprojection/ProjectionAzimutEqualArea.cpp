@@ -8,8 +8,6 @@ using namespace std;
 #include "ProjectionAzimutEqualArea.h"
 #include "xpUtil.h"
 
-#include <iostream.h>
-
 ProjectionAzimutEqualArea::ProjectionAzimutEqualArea(const int f, const int w, 
 						     const int h) 
     : ProjectionBase(f, w, h)

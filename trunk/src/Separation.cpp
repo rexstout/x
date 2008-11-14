@@ -88,7 +88,6 @@ Separation::setSeparation(double sep)
     }
 
     double f0 = calcSeparation(x0) - sep;
-    double f1 = calcSeparation(x1) - sep;
 
     if (x0 == alpha0 && f0 > 0)
         f0 = -(calcSeparation(x0) + sep);
