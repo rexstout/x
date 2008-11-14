@@ -1,6 +1,7 @@
 #include <sys/time.h>
 
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 #include <map>
 #include <sstream>
