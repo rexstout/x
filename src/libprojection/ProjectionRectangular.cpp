@@ -37,8 +37,8 @@ bool
 ProjectionRectangular::pixelToSpherical(const double x, const double y, 
                                         double &lon, double &lat)
 {
-    lon = (x + 0.5) * delLon_ + startLon_;
-    lat = startLat_ - (y + 0.5) * delLat_;
+    lon = x * delLon_ + startLon_;
+    lat = startLat_ - y * delLat_;
     return(true);
 }
 
