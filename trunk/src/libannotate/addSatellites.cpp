@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -96,6 +97,7 @@ readSatelliteFile(const char *line, Planet *planet,
     int fontSize = -1;
     string image;
     string name("");
+    ofstream outputFile;
     Satellite *satellite = NULL;
     int symbolSize = 2;
     double spacing = 0.1;
@@ -218,6 +220,16 @@ readSatelliteFile(const char *line, Planet *planet,
         break;
         case NAME:
             name.assign(returnString);
+            break;
+        case OUTPUT:
+            outputFile.open(returnString, ios::app);
+            if (outputFile.fail())
+            {
+                ostringstream errMsg;
+                errMsg << "Can't open satellite output file: " 
+                       << returnString << endl;
+                xpWarn(errMsg.str(), __FILE__, __LINE__);
+            }
             break;
         case SPACING:
             checkLocale(LC_NUMERIC, "C");
@@ -360,6 +372,16 @@ readSatelliteFile(const char *line, Planet *planet,
     double lat, lon, rad;
     satellite->getSpherical(startTime, lat, lon, rad);
 
+    if (outputFile.is_open() && endTime > startTime)
+    {
+        outputFile << "BEGIN " << satellite->getName() << "\t" 
+                   << satellite->getID() << endl;
+        char line[128];
+        snprintf(line, 128, "%12s%12s%12s%12s%30s\n",
+                 "lat", "lon", "alt", "UNIX time", "UTC ");
+        outputFile << line;
+    }
+
     for (time_t t = startTime + interval; t <= endTime; t += interval)
     {
         const double prevLat = lat;
@@ -367,6 +389,16 @@ readSatelliteFile(const char *line, Planet *planet,
         double prevRad = rad;
 
         satellite->getSpherical(t, lat, lon, rad);
+
+        if (outputFile.is_open()) 
+        {
+            char line[128];
+            snprintf(line, 128, "%12.3f%12.3f%12.3f%12ld%30s",
+                     lat/deg_to_rad, lon/deg_to_rad, 6378.14 * (rad - 1),
+                     t, asctime(gmtime((time_t *) &t)));
+            outputFile << line;
+        }
+
         if (trailType == GROUND)
         {
             rad = 1;
@@ -376,6 +408,16 @@ readSatelliteFile(const char *line, Planet *planet,
         drawArc(prevLat, prevLon, prevRad, lat, lon, rad, color, thickness, 
                 spacing * deg_to_rad, planetProperties->Magnify(),
                 planet, view, projection, annotationMap);
+    }
+
+    if (outputFile.is_open())
+    {
+        if (endTime > startTime)
+        {
+            outputFile << "END   " << satellite->getName() << "\t" 
+                       << satellite->getID() << endl;
+        }
+        outputFile.close();
     }
 
     satellite->getSpherical(options->TVSec(), lat, lon, rad);
