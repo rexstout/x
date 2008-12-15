@@ -78,8 +78,8 @@ getValueAfter(const char *line, int &i, const char *key, const char endChar,
     if (strncmp(line + i, key, length) == 0)
     {
         i += length;
-        skipPastToken(i, line, endChar); 	// Skips 'to' endChar
-        int istart = i + 1; 	// Add another to not include endChar
+        skipPastToken(i, line, endChar);        // Skips 'to' endChar
+        int istart = i + 1;     // Add another to not include endChar
         skipPastToken(i, line);
         returnstring = new char[i - istart + 1];
         strncpy(returnstring, (line + istart), i - istart);
@@ -214,6 +214,7 @@ parse(int &i, const char *line, char *&returnString)
     // This line must be after all other "marker_" keywords, because
     // it gobbles all forms
     else if (getValueAfter(line, i, "marker_", '=', returnString))
+
         returnVal = MARKER_FILE;
     else if (getValue(line, i, "map=", returnString))
         returnVal = DAY_MAP;
@@ -288,6 +289,8 @@ parse(int &i, const char *line, char *&returnString)
     }
     else if (getValue(line, i, "trail={", '}', returnString))
         returnVal = TRAIL;
+    else if (getValue(line, i, "trail_output=", returnString))
+        returnVal = OUTPUT;
     else if (getValue(line, i, "transparent={", '}', returnString))
         returnVal = TRANSPARENT;
     else if (getValue(line, i, "twilight=", returnString))

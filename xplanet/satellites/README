@@ -9,12 +9,12 @@ Each line in satfile must begin with a satellite ID number (e.g. 25544
 for the ISS).  Each ID must exist in the associated TLE file. 
 
 Valid additional keywords are "align", "altcirc", "color", "font",
-"fontsize", "image", "position", "spacing", "thickness", "trail", and
-"transparent".  The usage for most of these is identical to the usage
-for arc and marker files.  In addition, a string to be plotted with
-the marker may be enclosed in either double quotes (""), or braces
-({}).  If a string is not supplied, the marker will take the name of
-the satellite supplied in the TLE file.
+"fontsize", "image", "position", "spacing", "thickness", "trail",
+"trail_output", and "transparent".  The usage for most of these is
+identical to the usage for arc and marker files.  In addition, a
+string to be plotted with the marker may be enclosed in either double
+quotes (""), or braces ({}).  If a string is not supplied, the marker
+will take the name of the satellite supplied in the TLE file.
 
 The "altcirc" keyword draws altitude circles on the surface of the
 earth.  The format is "altcirc=angle", where a circle is drawn
@@ -29,6 +29,10 @@ must be "trail={ground|orbit,start_time,end_time,interval}", where the
 start and end times and interval are each in minutes.  The start and
 end times are relative to the time of the calculation.  When using the
 -projection option, trail will always be "ground".
+
+The "trail_output" keyword outputs the satellite's position to a text
+file, using the same time interval specified by "trail".  If the
+"trail" option is not also present, "trail_output" has no effect.
 
 A few sample entries are given below:
 
