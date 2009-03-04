@@ -125,6 +125,49 @@ drawProjection(DisplayBase *display, Planet *target,
         addSatellites(planetProperties, target, NULL, projection,
                       annotationMap);
 
+    // add tabs to make a photocube.  Lines are black, so -background
+    // white will make them stand out.
+    if (options->Projection() == TSC)
+    {
+        unsigned char black[3] = { 0, 0, 0 };
+        const int thickness = 3;
+        const double Z = 0;
+        LineSegment *ls = NULL;
+
+        int blockWidth = width/4;
+        for (int i = 0; i < 4; i++)
+        {
+            if (i == 1) continue;
+
+            double X0 = i * blockWidth;
+
+            ls = new LineSegment(black, thickness, X0, height/3, 
+                                 X0+width/40, 9*height/30);
+            annotationMap.insert(pair<const double, Annotation*>(Z, ls));
+
+            ls = new LineSegment(black, thickness, X0+width/4, height/3, 
+                                 X0+9*width/40, 9*height/30);
+            annotationMap.insert(pair<const double, Annotation*>(Z, ls));
+
+            ls = new LineSegment(black, thickness, X0+width/40, 9*height/30, 
+                                 X0+9*width/40, 9*height/30);
+            annotationMap.insert(pair<const double, Annotation*>(Z, ls));
+
+            ls = new LineSegment(black, thickness, X0, 2*height/3, 
+                                 X0+width/40, 21*height/30);
+            annotationMap.insert(pair<const double, Annotation*>(Z, ls));
+
+            ls = new LineSegment(black, thickness, X0+width/4, 2*height/3, 
+                                 X0+9*width/40, 21*height/30);
+            annotationMap.insert(pair<const double, Annotation*>(Z, ls));
+
+            ls = new LineSegment(black, thickness, X0+width/40, 21*height/30, 
+                                 X0+9*width/40, 21*height/30);
+            annotationMap.insert(pair<const double, Annotation*>(Z, ls));
+        }
+
+    }
+
     const bool limbDarkening = (options->Projection() == HEMISPHERE
                                 || options->Projection() == ORTHOGRAPHIC);
 
