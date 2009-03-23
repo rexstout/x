@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(xplanet, 1.2.0+SVN_0148)
+AC_INIT(xplanet, 1.2.0+SVN_0149)
 AC_CONFIG_SRCDIR(src/xplanet.cpp)
 AM_INIT_AUTOMAKE
 
@@ -26,8 +26,8 @@ case "$host" in
        if test "x$GXX" != "xyes"; then
 # This is for Sun Workshop compiler
          use_ar='no'
-	 xplanet_ARFLAGS="-xar -o"
-	 xplanet_LDFLAGS="-xildoff"
+         xplanet_ARFLAGS="-xar -o"
+         xplanet_LDFLAGS="-xildoff"
        fi
      ;;
      mips-sgi-irix*)

@@ -148,8 +148,12 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         ostringstream msg;
         char buffer[128];
 
-        snprintf(buffer, 128, "Julian Date = %14.6f\n",
-                 options->JulianDay());
+        int year, month, day, hour, min;
+        double sec;
+        fromJulian(options->JulianDay(), year, month, day, hour, min, sec);
+
+        snprintf(buffer, 128, "Julian Date = %14.6f (%04d%02d%02d.%02d%02d%02d)\n",
+                 options->JulianDay(), year, month, day, hour, min, (int) (sec+0.5));
         msg << buffer;
 
         snprintf(buffer, 128, "origin XYZ  = %14.8f %14.8f %14.8f\n",
@@ -398,6 +402,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                             ring_brightness, LIT, ring_transparency, 
                             TRANSP, sLon, sLat,
                             currentProperties->Shade(), 
+                            planetsFromSunMap, 
                             current_planet);
 
             const bool lit_side = (sLat * oLat > 0);

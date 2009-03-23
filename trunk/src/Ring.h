@@ -1,6 +1,8 @@
 #ifndef RING_H
 #define RING_H
 
+#include <map>
+
 class Planet;
 
 class Ring
@@ -11,6 +13,7 @@ class Ring
          const double *ring_transparency, const int num_trans,
          const double sunlon, const double sunlat,
          const double shade, 
+         std::map<double, Planet *> &planetsFromSunMap,
          Planet *p);
 
     ~Ring();
@@ -49,6 +52,7 @@ class Ring
     int window_b;  // each pixel contains this many brightness points
 
     Planet *planet_;
+    std::map<double, Planet *> planetsFromSunMap_;
 
     double shade_;
     double sunLat_, sunLon_;
