@@ -65,6 +65,7 @@ drawProjection(DisplayBase *display, Planet *target,
                         ring_brightness, LIT, ring_transparency, TRANSP,
                         sLon, sLat, 
                         planetProperties->Shade(), 
+                        planetsFromSunMap, 
                         target);
     }
 

@@ -1,8 +1,8 @@
 #include <cstdlib>
 #include <cmath>
+#include <map>
 using namespace std;
 
-#include "Options.h"
 #include "Ring.h"
 #include "xpUtil.h"
 
@@ -13,6 +13,7 @@ Ring::Ring(const double inner_radius, const double outer_radius,
            const double *ring_transparency, const int num_trans,
            const double sunlon, const double sunlat,
            const double shade, 
+           map<double, Planet *> &planetsFromSunMap,
            Planet *p) : planet_(p), 
                         shade_(shade), 
                         sunLat_(sunlat),
@@ -74,6 +75,9 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     }
 
     planet_->XYZToPlanetaryXYZ(0, 0, 0, sunX_, sunY_, sunZ_);
+
+    planetsFromSunMap_.clear();
+    planetsFromSunMap_.insert(planetsFromSunMap.begin(), planetsFromSunMap.end());
 }
 
 Ring::~Ring()
@@ -163,9 +167,6 @@ double
 Ring::getValue(const double *array, const int size, const int window,
                const double dr, const double r, const double lon)
 {
-    if (cos(lon-sunLon_) > -0.45) 
-        return(getValue(array, size, window, dr, r));
-    
     int i = static_cast<int> ((r_out - r)/dr);
 
     if (i < 0 || i >= size) return(-1.0);
@@ -175,22 +176,76 @@ Ring::getValue(const double *array, const int size, const int window,
     if (j1 < 0) j1 = 0;
     if (j2 >= size) j2 = size - 1;
 
-    double sum = 0;
-    double r0 = r;
+    bool shaded[j2-j1];
+    for (int j = 0; j < j2-j1; j++) shaded[j] = false;
+
     const double cosLon = cos(lon);
     const double sinLon = sin(lon);
-    for (int j = j1; j < j2; j++) 
-    {
-        const double x =  r0 * cosLon;
-        const double y = -r0 * sinLon;
-        const double z =  0;
+    
+    // planet's distance from the sun
+    double cX, cY, cZ;
+    planet_->getPosition(cX, cY, cZ);
+    double p_dist = sqrt(cX*cX + cY*cY + cZ*cZ);
 
-        if (planet_->IsInMyShadow(x, y, z))
+    for (map<double, Planet *>::iterator it0 = planetsFromSunMap_.begin(); 
+         it0 != planetsFromSunMap_.end(); it0++)
+    {
+        Planet *p = it0->second;
+        if (p->Index() == planet_->Index())
+        {
+            // Only check behind the planet for its own shadow
+            if (cos(lon-sunLon_) > -0.45) break;
+        }
+        else if (p->Primary() == planet_->Index())
+        {
+            // Check that the planet-sun-satellite angle is
+            // smaller than the angular size of the rings seen
+            // from the sun
+
+            double pX, pY, pZ;
+            p->getPosition(pX, pY, pZ);
+            
+            double sep = abs(acos(ndot(pX, pY, pZ, cX, cY, cZ)));
+            
+            if (sep > r_out * planet_->Radius() / p_dist) continue;
+        }
+        else
+        {
+            // Don't worry about this body shadowing the rings
+            continue;
+        }
+
+        double r0 = r;
+        for (int j = j1; j < j2; j++) 
+        {
+            if (shaded[j-j1]) continue;
+
+            const double rX =  r0 * cosLon;
+            const double rY = -r0 * sinLon;
+            const double rZ =  0;
+            
+            double X, Y, Z;
+            planet_->PlanetaryXYZToXYZ(rX, rY, rZ, X, Y, Z);
+    
+            // convert this point on the rings to this planet's
+            // XYZ coordinate system
+            double thisX, thisY, thisZ;
+            p->XYZToPlanetaryXYZ(X, Y, Z, thisX, thisY, thisZ);
+            
+            if (p->IsInMyShadow(thisX, thisY, thisZ)) shaded[j-j1] = true;
+
+            r0 += dr;
+        }
+        if (p->Index() == planet_->Index()) break;
+    }
+
+    double sum = 0;
+    for (int j = j1; j < j2; j++)
+    {
+        if (shaded[j-j1])
             sum += (shade_ * array[j]);
         else
             sum += array[j];
-
-        r0 += dr;
     }
     sum /= (j2 - j1);
 

@@ -449,17 +449,17 @@ Options::parseArgs(int argc, char **argv)
             drawLabel_ = true;
         }
         break;
-	case LABEL_BODY:
-	{
-	    labelBody_ = Planet::parseBodyName(optarg);
-	    if (labelBody_ >= UNKNOWN_BODY)
-	    {
-		xpWarn("Unknown body specified for label_body\n", 
+        case LABEL_BODY:
+        {
+            labelBody_ = Planet::parseBodyName(optarg);
+            if (labelBody_ >= UNKNOWN_BODY)
+            {
+                xpWarn("Unknown body specified for label_body\n", 
                        __FILE__, __LINE__);
-		labelBody_ = UNKNOWN_BODY;
-	    }
-	}
-	break;
+                labelBody_ = UNKNOWN_BODY;
+            }
+        }
+        break;
         case LABEL_STRING:
             labelString_ = optarg;
             drawLabel_ = true;
