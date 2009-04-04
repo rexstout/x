@@ -44,6 +44,7 @@ class Ring
     int num_t;
     double *radius_t;
     double *transparency;
+    double *brightness_dark; // brightness of the dark side
     int window_t;  // each pixel contains this many transparency points
 
     int num_b;
