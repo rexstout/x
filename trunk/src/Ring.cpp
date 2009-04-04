@@ -47,10 +47,6 @@ Ring::Ring(const double inner_radius, const double outer_radius,
     for (int i = 0; i < innerPadding; i++)
         brightness[outerPadding + num_bright + i] = ring_brightness[num_bright-1];
 
-    const double cos_sun_lat = cos(sunLat_);
-    for (int i = 0; i < num_b; i++)
-        brightness[i] *= cos_sun_lat;
-
     radius_t = new double[num_t];
     for (int i = 0; i < num_t; i++) 
         radius_t[i] = r_out - i * dr_t;
@@ -73,6 +69,14 @@ Ring::Ring(const double inner_radius, const double outer_radius,
         transparency[outerPadding + num_trans + i] = (1 - (1-ring_transparency[num_trans-1]) 
                                                     * weight);
     }
+
+    // make the rings darker as we get closer to equinox
+    const double sin_sun_lat_025 = pow(abs(sin(sunLat_)), 0.25);
+    for (int i = 0; i < num_b; i++)
+        brightness[i] *= sin_sun_lat_025;
+
+    brightness_dark = new double[num_t];
+    for (int i = 0; i < num_t; i++) brightness_dark[i] = transparency[i] * sin_sun_lat_025;
 
     planet_->XYZToPlanetaryXYZ(0, 0, 0, sunX_, sunY_, sunZ_);
 
@@ -132,7 +136,7 @@ Ring::getBrightness(const double lon, const double r, const double t)
     }
     else 
     {
-        returnval = getValue(transparency, num_t, window_t, dr_t, r, lon);
+        returnval = getValue(brightness_dark, num_t, window_t, dr_t, r, lon);
     }
     return(returnval);
 }

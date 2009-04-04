@@ -327,10 +327,10 @@ each body xplanet knows about, and then exit.
 
 -projection projection_type
 The projection type may be one of ancient, azimuthal, bonne,
-equal_area, gnomonic, hemisphere, lambert, mercator, mollweide,
-orthographic, peters, polyconic, rectangular, or tsc.  The default is
-no projection.  Multiple bodies will not be shown if this option is
-specified, although shadows will still be drawn.
+equal_area, gnomonic, hemisphere, icosagnomonic, lambert, mercator,
+mollweide, orthographic, peters, polyconic, rectangular, or tsc.  The
+default is no projection.  Multiple bodies will not be shown if this
+option is specified, although shadows will still be drawn.
 
 -proj_param value
 Pass additional parameters for some projections.  The only projections

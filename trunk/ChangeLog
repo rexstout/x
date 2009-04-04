@@ -1,11 +1,33 @@
 Version 1.2.1 (released ???)
+
+	* Add shadows from satellites on Saturn's rings, let brightness of
+	rings go to zero as Saturn approaches equinox.
+	
+	* Add trail_output option to satellite files to print out
+	satellite positions.
+	
 	* Calculate eclipse shadows a little past the terminator so they
-	don't get cut of sharply.
+	don't get cut off sharply.
 
 	* Reload satellite files in case TLE files are updated between
 	renderings.  Suggested by Lutz Mändle.
 	
 	* Added Lambert Equal Area projection
+
+	* Check that -origin above or below is not specified for the Sun.
+
+	* Added a definition for signbit() in ProjectionIcosagnomonic.cpp
+
+	* Add patch from Doug Hawkins to support marker_* keywords in
+	config file.
+
+	* Added the -label_body option.  This is useful in conjunction
+	with -separation to specify which body the label should apply to.
+
+	* Added the -separation option.  This places the observer at a
+	point in space where two bodies have the specified separation.
+
+	* Allow -glare 0 to remove sun glare.
 
 	* Fixed a bug where arcs were sometimes not drawn if they were
 	vertical or horizontal lines.
@@ -18,16 +40,6 @@ Version 1.2.1 (released ???)
 
 	* Fixed a bug where the arc color was not reset to the default
 	color for subsequent arcs in the file.
-
-	* Check that -origin above or below is not specified for the Sun.
-
-	* Added a definition for signbit() in ProjectionIcosagnomonic.cpp
-
-	* Added the -separation option.  This places the observer at a
-	point in space where two bodies have the specified separation.
-
-	* Added the -label_body option.  This is useful in conjunction
-	with -separation to specify which body the label should apply to.
 
 Version 1.2.0 (released 16 Jun 2005)
 
