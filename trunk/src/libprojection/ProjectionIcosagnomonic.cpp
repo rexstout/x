@@ -26,18 +26,6 @@ using namespace std;
 #define THIGH 3
 #define RATIO (((THIGH)*sqrt(3.0)/2)/(TWIDE))
 
-// signbit() is not defined on all operating systems
-#ifndef signbit
-static int
-signbit(double x)
-{
-    if ((x < 0.0) || (x = -0.0)) 
-        return 1;
-    else
-        return 0;
-}
-#endif /* signbit */
-
 bool
 ProjectionIcosagnomonic::PointXY::sameSide(const PointXY& p1,
                                            const PointXY& p2,
@@ -114,7 +102,7 @@ ProjectionIcosagnomonic::PointLL::sameSide(const PointLL& p1,
     double dp1 = PointXYZ::dotP(cp, p1);
     double dp2 = PointXYZ::dotP(cp, p2);
 
-    return (signbit(dp1) == signbit(dp2) || fabs(dp1) < 1e-10);    
+    return (dp1 * dp2 >= 0);
 }
 
 bool
