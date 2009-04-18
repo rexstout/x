@@ -14,7 +14,8 @@ AM_CONDITIONAL([am__fastdepOBJC], false)
 AC_PATH_PROG(PERL, perl, no)
 AC_SUBST(PERL)
 
-AC_ARG_WITH(cygwin,AC_HELP_STRING([--with-cygwin],[check for Cygwin environment (YES)]))
+AC_ARG_WITH(cygwin,AC_HELP_STRING([--with-cygwin],
+	[check for Cygwin environment (YES)]))
 
 separator="/"
 use_ar='yes'
@@ -100,7 +101,8 @@ AC_DEFINE_UNQUOTED(ICONV_CONST, $proto_iconv,
   [Define as const if the declaration of iconv() needs const.])
 
 AC_ARG_WITH(map-extension, [  --with-map-extension=EXTENSION
-                          use EXTENSION as default map extension [jpg]], mapext="$withval", mapext="jpg")
+                          use EXTENSION as default map extension [jpg]], 
+			  mapext="$withval", mapext="jpg")
 AC_SUBST(mapext)
 
 AC_CHECK_FUNCS(unsetenv)
