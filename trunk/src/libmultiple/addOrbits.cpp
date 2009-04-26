@@ -86,9 +86,13 @@ addOrbits(const double jd0, const View *view,
     const double period = p->Period();
     if (period == 0) return;
 
+    // Units of orbit circumference
     const double startOrbit = currentProperties->StartOrbit();
     const double stopOrbit = currentProperties->StopOrbit();
+
+    // degrees
     const double delOrbit = currentProperties->DelOrbit();
+
     const unsigned char *color = currentProperties->OrbitColor();
     const int thickness = currentProperties->ArcThickness();
 
@@ -103,10 +107,11 @@ addOrbits(const double jd0, const View *view,
     const double startTime = jd0 + startOrbit * period;
     const double stopTime = jd0 + stopOrbit * period;
 
-    const int numTimes = (int) (180/delOrbit + 0.5);
-
+    int numTimes = (int) abs(360 * startOrbit / delOrbit + 0.5);
     addArc(startTime, jd0, numTimes, color, thickness, view, width, height, 
            Prx, Pry, Prz, p, annotationMap);
+
+    numTimes = (int) abs(360 * stopOrbit / delOrbit + 0.5);
     addArc(jd0, stopTime, numTimes, color, thickness, view, width, height, 
            Prx, Pry, Prz, p, annotationMap);
 }
