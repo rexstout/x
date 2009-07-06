@@ -5,7 +5,7 @@
 #include <sstream>
 using namespace std;
 
-#include <Quicktime/Quicktime.h>
+#include <QuickTime/QuickTime.h>
 
 #include "xpUtil.h"
 
