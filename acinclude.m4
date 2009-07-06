@@ -291,7 +291,7 @@ fi
 AC_DEFUN([AC_USE_MACAQUA],
 [
 AC_ARG_WITH(aqua,AC_HELP_STRING([--with-aqua],[For Mac OS X Aqua (NO)]))
-AC_ARG_WITH(quicktime,AC_HELP_STRING([--with-quicktime],[On Aqua, use Quicktime library to read/write image files (YES)]))
+AC_ARG_WITH(quicktime,AC_HELP_STRING([--with-quicktime],[On Aqua, use QuickTime library to read/write image files (YES)]))
 
 have_quicktime='no'
 if test "$with_aqua" = yes; then
@@ -299,8 +299,8 @@ if test "$with_aqua" = yes; then
   AC_DEFINE(HAVE_AQUA,,Define for Mac OS X)
   if test "$with_quicktime" != no; then
     have_quicktime='yes'
-    AQUA_LIBS="-framework Quicktime"
-    AC_DEFINE(HAVE_QUICKTIME,,Define if you have Quicktime)
+    AQUA_LIBS="-framework QuickTime"
+    AC_DEFINE(HAVE_QUICKTIME,,Define if you have QuickTime)
   fi
   AQUA_LIBS="$AQUA_LIBS -framework IOKit -framework Carbon -framework Cocoa -bind_at_load"
   AC_SUBST(AQUA_LIBS)

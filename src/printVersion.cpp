@@ -26,7 +26,7 @@ printVersion()
 #ifdef HAVE_AQUA
     cout << "\tMac OS X";
 # ifdef HAVE_QUICKTIME
-    cout << " (with Quicktime)";
+    cout << " (with QuickTime)";
 # endif
     cout << endl;
 #endif
