@@ -249,6 +249,8 @@ parse(int &i, const char *line, char *&returnString)
     }
     else if (getValue(line, i, "relative_to=", returnString))
         returnVal = ORIGIN;
+    else if (getValue(line, i, "outlined=", returnString))
+        returnVal = OUTLINED;
     else if (getValue(line, i, "position=", returnString))
         returnVal = POSITION;
     else if (getValue(line, i, "radius=", returnString))

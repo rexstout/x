@@ -12,6 +12,10 @@ class TextRenderer
     TextRenderer(DisplayBase *display);
     virtual ~TextRenderer();
 
+    void DrawText(const int x, int y, 
+                  const std::string &text, 
+                  const unsigned char color[3]);
+
     void DrawOutlinedText(const int x, int y, 
                           const std::string &text, 
                           const unsigned char color[3]);

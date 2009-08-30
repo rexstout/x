@@ -9,10 +9,10 @@ class Text : public Annotation
 {
  public:
     Text(const unsigned char color[3], 
-	 const int x, const int y, 
-	 const int iconWidth, const int iconHeight,
-	 const int align, 
-	 const std::string &text);
+         const int x, const int y, 
+         const int iconWidth, const int iconHeight,
+         const int align, 
+         const std::string &text);
 
     virtual ~Text();
 
@@ -22,6 +22,8 @@ class Text : public Annotation
     bool FixedAlign() const { return(fixedAlign_); };
     void Font(const std::string &font) { font_.assign(font); };
     void FontSize(const int fontSize) { fontSize_ = fontSize; };
+
+    void Outline(const bool b) { outlined_ = b; };
 
     int Overhang(const int width, const int height);
     int Overlap(const Text *const t);
@@ -49,6 +51,8 @@ class Text : public Annotation
     // (xOffset, yOffset) is the offset of the text from (x_, y_)
     int xOffset_;
     int yOffset_;
+
+    bool outlined_;
 
     std::string text_;
     int textHeight_;

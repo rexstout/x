@@ -41,6 +41,8 @@ public:
     void FontSize(const int size);
 
     void setText(const std::string &text);
+    void DrawText(const int x, int y, const std::string &text, 
+                  const unsigned char color[3]);
     void DrawOutlinedText(const int x, int y, const std::string &text, 
                           const unsigned char color[3]);
     void FreeText();
@@ -65,7 +67,7 @@ protected:
     void PlaceImageOnRoot();
 
     void SetBackground(const int width, const int height, 
-		       unsigned char *rgb);
+                       unsigned char *rgb);
 
 private:
     TextRenderer *textRenderer_;
