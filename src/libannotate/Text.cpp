@@ -19,7 +19,7 @@ Text::Text(const unsigned char color[3],
            const std::string &text)
     : Annotation(color), align_(align), font_(""), fontSize_(-1), 
       iconHeight_(iconHeight), iconWidth_(iconWidth), needAlign_(true),
-      needBoundingBox_(true), text_(text), x_(x), y_(y)
+      needBoundingBox_(true), outlined_(false), text_(text), x_(x), y_(y)
 {
     if (align_ == AUTO)
     {
@@ -219,7 +219,12 @@ Text::Draw(DisplayBase *display)
         }
     }
 
-    display->DrawOutlinedText(x_ + xOffset_, y_ + yOffset_, text_, color_);
+    if (outlined_)
+        display->DrawOutlinedText(x_ + xOffset_, y_ + yOffset_, 
+                                  text_, color_);
+    else
+        display->DrawText(x_ + xOffset_, y_ + yOffset_, 
+                          text_, color_);
 
     if (!font_.empty())
         display->Font(saveFont);

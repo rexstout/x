@@ -51,6 +51,7 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
 
     string lang("");
     string name("");
+    bool outlined = true;
     bool pixelCoords = false;
     double radius = -1;
     bool relativeToEdges = true;
@@ -168,6 +169,11 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
         break;
         case NAME:
             name.assign(returnString);
+            break;
+        case OUTLINED:
+            if (strncmp(returnString, "f", 1) == 0
+                || strncmp(returnString, "F", 1) == 0)
+                outlined = false;
             break;
         case POSITION:
             if (strncmp(returnString, "pixel", 2) == 0)
@@ -372,6 +378,8 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
             Text *t = new Text(color, ix, iy, 
                                iconWidth, iconHeight, 
                                align, name);
+
+            t->Outline(outlined);
 
             if (!font.empty()) t->Font(font);
             if (fontSize > 0) t->FontSize(fontSize);

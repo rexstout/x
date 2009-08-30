@@ -23,6 +23,23 @@ TextRenderer::~TextRenderer()
 
 // x and y are the center left coordinates of the string
 void 
+TextRenderer::DrawText(const int x, int y, const string &text, 
+                       const unsigned char color[3])
+{
+    SetText(text);
+
+    int textWidth, textHeight;
+    TextBox(textWidth, textHeight);
+
+    y += textHeight/2;
+
+    DrawText(x, y, color);
+
+    FreeText();
+}
+
+// x and y are the center left coordinates of the string
+void 
 TextRenderer::DrawOutlinedText(const int x, int y, const string &text, 
                                const unsigned char color[3])
 {
@@ -33,7 +50,8 @@ TextRenderer::DrawOutlinedText(const int x, int y, const string &text,
 
     y += textHeight/2;
 
-    unsigned char black[3] = { 0, 0, 0 };
+    unsigned char black[3] = { 0, 0, 0 }; 
+
     DrawText(x+1, y, black);
     DrawText(x-1, y, black);
     DrawText(x, y+1, black);
@@ -250,7 +268,7 @@ TextRenderer::FontHeight() const
 
 void
 TextRenderer::DrawText(const int x, const int y, 
-                               const unsigned char color[3])
+                       const unsigned char color[3])
 {
 }
 
