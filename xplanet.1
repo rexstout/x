@@ -258,6 +258,11 @@ Account for the time it takes for light to travel from the target body
 to the observer.  The default is to ignore the effects of light time.
 
 .TP
+.B \-localtime localtime
+Place the observer above the longitude where the local time is the
+specified value.  0 is midnight and 12 is noon.
+
+.TP
 .B \-log_magstep step
 Increase the brightness of a star by 10^step for each integer decrease
 in magnitude.  The default value is 0.4.  This means that a star of
@@ -627,8 +632,17 @@ Render the image to its own X window.  The size defaults to 512 by 512
 pixels but this may be set by the \-geometry flag.
 
 .TP
+.B \-window-id ID
+When using the X11 windowing system, draw to the window with the
+specified ID. 
+
+.TP
 .B \-window_title title
 Set the window's title to title.  This option implies \-window.
+
+.TP
+.B \-XID ID
+Same as -window-id.
 
 .TP
 .B \-xscreensaver
