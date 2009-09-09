@@ -136,34 +136,39 @@ drawProjection(DisplayBase *display, Planet *target,
         LineSegment *ls = NULL;
 
         int blockWidth = width/4;
+        int blockHeight = blockWidth;
+        int hp0 = (height + blockHeight)/2;
+        int hp1 = hp0 + height/30;
+        int hm0 = (height - blockHeight)/2;
+        int hm1 = hm0 - height/30;
         for (int i = 0; i < 4; i++)
         {
             if (i == 1) continue;
 
             double X0 = i * blockWidth;
 
-            ls = new LineSegment(black, thickness, X0, height/3, 
-                                 X0+width/40, 9*height/30);
+            ls = new LineSegment(black, thickness, X0, hp0, 
+                                 X0+width/40, hp1);
             annotationMap.insert(pair<const double, Annotation*>(Z, ls));
 
-            ls = new LineSegment(black, thickness, X0+width/4, height/3, 
-                                 X0+9*width/40, 9*height/30);
+            ls = new LineSegment(black, thickness, X0+width/4, hp0, 
+                                 X0+9*width/40, hp1);
             annotationMap.insert(pair<const double, Annotation*>(Z, ls));
 
-            ls = new LineSegment(black, thickness, X0+width/40, 9*height/30, 
-                                 X0+9*width/40, 9*height/30);
+            ls = new LineSegment(black, thickness, X0+width/40, hp1, 
+                                 X0+9*width/40, hp1);
             annotationMap.insert(pair<const double, Annotation*>(Z, ls));
 
-            ls = new LineSegment(black, thickness, X0, 2*height/3, 
-                                 X0+width/40, 21*height/30);
+            ls = new LineSegment(black, thickness, X0, hm0, 
+                                 X0+width/40, hm1);
             annotationMap.insert(pair<const double, Annotation*>(Z, ls));
 
-            ls = new LineSegment(black, thickness, X0+width/4, 2*height/3, 
-                                 X0+9*width/40, 21*height/30);
+            ls = new LineSegment(black, thickness, X0+width/4, hm0, 
+                                 X0+9*width/40, hm1);
             annotationMap.insert(pair<const double, Annotation*>(Z, ls));
 
-            ls = new LineSegment(black, thickness, X0+width/40, 21*height/30, 
-                                 X0+9*width/40, 21*height/30);
+            ls = new LineSegment(black, thickness, X0+width/40, hm1, 
+                                 X0+9*width/40, hm1);
             annotationMap.insert(pair<const double, Annotation*>(Z, ls));
         }
 

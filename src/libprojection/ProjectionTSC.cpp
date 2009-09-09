@@ -21,8 +21,11 @@ ProjectionTSC::ProjectionTSC(const int f, const int w, const int h)
     xScale_ = 1;
     yScale_ = 2./3.;
 
-    xOffset_ = -width_/8;
-    yOffset_ = 0;
+    trueWidth_ = width_;
+    trueHeight_ = static_cast<int> (0.75 * trueWidth_);
+
+    xOffset_ = trueWidth_/8;
+    yOffset_ = (trueHeight_ - height_)/2;
 
     // find the pixel values of the center of each cube face
     bool rotateSave = rotate_;
@@ -33,7 +36,8 @@ ProjectionTSC::ProjectionTSC(const int f, const int w, const int h)
         GetCenterLatLon(i, lat_c, lon_c);
         sphericalToPixel(lon_c, lat_c, xPixel_[i], yPixel_[i]);
 
-        xPixel_[i] -= xOffset_;
+        xPixel_[i] += xOffset_;
+        yPixel_[i] += yOffset_;
     }
     rotate_ = rotateSave;
 }
@@ -165,7 +169,7 @@ ProjectionTSC::GetFace(const double x, const double y) const
 {
     int returnVal = -1;
 
-    double dist = width_;
+    double dist = trueWidth_;
     for (int i = 0; i < 6; i++)
     {
         const double dx = x - xPixel_[i];
@@ -180,8 +184,8 @@ ProjectionTSC::GetFace(const double x, const double y) const
     }
 
     // check that the point is on the cube face
-    if (fabs(x - xPixel_[returnVal]) > width_/8) return(-1);
-    if (fabs(y - yPixel_[returnVal]) > height_/6) return(-1);
+    if (fabs(x - xPixel_[returnVal]) > trueWidth_/8) return(-1);
+    if (fabs(y - yPixel_[returnVal]) > trueHeight_/6) return(-1);
 
     return(returnVal);
 }
@@ -190,11 +194,11 @@ bool
 ProjectionTSC::pixelToSpherical(const double x, const double y,
                                 double &lon, double &lat)
 {
-    const double offsetX = x + width_/2 - centerX_ - xOffset_;
-    const double offsetY = y + height_/2 - centerY_ - yOffset_;
+    const double offsetX = x + width_/2 - centerX_ + xOffset_;
+    const double offsetY = y + height_/2 - centerY_ + yOffset_;
 
-    const double X = TWO_PI * (offsetX/width_ - 0.5)/xScale_;
-    const double Y = M_PI * (0.5 - offsetY/height_)/yScale_;
+    const double X = TWO_PI * (offsetX/trueWidth_ - 0.5)/xScale_;
+    const double Y = M_PI * (0.5 - offsetY/trueHeight_)/yScale_;
 
     const int face = GetFace(offsetX, offsetY);
     if (face < 0) return(false);
@@ -260,11 +264,11 @@ ProjectionTSC::sphericalToPixel(double lon, double lat,
     const double X = lon_c + chi * M_PI / 4;
     const double Y = lat_c + psi * M_PI / 4;
 
-    x = width_ * (X * xScale_ / TWO_PI + 0.5);
-    y = height_ * (0.5 - Y * yScale_ / M_PI);
+    x = trueWidth_ * (X * xScale_ / TWO_PI + 0.5);
+    y = trueHeight_ * (0.5 - Y * yScale_ / M_PI);
 
-    x += (centerX_ - width_/2 + xOffset_);
-    y += (centerY_ - height_/2 + yOffset_);
+    x += (centerX_ - width_/2 - xOffset_);
+    y += (centerY_ - height_/2 - yOffset_);
 
     if (y < 0 || y >= height_) return(false);
 
