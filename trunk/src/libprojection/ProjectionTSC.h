@@ -13,6 +13,9 @@ class ProjectionTSC : public ProjectionBase
     bool sphericalToPixel(double lon, double lat, double &x, double &y) const;
 
  private:
+    int trueWidth_;
+    int trueHeight_;
+
     double xOffset_;
     double yOffset_;
     
