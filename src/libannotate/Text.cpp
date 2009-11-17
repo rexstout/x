@@ -19,7 +19,7 @@ Text::Text(const unsigned char color[3],
            const std::string &text)
     : Annotation(color), align_(align), font_(""), fontSize_(-1), 
       iconHeight_(iconHeight), iconWidth_(iconWidth), needAlign_(true),
-      needBoundingBox_(true), outlined_(false), text_(text), x_(x), y_(y)
+      needBoundingBox_(true), outlined_(true), text_(text), x_(x), y_(y)
 {
     if (align_ == AUTO)
     {
