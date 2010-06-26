@@ -48,14 +48,4 @@ nobase_dist_data_DATA = \
 	xplanet/spice/voyager.krn	\
 	xplanet/stars/BSC
 
-sources = \
-	scripts/convertCassini.perl.in	\
-	scripts/convertCassini2.perl.in	
-
-derived = \
-	scripts/convertCassini.perl	\
-	scripts/convertCassini2.perl
-
-nobase_pkgdata_SCRIPTS = $(derived)
-
 EXTRA_DIST = xplanet.1 $(sources)
