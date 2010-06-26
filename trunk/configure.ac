@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(xplanet, 1.2.1+SVN_162)
+AC_INIT(xplanet, 1.2.1+SVN_163)
 AC_CONFIG_SRCDIR(src/xplanet.cpp)
 AM_INIT_AUTOMAKE
 
@@ -57,7 +57,6 @@ AC_FIND_X11
 AC_FIND_XSS
 AC_FIND_FREETYPE
 AC_FIND_PANGO
-AC_FIND_CSPICE
 
 AC_SUBST(xplanet_ARFLAGS)
 AC_SUBST(xplanet_LDFLAGS)
@@ -65,9 +64,9 @@ AC_SUBST(separator)
 
 AC_USE_MACAQUA
 
-if test "$have_quicktime" != 'yes'; then
 AC_FIND_GRAPHICS_LIBS
-fi
+
+AC_FIND_CSPICE
 
 if test "$have_aqua" = no; then
 AM_ICONV
@@ -86,7 +85,6 @@ AM_CONDITIONAL(HAVE_LIBFREETYPE, test "$have_freetype" = 'yes')
 AM_CONDITIONAL(HAVE_LIBPANGOFT2, test "$have_pangoft2" = 'yes')
 AM_CONDITIONAL(HAVE_LIBX11, test "$have_libx11" = 'yes')
 AM_CONDITIONAL(HAVE_AQUA, test "$with_aqua" = 'yes')
-AM_CONDITIONAL(HAVE_QUICKTIME, test "$have_quicktime" = 'yes')
 
 AM_CONDITIONAL(HAVE_LIBGIF, test "$have_gif" = 'yes')
 AM_CONDITIONAL(HAVE_LIBJPEG, test "$have_jpeg" = 'yes')
@@ -121,7 +119,4 @@ AC_CONFIG_FILES([xpDefines.h				\
 		src/libprojection/Makefile		\
 		src/libsgp4sdp4/Makefile])
 		
-AC_CONFIG_FILES([scripts/convertCassini.perl		\
-		scripts/convertCassini2.perl])
-
 AC_OUTPUT

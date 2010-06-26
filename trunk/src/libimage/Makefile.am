@@ -1,13 +1,8 @@
 noinst_LIBRARIES = libimage.a
 
-if HAVE_QUICKTIME
-  read = ReadImageQT.cpp
-  write = WriteImageQT.cpp
-else
-  read = ReadImage.cpp 
-  write = WriteImage.cpp
-  bmp = bmp.c
-endif
+read = ReadImage.cpp 
+write = WriteImage.cpp
+bmp = bmp.c
 
 if HAVE_LIBGIF
   gif = gif.c
@@ -29,7 +24,7 @@ if HAVE_LIBTIFF
   tiff = tiff.c
 endif
 
-EXTRA_libimage_a_SOURCES = bmp.c gif.c jpeg.c png.c pnm.c tiff.c ReadImage.cpp ReadImageQT.cpp WriteImage.cpp WriteImageQT.cpp
+EXTRA_libimage_a_SOURCES = bmp.c gif.c jpeg.c png.c pnm.c tiff.c ReadImage.cpp WriteImage.cpp
 
 AM_CPPFLAGS = -I@top_srcdir@/src
 

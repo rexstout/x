@@ -24,11 +24,7 @@ printVersion()
          << "http://xplanet.sourceforge.net\n";
     cout << "Compiled with support for:\n";
 #ifdef HAVE_AQUA
-    cout << "\tMac OS X";
-# ifdef HAVE_QUICKTIME
-    cout << " (with QuickTime)";
-# endif
-    cout << endl;
+    cout << "\tMac OS X\n";
 #endif
 
 #ifdef HAVE_CYGWIN

@@ -116,7 +116,7 @@ bool SetDesktopPictureFromCharString(const char *file)
 {
      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-     NSString *filePath = [NSString stringWithCString: file];
+     NSString *filePath = [NSString stringWithUTF8String: file];
 
      OSErr err = SetDesktopPicture(filePath, 0);
      
