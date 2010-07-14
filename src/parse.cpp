@@ -15,10 +15,17 @@ isDelimiter(char c)
 }
 
 bool
-isEndOfLine(char c)
+isEndOfLineOrComment(char c)
 {
     // 13 is DOS end-of-line, 28 is the file separator
     return(c == '#' || c == '\0' || c == 13 || c == 28); 
+}
+
+bool
+isEndOfLine(char c)
+{
+    // 13 is DOS end-of-line, 28 is the file separator
+    return(c == '\0' || c == 13 || c == 28); 
 }
 
 static void
@@ -124,7 +131,7 @@ parse(int &i, const char *line, char *&returnString)
         i++;
         returnVal = DELIMITER;
     }
-    else if (isEndOfLine(line[i]))
+    else if (isEndOfLineOrComment(line[i]))
         returnVal = ENDOFLINE;
     else if (getValue(line, i, "align=", returnString))
         returnVal = ALIGN;
@@ -214,7 +221,6 @@ parse(int &i, const char *line, char *&returnString)
     // This line must be after all other "marker_" keywords, because
     // it gobbles all forms
     else if (getValueAfter(line, i, "marker_", '=', returnString))
-
         returnVal = MARKER_FILE;
     else if (getValue(line, i, "map=", returnString))
         returnVal = DAY_MAP;
