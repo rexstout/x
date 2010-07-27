@@ -347,9 +347,9 @@ readSatelliteFile(const char *line, Planet *planet,
     if (satellite == NULL) 
     {
         
-        ostringstream errStr;
-        errStr << "No satellite found for  \"" << line << "\"" << endl;
-        xpWarn(errStr.str(), __FILE__, __LINE__);
+      //        ostringstream errStr;
+      //        errStr << "No satellite found for  \"" << line << "\"" << endl;
+      //        xpWarn(errStr.str(), __FILE__, __LINE__);
         return;
     }
 
