@@ -8,6 +8,10 @@ using namespace std;
 #include "parseColor.h"
 #include "xpUtil.h"
 
+// sloppy, but it's an easy way to set the comment marker as a line
+// terminator
+static bool commentEndsLine = true;
+
 bool
 isDelimiter(char c)
 {
@@ -15,17 +19,14 @@ isDelimiter(char c)
 }
 
 bool
-isEndOfLineOrComment(char c)
-{
-    // 13 is DOS end-of-line, 28 is the file separator
-    return(c == '#' || c == '\0' || c == 13 || c == 28); 
-}
-
-bool
 isEndOfLine(char c)
 {
     // 13 is DOS end-of-line, 28 is the file separator
-    return(c == '\0' || c == 13 || c == 28); 
+    bool returnValue = (c == '\0' || c == 13 || c == 28);
+
+    if (commentEndsLine) returnValue = (c == '#' || returnValue);
+
+    return(returnValue); 
 }
 
 static void
@@ -55,10 +56,10 @@ skipPastToken(int &i, const char *line)
     }
 }
 
+// If the line contains 'key', return everything between 'key' and 'endChar'
 static bool
 getValue(const char *line, int &i, const char *key, const char endChar, 
          char *&returnstring)
-// If the line contains 'key', return everything between 'key' and 'endChar'
 {
     const unsigned int length = strlen(key);
     if (strncmp(line + i, key, length) == 0)
@@ -73,6 +74,19 @@ getValue(const char *line, int &i, const char *key, const char endChar,
         return(true);
     }
     return(false);
+}
+
+// If the line contains 'key', return everything between 'key' and
+// 'endChar' comment markers are allowed in the string.  Use this for
+// reading marker labels.
+static bool
+getValueIncludingComment(const char *line, int &i, const char *key, 
+                       const char endChar, char *&returnstring)
+{
+    commentEndsLine = false;
+    bool returnValue = getValue(line, i, key, endChar, returnstring);
+    commentEndsLine = true;
+    return(returnValue);
 }
 
 static bool
@@ -131,7 +145,7 @@ parse(int &i, const char *line, char *&returnString)
         i++;
         returnVal = DELIMITER;
     }
-    else if (isEndOfLineOrComment(line[i]))
+    else if (isEndOfLine(line[i]))
         returnVal = ENDOFLINE;
     else if (getValue(line, i, "align=", returnString))
         returnVal = ALIGN;
@@ -234,9 +248,9 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = MAX_RAD_FOR_MARKERS;
     else if (getValue(line, i, "min_radius=", returnString))
         returnVal = MIN_RAD_FOR_MARKERS;
-    else if (getValue(line, i, "\"", '"', returnString))
+    else if (getValueIncludingComment(line, i, "\"", '"', returnString))
         returnVal = NAME;
-    else if (getValue(line, i, "{", '}', returnString))
+    else if (getValueIncludingComment(line, i, "{", '}', returnString))
         returnVal = NAME;
     else if (getValue(line, i, "night_map=", returnString))
         returnVal = NIGHT_MAP;
