@@ -67,25 +67,18 @@ createMap(const double sLat, const double sLon,
     Map *m = NULL;
 
     string imageFile(planetProperties->DayMap());
-    bool foundFile = findFile(imageFile, "images");
-    if (!foundFile)
-    {
-        string errMsg("Can't find map file ");
-        errMsg += imageFile;
-        errMsg += "\n";
-        xpWarn(errMsg, __FILE__, __LINE__);
-    }
 
     Image *day = new Image;
-    foundFile = day->Read(imageFile.c_str());
+
+    bool foundFile = false;
+    if (imageFile.compare("none") != 0) 
+    {
+       findFile(imageFile, "images");
+       foundFile = day->Read(imageFile.c_str());
+    }
 
     if (!foundFile)
     {
-        string errMsg("Can't load map file ");
-        errMsg += imageFile;
-        errMsg += "\n";
-        xpWarn(errMsg, __FILE__, __LINE__);
-
         // If the day map isn't found, assume the other maps won't be
         // found either
 
