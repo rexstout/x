@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libmultiple.a
 
-AM_CPPFLAGS = @FREETYPE_CFLAGS@ -I@top_srcdir@/src
+AM_CPPFLAGS = -I@top_srcdir@/src @FREETYPE_CFLAGS@
 
 if USE_AR
   libmultiple_a_AR = $(AR) cru
