@@ -26,7 +26,7 @@ endif
 
 EXTRA_libdisplay_a_SOURCES = DisplayMacAqua.cpp DisplayMacAqua.h DisplayMSWin.cpp DisplayMSWin.h TextRendererFT2.cpp TextRendererFT2.h TextRendererPangoFT2.cpp TextRendererPangoFT2.h DisplayX11.cpp DisplayX11.h vroot.h TimerMacAqua.cpp TimerMacAqua.h TimerX11.cpp TimerX11.h
 
-AM_CPPFLAGS = @X_CFLAGS@ @FREETYPE_CFLAGS@ -I@top_srcdir@/src
+AM_CPPFLAGS = -I@top_srcdir@/src @X_CFLAGS@ @FREETYPE_CFLAGS@
 
 if USE_AR
   libdisplay_a_AR = $(AR) cru
