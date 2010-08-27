@@ -23,9 +23,11 @@
 
 #include <png.h>
 
+#define MAX_DIMENSION 21600
+
 int
 read_png(const char *filename, int *width, int *height, unsigned char **rgb, 
-	 unsigned char **alpha)
+         unsigned char **alpha)
 {
     FILE *infile = fopen(filename, "rb");
 
@@ -73,15 +75,23 @@ read_png(const char *filename, int *width, int *height, unsigned char **rgb,
     *width = (int) w;
     *height = (int) h;
     
-    if (color_type == PNG_COLOR_TYPE_RGB_ALPHA
-	|| color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    /* Prevent against integer overflow - thanks to Niels Heinen */
+    if (*width > MAX_DIMENSION || *height > MAX_DIMENSION) 
     {
-	alpha[0] = malloc(*width * *height);
-	if (alpha[0] == NULL)
-	{
-	    fprintf(stderr, "Can't allocate memory for alpha channel in PNG file.\n");
-	    return(0); 
-	}
+       fprintf(stderr, "Width, height in PNG header is %d, %d\n",
+               *width, *height);
+       return(0);
+    }
+
+    if (color_type == PNG_COLOR_TYPE_RGB_ALPHA
+        || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+    {
+        alpha[0] = malloc(*width * *height);
+        if (alpha[0] == NULL)
+        {
+            fprintf(stderr, "Can't allocate memory for alpha channel in PNG file.\n");
+            return(0); 
+        }
     }
 
     /* Change a paletted/grayscale image to RGB */
@@ -127,28 +137,28 @@ read_png(const char *filename, int *width, int *height, unsigned char **rgb,
 
     if (alpha[0] == NULL)
     {
-	ptr = rgb[0];
-	for (i = 0; i < *height; i++)
-	{
-	    memcpy(ptr, row_pointers[i], 3 * *width);
-	    ptr += 3 * *width;
-	}
+        ptr = rgb[0];
+        for (i = 0; i < *height; i++)
+        {
+            memcpy(ptr, row_pointers[i], 3 * *width);
+            ptr += 3 * *width;
+        }
     }
     else
     {
-	int j;
-	ptr = rgb[0];
-	for (i = 0; i < *height; i++)
-	{
-	    int ipos = 0;
-	    for (j = 0; j < *width; j++)
-	    {
-		*ptr++ = row_pointers[i][ipos++];
-		*ptr++ = row_pointers[i][ipos++];
-		*ptr++ = row_pointers[i][ipos++];
-		alpha[0][i * *width + j] = row_pointers[i][ipos++];
-	    }
-	}
+        int j;
+        ptr = rgb[0];
+        for (i = 0; i < *height; i++)
+        {
+            int ipos = 0;
+            for (j = 0; j < *width; j++)
+            {
+                *ptr++ = row_pointers[i][ipos++];
+                *ptr++ = row_pointers[i][ipos++];
+                *ptr++ = row_pointers[i][ipos++];
+                alpha[0][i * *width + j] = row_pointers[i][ipos++];
+            }
+        }
     }
 
     png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
@@ -162,7 +172,7 @@ read_png(const char *filename, int *width, int *height, unsigned char **rgb,
 
 int
 write_png(FILE *outfile, int width, int height, unsigned char *rgb,
-	  unsigned char *alpha)
+          unsigned char *alpha)
 {
     png_structp png_ptr;
     png_infop info_ptr;
@@ -188,48 +198,48 @@ write_png(FILE *outfile, int width, int height, unsigned char *rgb,
 
     if (alpha == NULL)
     {
-	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB,
-		     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-		     PNG_FILTER_TYPE_DEFAULT);
-	
-	png_write_info(png_ptr, info_ptr);
-	
-	for (i = 0; i < height; i++) 
-	{
-	    row_ptr = rgb + 3 * i * width;
-	    png_write_rows(png_ptr, &row_ptr, 1);
-	}
+        png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB,
+                     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                     PNG_FILTER_TYPE_DEFAULT);
+        
+        png_write_info(png_ptr, info_ptr);
+        
+        for (i = 0; i < height; i++) 
+        {
+            row_ptr = rgb + 3 * i * width;
+            png_write_rows(png_ptr, &row_ptr, 1);
+        }
     }
     else
     {
-	int irgb = 0;
-	int irgba = 0;
+        int irgb = 0;
+        int irgba = 0;
 
-	int area = width * height;
-	unsigned char *rgba = malloc(4 * area);
+        int area = width * height;
+        unsigned char *rgba = malloc(4 * area);
 
-	png_set_IHDR(png_ptr, info_ptr, width, height, 8, 
-		     PNG_COLOR_TYPE_RGB_ALPHA,
-		     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-		     PNG_FILTER_TYPE_DEFAULT);
-	
-	png_write_info(png_ptr, info_ptr);
-	
-	for (i = 0; i < area; i++)
-	{
-	    rgba[irgba++] = rgb[irgb++];
-	    rgba[irgba++] = rgb[irgb++];
-	    rgba[irgba++] = rgb[irgb++];
-	    rgba[irgba++] = alpha[i];
-	}
-	
-	for (i = 0; i < height; i++) 
-	{
-	    row_ptr = rgba + 4 * i * width;
-	    png_write_rows(png_ptr, &row_ptr, 1);
-	}
+        png_set_IHDR(png_ptr, info_ptr, width, height, 8, 
+                     PNG_COLOR_TYPE_RGB_ALPHA,
+                     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                     PNG_FILTER_TYPE_DEFAULT);
+        
+        png_write_info(png_ptr, info_ptr);
+        
+        for (i = 0; i < area; i++)
+        {
+            rgba[irgba++] = rgb[irgb++];
+            rgba[irgba++] = rgb[irgb++];
+            rgba[irgba++] = rgb[irgb++];
+            rgba[irgba++] = alpha[i];
+        }
+        
+        for (i = 0; i < height; i++) 
+        {
+            row_ptr = rgba + 4 * i * width;
+            png_write_rows(png_ptr, &row_ptr, 1);
+        }
 
-	free(rgba);
+        free(rgba);
     }
 
     png_write_end(png_ptr, info_ptr);
