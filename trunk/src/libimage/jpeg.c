@@ -23,6 +23,8 @@
 
 #include <jpeglib.h>
 
+#define MAX_DIMENSION 21600
+
 int
 read_jpeg(const char *filename, int *width, int *height, unsigned char **rgb)
 {
@@ -42,11 +44,20 @@ read_jpeg(const char *filename, int *width, int *height, unsigned char **rgb)
     *width = cinfo.output_width;
     *height = cinfo.output_height;
 
+    /* Prevent against integer overflow - thanks to Niels Heinen */
+    if (cinfo.output_width > MAX_DIMENSION 
+        || cinfo.output_height > MAX_DIMENSION) 
+    {
+       fprintf(stderr, "Width, height in JPEG header is %d, %d\n",
+               cinfo.output_width, cinfo.output_height);
+       return(0);
+    }
+
     rgb[0] = malloc(3 * cinfo.output_width * cinfo.output_height);
     if (rgb[0] == NULL)
     {
         fprintf(stderr, "Can't allocate memory for JPEG file.\n");
-	fclose(infile);
+        fclose(infile);
         return(0);
     }
 
@@ -65,7 +76,7 @@ read_jpeg(const char *filename, int *width, int *height, unsigned char **rgb)
         if (ptr == NULL)
         {
             fprintf(stderr, "Can't allocate memory for JPEG file.\n");
-	    fclose(infile);
+            fclose(infile);
             return(0);
         }
 
