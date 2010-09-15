@@ -4,11 +4,19 @@
 *                                                                            *
 *  This program was written in standard fortran-77 and it was manually       *
 *  translated to C language by Piotr A. Dybczynski (dybol@phys.amu.edu.pl),  *
-*  subsequently revised heavily by Bill J Gray (pluto@gwi.net).              *
+*  subsequently revised heavily by Bill J Gray (pluto@gwi.net),  just short  *
+*  of a total re-write.                                                      *
 *                                                                            *
 ******************************************************************************
 *                 Last modified: July 23, 1997 by PAD                        *
 ******************************************************************************
+21 Apr 2010:  Revised by Bill J. Gray.  The code now determines the kernel
+size,  then allocates memory accordingly.  This should 'future-proof' us in
+case JPL (or someone else) creates kernels that are larger than the previously
+arbitrary MAX_KERNEL_SIZE parameter.  'swap_long' and 'swap_double' have
+been replaced with 'swap_32_bit_val' and 'swap_64_bit_val'.  It also works
+on 64-bit compiles now.
+
 16 Mar 2001:  Revised by Bill J. Gray.  You can now use binary
 ephemerides with either byte order ('big-endian' or 'small-endian');
 the code checks to see if the data is in the "wrong" order for the
@@ -30,6 +38,11 @@ details of the implementation encapsulated.
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef _MSC_VER            /* Microsoft Visual C/C++ lacks a 'stdint.h'; */
+#include "stdintvc.h"      /* 'stdintvc.h' is a replacement version      */
+#else
+#include <stdint.h>
+#endif
 
 /**** include variable and type definitions, specific for this C version */
 
@@ -44,9 +57,9 @@ double DLL_FUNC jpl_get_double( const void *ephem, const int value)
    return( *(double *)( (char *)ephem + value));
 }
 
-double DLL_FUNC jpl_get_long( const void *ephem, const int value)
+long DLL_FUNC jpl_get_long( const void *ephem, const int value)
 {
-   return( *(long *)( (char *)ephem + value));
+   return( *(int32_t *)( (char *)ephem + value));
 }
 
 
@@ -333,7 +346,7 @@ static void interp( struct interpolation_info *iinfo,
    return;
 }
 
-/* swap_long_integer() and swap_double() are used when reading a binary
+/* swap_32_bit_val() and swap_64_bit_val() are used when reading a binary
 ephemeris that was created on a machine with 'opposite' byte order to
 the currently-used machine (signalled by the 'swap_bytes' flag in the
 jpl_eph_data structure).  In such cases,  every double and integer
@@ -341,7 +354,7 @@ value read from the ephemeris must be byte-swapped by these two functions. */
 
 #define SWAP_MACRO( A, B, TEMP)   { TEMP = A;  A = B;  B = TEMP; }
 
-static void swap_long_integer( void *ptr)
+static void swap_32_bit_val( void *ptr)
 {
    char *tptr = (char *)ptr, tchar;
 
@@ -349,7 +362,7 @@ static void swap_long_integer( void *ptr)
    SWAP_MACRO( tptr[1], tptr[2], tchar);
 }
 
-static void swap_double( void *ptr, long count)
+static void swap_64_bit_val( void *ptr, long count)
 {
    char *tptr = (char *)ptr, tchar;
 
@@ -482,9 +495,10 @@ int DLL_FUNC jpl_state( void *ephem, const double et, const int list[12],
       {
       eph->curr_cache_loc = nr;
       fseek( eph->ifile, nr * eph->recsize, SEEK_SET);
-      fread( buf, (size_t)eph->ncoeff, sizeof( double), eph->ifile);
+      if( fread( buf, sizeof( double), (size_t)eph->ncoeff, eph->ifile) != (size_t)eph->ncoeff)
+         return( -2);
       if( eph->swap_bytes)
-         swap_double( buf, eph->ncoeff);
+         swap_64_bit_val( buf, eph->ncoeff);
       }
    t[1] = eph->ephem_step;
    aufac = 1.0 / eph->au;
@@ -543,6 +557,9 @@ int DLL_FUNC jpl_state( void *ephem, const double et, const int list[12],
 **      Return value is a pointer to the jpl_eph_data structure            **
 **      NULL is returned if the file isn't opened or memory isn't alloced  **
 ****************************************************************************/
+
+int jpl_init_err_code = 0;
+
 void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
                           char nam[][6], double *val)
 {
@@ -551,51 +568,77 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
    char title[84];
    FILE *ifile = fopen( ephemeris_filename, "rb");
    struct jpl_eph_data *rval;
+   struct jpl_eph_data temp_data;
    struct interpolation_info *iinfo;
 
+   jpl_init_err_code = 0;
    if( !ifile)
+      {
+      jpl_init_err_code = -1;
       return( NULL);
+      }
+   temp_data.ifile = ifile;
+   if( fread( title, 84, 1, ifile) != 1)
+      jpl_init_err_code = -3;
+   fseek( ifile, 2652L, SEEK_SET);      /* skip title & constant name data */
+   if( fread( &temp_data, JPL_HEADER_SIZE, 1, ifile) != 1)
+      jpl_init_err_code = -4;
+
+   if( jpl_init_err_code)
+      {
+      fclose( ifile);
+      return( NULL);
+      }
+
+   de_version = atoi( title + 26);
+
+          /* A small piece of trickery:  in the binary file,  data is stored */
+          /* for ipt[0...11],  then the ephemeris version,  then the         */
+          /* remaining ipt[12] data.  A little switching is required to get  */
+          /* the correct order. */
+   temp_data.ipt[12][0] = temp_data.ipt[12][1];
+   temp_data.ipt[12][1] = temp_data.ipt[12][2];
+   temp_data.ipt[12][2] = temp_data.ephemeris_version;
+   temp_data.ephemeris_version = de_version;
+
+   temp_data.swap_bytes = ( temp_data.ncon < 0 || temp_data.ncon > 65536L);
+   if( temp_data.swap_bytes)     /* byte order is wrong for current platform */
+      {
+      swap_64_bit_val( &temp_data.ephem_start, 1);
+      swap_64_bit_val( &temp_data.ephem_end, 1);
+      swap_64_bit_val( &temp_data.ephem_step, 1);
+      swap_32_bit_val( &temp_data.ncon);
+      swap_64_bit_val( &temp_data.au, 1);
+      swap_64_bit_val( &temp_data.emrat, 1);
+      for( j = 0; j < 3; j++)
+         for( i = 0; i < 13; i++)
+            swap_32_bit_val( &temp_data.ipt[i][j]);
+      }
+         /* Once upon a time,  the kernel size was determined from the */
+         /* DE version.  This was not a terrible idea,  except that it */
+         /* meant that when the code faced a new version,  it broke.   */
+         /* Now we use some logic to compute the kernel size.          */
+   temp_data.kernel_size = 4;
+   for( i = 0; i < 13; i++)
+      temp_data.kernel_size +=
+                       temp_data.ipt[i][1] * temp_data.ipt[i][2] * ((i == 11) ? 4 : 6);
+   temp_data.recsize = temp_data.kernel_size * 4L;
+   temp_data.ncoeff = temp_data.kernel_size / 2L;
+
                /* Rather than do three separate allocations,  everything   */
                /* we need is allocated in _one_ chunk,  then parceled out. */
                /* This looks a little weird,  but it does simplify error   */
                /* handling and cleanup.                                    */
    rval = (struct jpl_eph_data *)calloc( sizeof( struct jpl_eph_data)
                         + sizeof( struct interpolation_info)
-                        + MAX_KERNEL_SIZE * 4, 1);
+                        + temp_data.recsize, 1);
    if( !rval)
       {
+      jpl_init_err_code = -2;
       fclose( ifile);
       return( NULL);
       }
-   rval->ifile = ifile;
-   fread( title, 84, 1, ifile);
-   fseek( ifile, 2652L, SEEK_SET);      /* skip title & constant name data */
-   fread( rval, JPL_HEADER_SIZE, 1, ifile);
-
-   de_version = atoi( title + 26);
-         /* Once upon a time,  the kernel size was determined from the */
-         /* DE version.  This was not a terrible idea,  except that it */
-         /* meant that when the code faced a new version,  it broke.   */
-         /* Thus,  the 'OLD_CODE' section was replaced with some logic */
-         /* that figures out the kernel size.  The 'OLD_CODE' section  */
-         /* should therefore be of only historical interest.           */
-#ifdef OLD_CODE
-   switch( de_version)
-      {
-      case 200:
-      case 202:
-         rval->kernel_size = 1652;
-         break;
-      case 403:
-      case 405:
-         rval->kernel_size = 2036;
-         break;
-      case 404:
-      case 406:
-         rval->kernel_size = 1456;
-         break;
-      }
-#endif
+   memcpy( rval, &temp_data, sizeof( struct jpl_eph_data));
           /* The 'iinfo' struct is right after the 'jpl_eph_data' struct: */
    iinfo = (struct interpolation_info *)(rval + 1);
    rval->iinfo = (void *)iinfo;
@@ -607,48 +650,23 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
    rval->curr_cache_loc = -1L;
           /* The 'cache' data is right after the 'iinfo' struct: */
    rval->cache = (double *)( iinfo + 1);
-          /* A small piece of trickery:  in the binary file,  data is stored */
-          /* for ipt[0...11],  then the ephemeris version,  then the         */
-          /* remaining ipt[12] data.  A little switching is required to get  */
-          /* the correct order. */
-   for( i = 0; i < 3; i++)
-      rval->ipt[12][i] = rval->ipt[12][i + 1];
-   rval->ephemeris_version = de_version;
-
-   rval->swap_bytes = ( rval->ncon < 0 || rval->ncon > 65536L);
-   if( rval->swap_bytes)     /* byte order is wrong for current platform */
-      {
-      swap_double( &rval->ephem_start, 1);
-      swap_double( &rval->ephem_end, 1);
-      swap_double( &rval->ephem_step, 1);
-      swap_long_integer( &rval->ncon);
-      swap_double( &rval->au, 1);
-      swap_double( &rval->emrat, 1);
-      for( j = 0; j < 3; j++)
-         for( i = 0; i < 13; i++)
-            swap_long_integer( &rval->ipt[i][j]);
-      }
-   rval->kernel_size = 4;
-   for( i = 0; i < 13; i++)
-      rval->kernel_size +=
-                       rval->ipt[i][1] * rval->ipt[i][2] * ((i == 11) ? 4 : 6);
-// printf( "Kernel size = %d\n", rval->kernel_size);
-   rval->recsize = rval->kernel_size * 4L;
-   rval->ncoeff = rval->kernel_size / 2L;
 
    if( val)
       {
       fseek( ifile, rval->recsize, SEEK_SET);
-      fread( val, (size_t)rval->ncon, sizeof( double), ifile);
+      if( fread( val, sizeof( double), (size_t)rval->ncon, ifile)
+                        != (size_t)rval->ncon)
+         jpl_init_err_code = -5;
       if( rval->swap_bytes)     /* gotta swap the constants,  too */
-         swap_double( val, rval->ncon);
+         swap_64_bit_val( val, rval->ncon);
       }
 
    if( nam)
       {
       fseek( ifile, 84L * 3L, SEEK_SET);   /* just after the 3 'title' lines */
       for( i = 0; i < (int)rval->ncon; i++)
-         fread( nam[i], 6, 1, ifile);
+         if( fread( nam[i], 6, 1, ifile) != 1)
+            jpl_init_err_code = -6;
       }
    return( rval);
 }
