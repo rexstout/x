@@ -33,8 +33,8 @@ int DLL_FUNC jpl_state( void *ephem, const double et, const int list[12],
 int DLL_FUNC jpl_pleph( void *ephem, const double et, const int ntarg,
                       const int ncent, double rrd[], const int calc_velocity);
 double DLL_FUNC jpl_get_double( const void *ephem, const int value);
-double DLL_FUNC jpl_get_long( const void *ephem, const int value);
-int DLL_FUNC make_sub_ephem( const void *ephem, const char *sub_filename,
+long DLL_FUNC jpl_get_long( const void *ephem, const int value);
+int DLL_FUNC make_sub_ephem( void *ephem, const char *sub_filename,
                               const double start_jd, const double end_jd);
 
 #ifdef __cplusplus
@@ -55,3 +55,5 @@ int DLL_FUNC make_sub_ephem( const void *ephem, const char *sub_filename,
 #define JPL_EPHEM_KERNEL_RECORD_SIZE   208
 #define JPL_EPHEM_KERNEL_NCOEFF        212
 #define JPL_EPHEM_KERNEL_SWAP_BYTES    216
+
+#define jpl_get_pvsun( ephem) ((double *)((char *)ephem + 224))
