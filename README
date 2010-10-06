@@ -303,6 +303,11 @@ appropriate libraries.  The image size defaults to 512 by 512 pixels
 but this may be changed by the -geometry flag.  If used with the
 -num_times option, each output file will be numbered sequentially.
 
+-output_map filename
+Output the intermediate rectangular map that is created in the process
+of rendering the final image.  It will have the same dimensions as the
+default day map.
+
 -output_start_index index
 Start numbering output files at index.  The default is 0.
 

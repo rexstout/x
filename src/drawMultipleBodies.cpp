@@ -414,6 +414,22 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         m = createMap(sLat, sLon, oLat, oLon, width, height, pR,
                       current_planet, ring, planetsFromSunMap,
                       currentProperties);
+
+        if (!options->OutputMapRect().empty())
+        {
+            if (current_planet->Index() == options->Target())
+            {
+                
+                if (!m->Write(options->OutputMapRect().c_str()))
+                {
+                    ostringstream errStr;
+                    errStr << "Can't create " << options->OutputMapRect() 
+                           << "\n";
+                    xpWarn(errStr.str(), __FILE__, __LINE__);
+                }
+            }
+        }
+        
         if (current_planet->Index() == JUPITER
             || current_planet->Index() == SATURN)
         {

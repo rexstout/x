@@ -92,6 +92,7 @@ class Options
     int OriginID() const { return(originID_); };
     const std::string & OutputBase() const      { return(outputBase_); };
     const std::string & OutputExtension() const { return(outputExt_); };
+    const std::string & OutputMapRect() const { return(outputMapRect_); };
     int OutputStartIndex() const { return(outputStartIndex_); };
 
     bool Pango() const { return(pango_); };
@@ -241,6 +242,7 @@ class Options
                                          // SYSTEM, ABOVE, BELOW
     std::string outputBase_;
     std::string outputExt_;
+    std::string outputMapRect_;
     int outputStartIndex_;  // start numbering output files with this
                             // index
     double oX_, oY_, oZ_;   // heliocentric rectangular coordinates of
@@ -302,7 +304,7 @@ class Options
 
     unsigned long xid_;
     std::string XYZFile_; // file containing XYZ coordinates of
-			  // target, origin, and/or north
+                          // target, origin, and/or north
 
     std::vector<std::string> searchdir; // check these directories for files
 

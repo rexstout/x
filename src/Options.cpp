@@ -102,6 +102,7 @@ Options::Options() :
     originMode_(LBR),
     outputBase_(""),
     outputExt_(defaultMapExt),
+    outputMapRect_(""), 
     outputStartIndex_(0),
     oX_(0),
     oY_(0),
@@ -233,6 +234,7 @@ Options::parseArgs(int argc, char **argv)
             {"origin",         required_argument, NULL, ORIGIN},
             {"origin_file",    required_argument, NULL, ORIGINFILE},
             {"output",         required_argument, NULL, OUTPUT},
+            {"output_map",     required_argument, NULL, OUTPUT_MAP_RECT},
             {"output_start_index",required_argument,NULL,OUTPUT_START_INDEX},
             {"pango",          no_argument,       NULL, PANGO},
             {"path_relative_to",         required_argument, NULL, PATH_RELATIVE_TO},
@@ -622,6 +624,18 @@ Options::parseArgs(int argc, char **argv)
             displayMode_ = OUTPUT;
             geometrySelected_ = true;
             break;
+        case OUTPUT_MAP_RECT:
+        {
+            string base = optarg;
+            string ext = defaultMapExt;
+            if (base.find('.') != string::npos)
+            {
+                ext.assign(base, base.rfind('.'), base.size());
+                base.assign(base, 0, base.rfind('.'));
+            }
+            outputMapRect_ = base + ext;
+        }
+        break;
         case OUTPUT_START_INDEX:
             sscanf(optarg, "%d", &outputStartIndex_);
             break;
