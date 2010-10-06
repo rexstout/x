@@ -40,6 +40,8 @@ class Map
     double MapHeight() const { return(mapHeight_); };
     double MapWidth() const { return(mapWidth_); };
 
+    bool Write(const char *filename) const; 
+
  private:
     int width_, height_, area_;
     bool mapbounds_;

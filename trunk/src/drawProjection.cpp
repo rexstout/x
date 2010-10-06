@@ -1,5 +1,6 @@
 #include <cstring>
 #include <map>
+#include <sstream>
 #include <vector>
 using namespace std;
 
@@ -75,6 +76,17 @@ drawProjection(DisplayBase *display, Planet *target,
                   width, height, options->Radius() * height,
                   target, ring, planetsFromSunMap,
                   planetProperties);
+
+    if (!options->OutputMapRect().empty())
+    {
+        if (!m->Write(options->OutputMapRect().c_str()))
+        {
+            ostringstream errStr;
+            errStr << "Can't create " << options->OutputMapRect() 
+                   << "\n";
+            xpWarn(errStr.str(), __FILE__, __LINE__);
+        }
+    }
 
     if (target->Index() == SATURN) 
     {

@@ -860,6 +860,17 @@ Map::CopyBlock(unsigned char *dest, unsigned char *src,
     }
 }
 
+bool
+Map::Write(const char *filename) const
+{
+    Options *options = Options::getInstance();
+
+    Image image(width_, height_, mapData_, NULL);
+    image.Quality(options->JPEGQuality());
+    const bool success = image.Write(filename);
+    return success;
+}
+
 void
 Map::CreateMap()
 {
