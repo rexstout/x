@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(xplanet, 1.2.1+SVN_172)
+AC_INIT(xplanet, 1.2.1+SVN_173)
 AC_CONFIG_SRCDIR(src/xplanet.cpp)
 AM_INIT_AUTOMAKE
 
