@@ -5,6 +5,8 @@
 #include <vector>
 using namespace std;
 
+#include <sys/stat.h>
+
 #include "Options.h"
 #include "xpDefines.h"
 #include "xpUtil.h"
@@ -19,9 +21,19 @@ fileExists(string &filename)
     ifstream f(filename.c_str());
     if (f.is_open())
     {
-        msg << "found\n";
-        f.close();
-        returnVal = true;
+        struct stat status;
+        stat(filename.c_str(), &status );
+        if (status.st_mode & S_IFREG)
+        {
+            msg << "found\n";
+            f.close();
+            returnVal = true;
+        }
+        else
+        {
+            msg << "is not a regular file!\n";
+            returnVal = false;
+        }
     }
     else
     {
