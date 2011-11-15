@@ -26,6 +26,9 @@ class PlanetProperties
     double BumpScale() const { return(bumpScale_); };
     void BumpScale(double b) { bumpScale_ = b; };
 
+    double BumpShade() const { return(bumpShade_); };
+    void BumpShade(double s) { bumpShade_ = s; };
+
     double CloudGamma() const { return(cloudGamma_); };
     void CloudGamma(double c) { cloudGamma_ = c; };
 
@@ -146,6 +149,7 @@ class PlanetProperties
 
     std::string bumpMap_;
     double bumpScale_;
+    double bumpShade_;
 
     double cloudGamma_;
     std::string cloudMap_;

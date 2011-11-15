@@ -14,6 +14,7 @@ PlanetProperties::PlanetProperties(const body index)
     : index_(index), 
       arcThickness_(1),
       bumpMap_(""),
+      bumpShade_(-1.0),
       bumpScale_(1),
       cloudGamma_(1),
       cloudMap_(""), 
@@ -92,6 +93,7 @@ PlanetProperties::operator= (const PlanetProperties &p)
     arcThickness_ = p.arcThickness_;
 
     bumpMap_ = p.bumpMap_;
+    bumpShade_ = p.bumpShade_;
     bumpScale_ = p.bumpScale_;
 
     cloudGamma_ = p.cloudGamma_;

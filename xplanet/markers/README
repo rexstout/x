@@ -31,6 +31,9 @@ planet's radius is larger than 40% of the screen height.  Similarly,
 min_radius=0.25 means that this marker will not be drawn if the
 planet's radius is less than 25% of the screen height.
 
+The keyword "opacity" controls the transparency of the marker.  It can
+range from 0 to 100.  A value of 100 is the default.
+
 The keyword "outlined" defaults to "true".  This draws a black outline
 around the marker for better visibility against the background.  Using
 "outlined=false" will not draw the outline.  You may want to use this

@@ -42,9 +42,9 @@ public:
 
     void setText(const std::string &text);
     void DrawText(const int x, int y, const std::string &text, 
-                  const unsigned char color[3]);
+                  const unsigned char color[3], const double opacity);
     void DrawOutlinedText(const int x, int y, const std::string &text, 
-                          const unsigned char color[3]);
+                          const unsigned char color[3], const double opacity);
     void FreeText();
     void getTextBox(int &textWidth, int &textHeight);
 

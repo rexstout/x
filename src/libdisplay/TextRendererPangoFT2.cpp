@@ -105,7 +105,7 @@ TextRendererPangoFT2::DrawText(const int x, const int y,
         {
             if (bitmap.buffer[istart + k])
             {
-                const double opacity = bitmap.buffer[istart + k]/255.0;
+                double opacity = opacity_ * bitmap.buffer[istart + k]/255.0;
                 display_->setPixel(x + k, 
                                    y + j - textHeight, 
                                    color, opacity);

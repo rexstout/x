@@ -214,6 +214,8 @@ void
 Map::AddBumpMap(const unsigned char *bump)
 {
     double scale = 0.1 * targetProperties_->BumpScale() / 255.;
+    double shade = targetProperties_->BumpShade();
+    unsigned char shaded[3];
 
     double *height =  new double[area_];
     for (int i = 0; i < area_; i++) 
@@ -297,10 +299,15 @@ Map::AddBumpMap(const unsigned char *bump)
 
             unsigned char *day = dayData_ + 3*ipos;
             unsigned char *night = nightData_ + 3*ipos;
+            if (shade >= 0 && shade <= 1)
+            {
+                for (int k = 0; k < 3; k++)
+                    shaded[k] = static_cast<unsigned char>(day[k] * shade);
+                night = shaded;
+            }
             for (int k = 0; k < 3; k++) 
                 day[k] = static_cast<unsigned char>((day[k]-night[k]) 
                                                     * shading + night[k]);
-
             ipos++;
         }
     }

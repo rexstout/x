@@ -14,11 +14,13 @@ class TextRenderer
 
     void DrawText(const int x, int y, 
                   const std::string &text, 
-                  const unsigned char color[3]);
+                  const unsigned char color[3], 
+                  const double opacity);
 
     void DrawOutlinedText(const int x, int y, 
                           const std::string &text, 
-                          const unsigned char color[3]);
+                          const unsigned char color[3], 
+                          const double opacity);
 
     virtual void Font(const std::string &font);
     const std::string & Font() const { return(font_); };
@@ -28,6 +30,8 @@ class TextRenderer
 
     virtual void DrawText(const int x, const int y, 
                           const unsigned char color[3]);
+
+    void SetOpacity(double opacity) { opacity_ = opacity; };
 
     virtual void SetText(const std::string &text);
     virtual void FreeText();
@@ -43,11 +47,13 @@ class TextRenderer
 
  protected:
 
+    DisplayBase *display_;
+    
     std::string font_;
     int fontSize_;
 
-    DisplayBase *display_;
-    
+    double opacity_;
+
  private:
 };
 
