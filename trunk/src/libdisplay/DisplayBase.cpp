@@ -71,17 +71,18 @@ DisplayBase::FreeText()
 // x and y are the center left coordinates of the string
 void 
 DisplayBase::DrawText(const int x, int y, const string &text, 
-                      const unsigned char color[3])
+                      const unsigned char color[3], const double opacity)
 {
-    textRenderer_->DrawText(x, y, text, color);
+    textRenderer_->DrawText(x, y, text, color, opacity);
 }
 
 // x and y are the center left coordinates of the string
 void 
 DisplayBase::DrawOutlinedText(const int x, int y, const string &text, 
-                              const unsigned char color[3])
+                              const unsigned char color[3], 
+                              const double opacity)
 {
-    textRenderer_->DrawOutlinedText(x, y, text, color);
+    textRenderer_->DrawOutlinedText(x, y, text, color, opacity);
 }
 
 void
@@ -100,7 +101,7 @@ DisplayBase::drawLabelLine(int &currentX, int &currentY, const string &text)
         currentX = (options->LabelX() + width_ - 2 - textWidth);
     }
 
-    DrawOutlinedText(currentX, currentY, text, options->Color());
+    DrawOutlinedText(currentX, currentY, text, options->Color(), 1.0);
     currentY += textRenderer_->FontHeight();
 }
 

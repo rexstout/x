@@ -9,7 +9,8 @@ using namespace std;
 #include "DisplayBase.h"
 #include "TextRenderer.h"
 
-TextRenderer::TextRenderer(DisplayBase *display) : display_(display)
+TextRenderer::TextRenderer(DisplayBase *display) : display_(display), 
+                                                   opacity_(1.0)
 {
     Options *options = Options::getInstance();
     fontSize_ = options->FontSize();
@@ -24,9 +25,10 @@ TextRenderer::~TextRenderer()
 // x and y are the center left coordinates of the string
 void 
 TextRenderer::DrawText(const int x, int y, const string &text, 
-                       const unsigned char color[3])
+                       const unsigned char color[3], const double opacity)
 {
     SetText(text);
+    SetOpacity(opacity);
 
     int textWidth, textHeight;
     TextBox(textWidth, textHeight);
@@ -41,9 +43,11 @@ TextRenderer::DrawText(const int x, int y, const string &text,
 // x and y are the center left coordinates of the string
 void 
 TextRenderer::DrawOutlinedText(const int x, int y, const string &text, 
-                               const unsigned char color[3])
+                               const unsigned char color[3], 
+                               const double opacity)
 {
     SetText(text);
+    SetOpacity(opacity);
 
     int textWidth, textHeight;
     TextBox(textWidth, textHeight);

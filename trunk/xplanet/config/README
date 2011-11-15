@@ -41,6 +41,13 @@ bump_scale
 Exaggerate the vertical relief for computing the shading.  The default
 value is 1.
 
+bump_shade 
+By default, the shadows in the bump map are colored using the night
+map.  If a value for bump_shade is specified, the day map will be
+shaded by this value instead.  Then areas in night will be colored
+using the night map, and areas in shadow will be colored according to
+bump_shade.  As with shade, permissible values are 0 to 100.
+
 cloud_gamma
 Apply a gamma correction to the cloud image before overlaying.  Each
 pixel's brightness is adjusted according to:

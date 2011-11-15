@@ -51,6 +51,7 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
 
     string lang("");
     string name("");
+    double opacity = 1.0;
     bool outlined = true;
     bool pixelCoords = false;
     double radius = -1;
@@ -170,6 +171,17 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
         case NAME:
             name.assign(returnString);
             break;
+        case OPACITY:
+        {
+            int s;
+            sscanf(returnString, "%d", &s);
+            if (s < 0) 
+                s = 0;
+            else if (s > 100) 
+                s = 100;
+            opacity = s/100.;
+        }
+        break;
         case OUTLINED:
             if (strncmp(returnString, "f", 1) == 0
                 || strncmp(returnString, "F", 1) == 0)
@@ -379,6 +391,7 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
                                iconWidth, iconHeight, 
                                align, name);
 
+            t->Opacity(opacity);
             t->Outline(outlined);
 
             if (!font.empty()) t->Font(font);

@@ -176,6 +176,8 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = BUMP_MAP;
     else if (getValue(line, i, "bump_scale=", returnString))
         returnVal = BUMP_SCALE;
+    else if (getValue(line, i, "bump_shade=", returnString))
+        returnVal = BUMP_SHADE;
     else if (getValue(line, i, "cloud_gamma=", returnString))
         returnVal = CLOUD_GAMMA;
     else if (getValue(line, i, "cloud_map=", returnString))
@@ -269,6 +271,8 @@ parse(int &i, const char *line, char *&returnString)
     }
     else if (getValue(line, i, "relative_to=", returnString))
         returnVal = ORIGIN;
+    else if (getValue(line, i, "opacity=", returnString))
+        returnVal = OPACITY;
     else if (getValue(line, i, "outlined=", returnString))
         returnVal = OUTLINED;
     else if (getValue(line, i, "position=", returnString))

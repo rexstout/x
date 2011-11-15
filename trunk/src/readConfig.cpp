@@ -122,6 +122,17 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             checkLocale(LC_NUMERIC, "");
         }
         break;
+        case BUMP_SHADE:
+        {
+            int s;
+            sscanf(returnString, "%d", &s);
+            if (s < 0) 
+                s = 0;
+            else if (s > 100) 
+                s = 100;
+            currentProperties->BumpShade(s/100.);
+        }
+        break;
         case CLOUD_GAMMA:
         {
             checkLocale(LC_NUMERIC, "C");
@@ -443,20 +454,20 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
         }
         break;
         case THICKNESS:
-	{
-	    int thickness;
+        {
+            int thickness;
             sscanf(returnString, "%d", &thickness);
             if (thickness > 0)
-	    {
-		currentProperties->ArcThickness(thickness);
-	    }
-	    else
+            {
+                currentProperties->ArcThickness(thickness);
+            }
+            else
             {
                 xpWarn("thickness must be positive.\n", 
                        __FILE__, __LINE__);
             }
-	}
-	break;
+        }
+        break;
         case TWILIGHT:
         {
             int value;

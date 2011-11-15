@@ -7,7 +7,7 @@
 
 class Text : public Annotation
 {
- public:
+public:
     Text(const unsigned char color[3], 
          const int x, const int y, 
          const int iconWidth, const int iconHeight,
@@ -23,6 +23,8 @@ class Text : public Annotation
     void Font(const std::string &font) { font_.assign(font); };
     void FontSize(const int fontSize) { fontSize_ = fontSize; };
 
+    void Opacity(const double d) { opacity_ = d; };
+
     void Outline(const bool b) { outlined_ = b; };
 
     int Overhang(const int width, const int height);
@@ -34,7 +36,7 @@ class Text : public Annotation
     virtual void Shift(const int x) { x_ += x; };
     virtual void Draw(DisplayBase *display);
 
- private:
+private:
 
     int align_;
     bool fixedAlign_;
@@ -47,6 +49,8 @@ class Text : public Annotation
 
     bool needAlign_;
     bool needBoundingBox_;
+
+    double opacity_;
 
     // (xOffset, yOffset) is the offset of the text from (x_, y_)
     int xOffset_;
