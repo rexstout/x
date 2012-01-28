@@ -296,7 +296,8 @@ Image::getPixel(double x, double y, unsigned char *pixel,
         pixels[2] = pngAlpha_[iy0 * width_ + ix0];
         pixels[3] = pngAlpha_[iy1 * width_ + ix1];
 
+        *alpha = 0;
         for (int i = 0; i < 4; i++)
-            *alpha = (unsigned char) (weight[i] * pixels[i]);
+            *alpha += (unsigned char) (weight[i] * pixels[i]);
     }
 }
