@@ -67,6 +67,10 @@ Use the configuration file config_file.  The format of config_file is
 described in README.config.  See the description of -searchdir to see
 where xplanet looks in order to find the configuration file.
 
+-create_scattering_tables scattering_file
+Create lookup tables for Rayleigh scattering.  See the README in the
+scattering directory for more information.
+
 -date YYYYMMDD.HHMMSS
 Use the date specified instead of the current local time.  The date is
 assumed to be GMT.

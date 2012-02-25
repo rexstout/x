@@ -115,6 +115,7 @@ class Options
     double Range() const         { return(range_); };
     void Range(const double r) { range_ = r; };
     bool RangeSpecified() const { return(rangeSpecified_); };
+    const std::string & RayleighFile() const { return(rayleighFile_); };
     void Rotate0(const double r) { rotate0_ = r; };
     double Rotate() const        { return(rotate_); };
     void Rotate(const double r) { rotate_ = rotate0_ + r; };
@@ -267,6 +268,7 @@ class Options
     bool random_;
     bool rangeSpecified_; // if the -range option is used
     double range_;        // distance from the body, in units of its radius
+    std::string rayleighFile_; // used to create Rayleigh scattering lookup tables
     double rotate_;       // rotate0 plus any increments
     double rotate0_;      // rotation angle specified on command line
 

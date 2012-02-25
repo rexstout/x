@@ -11,6 +11,8 @@ endif
 libmultiple_a_SOURCES = 	\
 	libmultiple.h 		\
 	addOrbits.cpp 		\
+	RayleighScattering.h	\
+	RayleighScattering.cpp	\
 	drawSphere.cpp		\
 	drawEllipsoid.cpp	\
 	drawRings.cpp 		\

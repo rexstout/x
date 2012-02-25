@@ -234,7 +234,7 @@ Image::Shift(const int x)
 }
 
 // Find the color of the desired point using bilinear interpolation.
-// Assume the array indices refer to the denter of the pixel, so each
+// Assume the array indices refer to the center of the pixel, so each
 // pixel has corners at (i - 0.5, j - 0.5) and (i + 0.5, j + 0.5)
 void
 Image::getPixel(double x, double y, unsigned char *pixel)

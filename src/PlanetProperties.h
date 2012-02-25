@@ -1,6 +1,7 @@
 #ifndef PLANETPROPERTIES_H
 #define PLANETPROPERTIES_H
 
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -123,6 +124,15 @@ class PlanetProperties
     bool RandomTarget() const { return(randomTarget_); };
     void RandomTarget(bool b) { randomTarget_ = b; };
 
+    void RayleighFile(const std::string &rayleighFile) { rayleighFile_ = rayleighFile; };
+    const std::string & RayleighFile() const { return rayleighFile_; };
+
+    void RayleighLimbScale(double r) { rayleighLimbScale_ = r; };
+    double RayleighLimbScale() { return rayleighLimbScale_; };
+
+    void RayleighScale(double r) { rayleighScale_ = r; };
+    double RayleighScale() { return rayleighScale_; };
+
     double Shade() const { return(shade_); };
     void Shade(double s) { shade_ = s; };
 
@@ -187,6 +197,10 @@ class PlanetProperties
 
     bool randomOrigin_;
     bool randomTarget_;
+
+    std::string rayleighFile_;
+    double rayleighLimbScale_;
+    double rayleighScale_;
 
     std::vector<std::string> satelliteFiles_;
 

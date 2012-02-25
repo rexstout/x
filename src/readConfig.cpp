@@ -421,6 +421,27 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             currentProperties->RandomTarget(returnString[0] == 't' 
                                             || returnString[0] == 'T');
             break;
+        case RAYLEIGH_FILE:
+            currentProperties->RayleighFile(returnString);
+            break;
+        case RAYLEIGH_LIMB_SCALE:
+        {
+            checkLocale(LC_NUMERIC, "C");
+            double scale;
+            sscanf(returnString, "%lf", &scale);
+            currentProperties->RayleighLimbScale(scale);
+            checkLocale(LC_NUMERIC, "");
+        }
+        break;
+        case RAYLEIGH_SCALE:
+        {
+            checkLocale(LC_NUMERIC, "C");
+            double scale;
+            sscanf(returnString, "%lf", &scale);
+            currentProperties->RayleighScale(scale);
+            checkLocale(LC_NUMERIC, "");
+        }
+        break;
         case SATELLITE_FILE:
             currentProperties->AddSatelliteFile(returnString);
             break;

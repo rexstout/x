@@ -49,7 +49,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 AR = ar
 ARFLAGS = cru
 libmultiple_a_LIBADD =
-am_libmultiple_a_OBJECTS = addOrbits.$(OBJEXT) drawSphere.$(OBJEXT) \
+am_libmultiple_a_OBJECTS = addOrbits.$(OBJEXT) \
+	RayleighScattering.$(OBJEXT) drawSphere.$(OBJEXT) \
 	drawEllipsoid.$(OBJEXT) drawRings.$(OBJEXT) \
 	drawStars.$(OBJEXT) drawSunGlare.$(OBJEXT)
 libmultiple_a_OBJECTS = $(am_libmultiple_a_OBJECTS)
@@ -202,6 +203,8 @@ AM_CPPFLAGS = -I@top_srcdir@/src @FREETYPE_CFLAGS@
 libmultiple_a_SOURCES = \
 	libmultiple.h 		\
 	addOrbits.cpp 		\
+	RayleighScattering.h	\
+	RayleighScattering.cpp	\
 	drawSphere.cpp		\
 	drawEllipsoid.cpp	\
 	drawRings.cpp 		\
@@ -256,6 +259,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RayleighScattering.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/addOrbits.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawEllipsoid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drawRings.Po@am__quote@

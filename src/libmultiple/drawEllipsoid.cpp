@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Options.h"
+#include "PlanetProperties.h"
 #include "View.h"
 #include "xpUtil.h"
 
@@ -12,7 +13,7 @@ drawEllipsoid(const double pX, const double pY, const double pR,
               const double X, const double Y, const double Z,
               DisplayBase *display, 
               const View *view, const Map *map, Planet *planet,
-              const double planetRadius)
+              PlanetProperties *planetProperties)
 {
     double lat, lon;
     unsigned char color[3];
@@ -43,6 +44,7 @@ drawEllipsoid(const double pX, const double pY, const double pR,
     planet->XYZToPlanetaryXYZ(oX, oY, oZ, p1X, p1Y, p1Z);
     p1Z *= ratio;
 
+    const double planetRadius = planetProperties->Magnify();
     const double c = 2 * (dot(p1X - p3X, p1Y - p3Y, p1Z - p3Z, 
                               p1X - p3X, p1Y - p3Y, p1Z - p3Z) 
                           - planetRadius * planetRadius);

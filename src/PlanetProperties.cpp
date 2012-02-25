@@ -14,8 +14,8 @@ PlanetProperties::PlanetProperties(const body index)
     : index_(index), 
       arcThickness_(1),
       bumpMap_(""),
-      bumpShade_(-1.0),
       bumpScale_(1),
+      bumpShade_(-1.0),
       cloudGamma_(1),
       cloudMap_(""), 
       cloudThreshold_(90), 
@@ -35,6 +35,9 @@ PlanetProperties::PlanetProperties(const body index)
       nightMap_(""), 
       randomOrigin_(true),
       randomTarget_(true),
+      rayleighFile_(""),
+      rayleighLimbScale_(1.),
+      rayleighScale_(0.),
       ssecMap_(false),
       shade_(0.3),
       specularMap_(""),
@@ -126,6 +129,10 @@ PlanetProperties::operator= (const PlanetProperties &p)
     randomOrigin_ = p.randomOrigin_;
     randomTarget_ = p.randomTarget_;
     
+    rayleighFile_ = p.rayleighFile_;
+    rayleighLimbScale_ = p.rayleighLimbScale_;
+    rayleighScale_ = p.rayleighScale_;
+
     ssecMap_ = p.ssecMap_;
     shade_ = p.shade_;
     startOrbit_ = p.startOrbit_;

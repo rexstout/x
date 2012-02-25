@@ -30,6 +30,8 @@ public:
     void setPixel(const int x, const int y, const unsigned char pixel[3]);
     void setPixel(const int x, const int y, const unsigned char pixel[3],
                   const double opacity);
+    void setPixel(const int x, const int y, const unsigned char pixel[3],
+                  const double opacity[3]);
     void getPixel(const int x, const int y, unsigned char pixel[3]) const;
 
     virtual void renderImage(PlanetProperties *planetProperties[]) = 0;
