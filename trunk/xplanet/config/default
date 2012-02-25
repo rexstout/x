@@ -13,7 +13,10 @@ arc_thickness=1
 bump_scale=1
 
 cloud_gamma=1
-#cloud_map=
+#cloud_map=                     # specify this in the [earth] section,
+				# or else all planets will be drawn 
+				# with clouds!
+
 cloud_ssec=false                # true if the cloud map is from the
 				# University of Wisconsin Space
 				# Science and Engineering Center 
@@ -109,6 +112,11 @@ color={28, 82, 110}
 #marker_file=earth
 
 min_radius_for_label=0
+
+# see xplanet/config/README and xplanet/scattering/README to enable Rayleigh scattering
+#rayleigh_limb_scale=1
+#rayleigh_scale=5
+#rayleigh_file=earthRayleigh 
 
 #satellite_file=iss
 

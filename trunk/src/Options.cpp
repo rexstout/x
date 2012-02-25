@@ -121,6 +121,7 @@ Options::Options() :
     random_(false),
     rangeSpecified_(false), 
     range_(1000),
+    rayleighFile_(""),
     rotate_(0),
     rotate0_(0),
     saveDesktopFile_(false),
@@ -201,6 +202,7 @@ Options::parseArgs(int argc, char **argv)
             {"center",         required_argument, NULL, CENTER},
             {"color",          required_argument, NULL, COLOR},
             {"config",         required_argument, NULL, CONFIG_FILE},
+            {"create_scattering_tables", required_argument, NULL, RAYLEIGH_FILE},
             {"date",           required_argument, NULL, DATE},
             {"date_format",    required_argument, NULL, DATE_FORMAT},
             {"dynamic_origin", required_argument, NULL, DYNAMIC_ORIGIN},
@@ -757,6 +759,9 @@ Options::parseArgs(int argc, char **argv)
                 xpWarn("range must be greater than 1\n",
                        __FILE__, __LINE__);
             }
+            break;
+        case RAYLEIGH_FILE:
+            rayleighFile_ = optarg;
             break;
         case ROTATE:
             sscanf(optarg, "%lf", &rotate0_);

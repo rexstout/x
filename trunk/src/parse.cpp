@@ -283,6 +283,12 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = RANDOM_ORIGIN;
     else if (getValue(line, i, "random_target=", returnString))
         returnVal = RANDOM_TARGET;
+    else if (getValue(line, i, "rayleigh_file=", returnString))
+        returnVal = RAYLEIGH_FILE;
+    else if (getValue(line, i, "rayleigh_limb_scale=", returnString))
+        returnVal = RAYLEIGH_LIMB_SCALE;
+    else if (getValue(line, i, "rayleigh_scale=", returnString))
+        returnVal = RAYLEIGH_SCALE;
     // Any 'new' satellite_* tokens must be before this, because it
     // gobbles all forms
     else if (getValueAfter(line, i, "satellite_", '=', returnString))

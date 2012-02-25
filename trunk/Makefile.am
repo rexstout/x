@@ -37,6 +37,8 @@ nobase_dist_data_DATA = \
 	xplanet/satellites/README	\
 	xplanet/satellites/iss		\
 	xplanet/satellites/iss.tle	\
+	xplanet/scattering/README	\
+	xplanet/scattering/earthRayleigh \
 	xplanet/spice/README		\
 	xplanet/spice/asteroids		\
 	xplanet/spice/asteroids.krn	\

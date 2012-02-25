@@ -1,3 +1,14 @@
+Version 1.3.0 (released 25 Feb 2012)
+	* add "outlined" keyword to marker files
+
+	* update JPL ephemeris code for 64 bit machines
+
+	* add bump_shade config file parameter
+
+	* add opacity keyword for markers
+
+	* implement Rayleigh scattering
+
 Version 1.2.1 (released 18 Apr 2009)
 
 	* Remove signbit() from ProjectionIcosagnomonic.cpp

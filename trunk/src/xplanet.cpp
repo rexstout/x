@@ -27,6 +27,7 @@ using namespace std;
 #include "libdisplay/libtimer.h"
 #include "libephemeris/ephemerisWrapper.h"
 #include "libplanet/Planet.h"
+#include "libmultiple/RayleighScattering.h"
 
 extern void
 drawMultipleBodies(DisplayBase *display, Planet *target,
@@ -100,6 +101,13 @@ main(int argc, char **argv)
             }
             return(EXIT_SUCCESS);
         }
+    }
+
+    if (options->RayleighFile().length() > 0)
+    {
+	RayleighScattering rayleigh(options->RayleighFile());
+	rayleigh.createTables();
+	return(EXIT_SUCCESS);
     }
 
     setUpEphemeris();

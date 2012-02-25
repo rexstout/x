@@ -455,27 +455,36 @@ DisplayBase::setPixel(const int x, const int y, const unsigned char pixel[3])
 
 void
 DisplayBase::setPixel(const int x, const int y, const unsigned char p[3],
-                      const double opacity)
+                      const double opacity[3])
 {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
 
     unsigned char *background = rgb_data + 3*(y*width_ + x);
     unsigned char pixel[3];
     memcpy(pixel, p, 3);
-    if (opacity < 1)
+
+    double meanOpacity = 0;
+    for (int i = 0; i < 3; i++) meanOpacity += opacity[i];
+    meanOpacity /= 3; 
+
+    if (meanOpacity < 1)
     {
         for (int i = 0; i < 3; i++)
-            pixel[i] = (unsigned char) (opacity * p[i] 
-                                        + (1 - opacity) * background[i]);
-        if (alpha != NULL) 
-            alpha[y*width_ + x] = (unsigned char) (opacity * 255);
-    }
-    else
-    {
-        if (alpha != NULL) alpha[y*width_ + x] = 255;
+            pixel[i] = (unsigned char) (opacity[i] * p[i] 
+                                        + (1 - opacity[i]) * background[i]);
     }
 
     memcpy(background, pixel, 3);
+}
+
+void
+DisplayBase::setPixel(const int x, const int y, const unsigned char p[3],
+                      const double opacity)
+{
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
+
+    double opacity3[3] = { opacity, opacity, opacity };
+    setPixel(x, y, p, opacity3);
 }
 
 void

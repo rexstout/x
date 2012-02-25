@@ -103,7 +103,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
 
     // Find the pixel radius and angle subtended by the target.
     // This is used to get degrees per pixel.
-    double pixels_per_radian;
+    double pixels_per_radian = -1;
     switch (options->FOVMode())
     {
     case RADIUS:
@@ -152,34 +152,34 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         double sec;
         fromJulian(options->JulianDay(), year, month, day, hour, min, sec);
 
-        snprintf(buffer, 128, "Julian Date = %14.6f (%04d%02d%02d.%02d%02d%02d)\n",
+        snprintf(buffer, 128, "Julian Date    = %14.6f (%04d%02d%02d.%02d%02d%02d)\n",
                  options->JulianDay(), year, month, day, hour, min, (int) (sec+0.5));
         msg << buffer;
 
-        snprintf(buffer, 128, "origin XYZ  = %14.8f %14.8f %14.8f\n",
+        snprintf(buffer, 128, "origin XYZ     = %14.8f %14.8f %14.8f\n",
                  oX, oY, oZ);
         msg << buffer;
 
-        snprintf(buffer, 128, "target XYZ  = %14.8f %14.8f %14.8f\n",
+        snprintf(buffer, 128, "target XYZ     = %14.8f %14.8f %14.8f\n",
                  tX, tY, tZ);
         msg << buffer;
 
-        snprintf(buffer, 128, "up XYZ      = %14.8f %14.8f %14.8f\n",
+        snprintf(buffer, 128, "up XYZ         = %14.8f %14.8f %14.8f\n",
                  upX, upY, upZ);
         msg << buffer;
 
-        snprintf(buffer, 128, "fov         = %14.8f degrees\n", 
+        snprintf(buffer, 128, "fov            = %14.8f degrees\n", 
                  options->FieldOfView()/deg_to_rad);
         msg << buffer;
-        snprintf(buffer, 128, "dist_per_pixel = %14.8f\n", dist_per_pixel);
+        snprintf(buffer, 128, "dist_per_pixel = %14.8e AU (%14.8e km)\n", 
+                 dist_per_pixel, dist_per_pixel*AU_to_km);
         msg << buffer;
         xpMsg(msg.str(), __FILE__, __LINE__);
     }
 
     // Put the primary in the center of the field of view when looking
     // from above or below
-    if (options->OriginMode() == ABOVE
-        || options->OriginMode() == BELOW)
+    if (options->OriginMode() == ABOVE || options->OriginMode() == BELOW)
     {
         findBodyXYZ(options->JulianDay(), options->Primary(), -1, tX, tY, tZ);
     }
@@ -435,16 +435,13 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         {
             drawEllipsoid(pX, pY, pR, oX, oY, oZ, 
                           X, Y, Z, display, view, m,
-                          current_planet, 
-                          currentProperties->Magnify());
+                          current_planet, currentProperties);
         }
         else
         {
             drawSphere(pX, pY, pR, oX, oY, oZ, 
                        X, Y, Z, display, view, m,
-                       current_planet, 
-                       current_planet->Radius() 
-                       * currentProperties->Magnify());
+                       current_planet, currentProperties);
         }
         delete m;
 
