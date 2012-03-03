@@ -18,7 +18,7 @@ void
 printVersion()
 {
     cout << "Xplanet " << VERSION << endl;
-    cout << "Copyright (C) 2011 "
+    cout << "Copyright (C) 2012 "
          << "Hari Nair <hari@alumni.caltech.edu>" << endl;
     cout << "The latest version can be found at "
          << "http://xplanet.sourceforge.net\n";

@@ -170,6 +170,16 @@ random_target
 If false, don't use this body with -target random or major.  The
 default is true.
 
+rayleigh_emission_weight
+Reduces the Rayleigh scattering as a function of the emission angle
+(which is 0 at the center of the disk and 90 at the edge).  For a
+value of n, the weighting factor is sin(emission)^n.  A value of 0 is
+the default, meaning there is no reduction in Rayleigh scattering.
+
+rayleigh_file
+A text file describing the lookup tables.  See the earthRayleigh file
+in the xplanet/scattering directory for an example.
+
 rayleigh_limb_scale
 Exaggerate the size of the atmosphere when using Rayleigh scattering.
 The default value is 1.
@@ -179,10 +189,6 @@ If > 0, rayleigh scattering is calculated using precomputed lookup
 tables (see the README in the xplanet/scattering directory for
 instructions).  A value between 5 and 10 is typical.  A rayleigh_file
 must be specified as well.
-
-rayleigh_file
-A text file describing the lookup tables.  See the earthRayleigh file
-in the xplanet/scattering directory for an example.
 
 satellite_file
 Specify a file containing a list of satellites to display.  A file
