@@ -421,6 +421,15 @@ readConfig(const char *line, PlanetProperties *planetProperties[])
             currentProperties->RandomTarget(returnString[0] == 't' 
                                             || returnString[0] == 'T');
             break;
+        case RAYLEIGH_EMISSION_WEIGHT:
+        {
+            checkLocale(LC_NUMERIC, "C");
+            double scale;
+            sscanf(returnString, "%lf", &scale);
+            currentProperties->RayleighEmissionWeight(scale);
+            checkLocale(LC_NUMERIC, "");
+        }
+        break;
         case RAYLEIGH_FILE:
             currentProperties->RayleighFile(returnString);
             break;

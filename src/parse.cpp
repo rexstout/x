@@ -283,6 +283,8 @@ parse(int &i, const char *line, char *&returnString)
         returnVal = RANDOM_ORIGIN;
     else if (getValue(line, i, "random_target=", returnString))
         returnVal = RANDOM_TARGET;
+    else if (getValue(line, i, "rayleigh_emission_weight=", returnString))
+        returnVal = RAYLEIGH_EMISSION_WEIGHT;
     else if (getValue(line, i, "rayleigh_file=", returnString))
         returnVal = RAYLEIGH_FILE;
     else if (getValue(line, i, "rayleigh_limb_scale=", returnString))

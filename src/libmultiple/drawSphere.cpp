@@ -75,8 +75,8 @@ drawSphere(const double pX, const double pY, const double pR,
         double targetDist = sqrt(dX*dX + dY*dY + dZ*dZ);
 
         double kmPerPixel = radiansPerPixel * targetDist * AU_to_km;
-	double minRes = 2 * rayleighLimb->getScaleHeightKm() 
-	    * planetProperties->RayleighLimbScale();
+        double minRes = 2 * rayleighLimb->getScaleHeightKm() 
+            * planetProperties->RayleighLimbScale();
         if (kmPerPixel > minRes)
         {
             delete rayleighLimb;
@@ -121,8 +121,8 @@ drawSphere(const double pX, const double pY, const double pR,
 
                     double tanht = planet->Radius() * AU_to_km * 1e3 * (rad-1);
                     if (tanht < 0) tanht = 0;
-		    if (planetProperties->RayleighLimbScale() > 0)
-			tanht /= planetProperties->RayleighLimbScale();
+                    if (planetProperties->RayleighLimbScale() > 0)
+                        tanht /= planetProperties->RayleighLimbScale();
                     rayleighLimb->calcScatteringLimb(incidence, tanht, phase);
 
                     display->getPixel(i, j, color);
@@ -168,10 +168,15 @@ drawSphere(const double pX, const double pY, const double pR,
                 double phase = acos(ndot(oX-iX, oY-iY, oZ-iZ, 
                                          -iX, -iY, -iZ));
                 
+                double emsScale = 1;
+                if (planetProperties->RayleighEmissionWeight() > 0)
+                    emsScale = pow(sin(emission), 
+                                   planetProperties->RayleighEmissionWeight());
+
                 rayleighDisk->calcScatteringDisk(incidence, emission, phase);
                 for (int ic = 0; ic < 3; ic++)
                 {
-                    double thisColor = rayleighDisk->getColor(ic);
+                    double thisColor = rayleighDisk->getColor(ic) * emsScale;
                     thisColor = (rayleighScale * 255 * thisColor + color[ic]);
                     if (thisColor > 255) thisColor = 255;
                     color[ic] = thisColor;

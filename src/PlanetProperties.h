@@ -124,6 +124,9 @@ class PlanetProperties
     bool RandomTarget() const { return(randomTarget_); };
     void RandomTarget(bool b) { randomTarget_ = b; };
 
+    void RayleighEmissionWeight(double r) { rayleighEmissionWeight_ = r; };
+    double RayleighEmissionWeight() { return rayleighEmissionWeight_; };
+
     void RayleighFile(const std::string &rayleighFile) { rayleighFile_ = rayleighFile; };
     const std::string & RayleighFile() const { return rayleighFile_; };
 
@@ -198,6 +201,7 @@ class PlanetProperties
     bool randomOrigin_;
     bool randomTarget_;
 
+    double rayleighEmissionWeight_;
     std::string rayleighFile_;
     double rayleighLimbScale_;
     double rayleighScale_;

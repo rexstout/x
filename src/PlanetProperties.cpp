@@ -35,6 +35,7 @@ PlanetProperties::PlanetProperties(const body index)
       nightMap_(""), 
       randomOrigin_(true),
       randomTarget_(true),
+      rayleighEmissionWeight_(0.),
       rayleighFile_(""),
       rayleighLimbScale_(1.),
       rayleighScale_(0.),
@@ -129,6 +130,7 @@ PlanetProperties::operator= (const PlanetProperties &p)
     randomOrigin_ = p.randomOrigin_;
     randomTarget_ = p.randomTarget_;
     
+    rayleighEmissionWeight_ = p.rayleighEmissionWeight_;
     rayleighFile_ = p.rayleighFile_;
     rayleighLimbScale_ = p.rayleighLimbScale_;
     rayleighScale_ = p.rayleighScale_;

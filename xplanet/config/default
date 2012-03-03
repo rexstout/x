@@ -114,6 +114,7 @@ color={28, 82, 110}
 min_radius_for_label=0
 
 # see xplanet/config/README and xplanet/scattering/README to enable Rayleigh scattering
+#rayleigh_emission_weight=0
 #rayleigh_limb_scale=1
 #rayleigh_scale=5
 #rayleigh_file=earthRayleigh 
