@@ -337,6 +337,7 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
         if (image.empty())
         {
             Symbol *s = new Symbol(color, ix, iy, symbolSize);
+            s->Outline(outlined);
             annotationMap.insert(pair<const double, Annotation*>(Z, s));
             iconWidth = symbolSize * 2;
             iconHeight = symbolSize * 2;

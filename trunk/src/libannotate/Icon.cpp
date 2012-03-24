@@ -47,40 +47,39 @@ Icon::~Icon()
 void
 Icon::Draw(DisplayBase *display)
 {
-    if (image_ != NULL)
+    if (image_ == NULL) return;
+
+    const unsigned char *rgb_data = image_->getRGBData();
+    const unsigned char *png_alpha = image_->getPNGAlpha();
+
+    const int ulx = x_ - width_ / 2;
+    const int uly = y_ - height_ / 2;
+
+    for (int j = 0; j < height_; j++)
     {
-        const unsigned char *rgb_data = image_->getRGBData();
-        const unsigned char *png_alpha = image_->getPNGAlpha();
-
-        const int ulx = x_ - width_ / 2;
-        const int uly = y_ - height_ / 2;
-
-        for (int j = 0; j < height_; j++)
+        for (int i = 0; i < width_; i++)
         {
-            for (int i = 0; i < width_; i++)
-            {
-                const unsigned char *pixel = rgb_data + 3*(j * width_ + i);
+            const unsigned char *pixel = rgb_data + 3*(j * width_ + i);
 
-                double opacity = 1;
-                if (transparent_ != NULL)
+            double opacity = 1;
+            if (transparent_ != NULL)
+            {
+                opacity = 0;
+                for (int ii = 0; ii < 3; ii++)
                 {
-                    opacity = 0;
-                    for (int ii = 0; ii < 3; ii++)
+                    if (pixel[ii] != transparent_[ii])
                     {
-                        if (pixel[ii] != transparent_[ii])
-                        {
-                            opacity = 1;
-                            break;
-                        }
+                        opacity = 1;
+                        break;
                     }
                 }
-                else if (png_alpha != NULL)
-                {
-                    opacity = png_alpha[j * width_ + i]  / 255.;
-                }
-
-                display->setPixel(ulx + i, uly + j, pixel, opacity);
             }
+            else if (png_alpha != NULL)
+            {
+                opacity = png_alpha[j * width_ + i]  / 255.;
+            }
+
+            display->setPixel(ulx + i, uly + j, pixel, opacity);
         }
     }
 }
