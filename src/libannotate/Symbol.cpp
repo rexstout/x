@@ -11,7 +11,7 @@ using namespace std;
 
 Symbol::Symbol(const unsigned char color[3], 
                const int x, const int y, const int r)
-    : Annotation(color), x_(x), y_(y), r_(r)
+    : Annotation(color), x_(x), y_(y), r_(r), outlined_(true)
 {
     width_ = 2*r;
     height_ = 2*r;
@@ -51,8 +51,11 @@ Symbol::Draw(DisplayBase *display)
 {
     if (r_ < 1) return;
     unsigned char black[3] = { 0, 0, 0 };
-    DrawCircle(display, r_ - 1, black);
-    DrawCircle(display, r_ + 1, black);
+    if (outlined_)
+    {
+        DrawCircle(display, r_ - 1, black);
+        DrawCircle(display, r_ + 1, black);
+    }
 
     DrawCircle(display, r_, color_);
 }
