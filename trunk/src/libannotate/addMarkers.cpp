@@ -26,7 +26,6 @@ using namespace std;
 
 static void
 readMarkerFile(const char *line, Planet *planet, const double pR, 
-               const double pX, const double pY, const double pZ,
                View *view, ProjectionBase *projection,
                const int width, const int height, unsigned char *color, 
                string &font, int fontSize, const double magnify,
@@ -320,11 +319,17 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
                                          X, Y, Z, planet, view, projection);
 
         // don't draw markers on the far side of the planet
-        if (planet != NULL 
-            && view != NULL 
-            && Z > pZ
-            && sqrt((X-pX)*(X-pX) + (Y-pY)*(Y-pY))/pR < radius * magnify) 
-            markerVisible = false;
+        if (planet != NULL && view != NULL)
+        {
+            double mX, mY, mZ;
+            planet->PlanetographicToXYZ(mX, mY, mZ, lat, lon, radius * magnify);
+            double oX, oY, oZ;
+            options->getOrigin(oX, oY, oZ);
+            double tX, tY, tZ;
+            planet->getPosition(tX, tY, tZ);
+            double cosAngle = ndot(tX-mX, tY-mY, tZ-mZ, oX-mX, oY-mY, oZ-mZ);
+            if (cosAngle > 0) markerVisible = false;
+        } 
     }
 
     if (pixelCoords || markerVisible)
@@ -431,7 +436,7 @@ addMarkers(PlanetProperties *planetProperties, Planet *planet,
                 string font(planetProperties->MarkerFont());
                 int fontSize(planetProperties->MarkerFontSize());
                 
-                readMarkerFile(line, planet, pixel_radius, X, Y, Z, 
+                readMarkerFile(line, planet, pixel_radius, 
                                view, projection, width, height, 
                                color, font, fontSize, 
                                planetProperties->Magnify(),
@@ -477,7 +482,7 @@ addMarkers(View *view, const int width, const int height,
                 string font(options->Font());
                 int fontSize(options->FontSize());
                 
-                readMarkerFile(line, NULL, 0, 0, 0, 0,
+                readMarkerFile(line, NULL, 0, 
                                view, NULL, width, height, 
                                color, font, fontSize, 1.0, 
                                planetsFromSunMap, annotationMap);
