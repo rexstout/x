@@ -42,13 +42,18 @@ read_gif(const char *filename, int *width, int *height, unsigned char **rgb)
     GifRecordType RecordType;
     GifByteType *Extension;
     GifRowType *ScreenBuffer;
-    GifFileType *GifFile;
 
     GifRowType GifRow;
     GifColorType *ColorMapEntry;
     unsigned char *BufferP;
 
-    if ((GifFile = DGifOpenFileName(filename)) == NULL) {
+    GifFileType *GifFile;
+#if GIFLIB_MAJOR >= 5
+    GifFile = DGifOpenFileName(filename, NULL);
+#else
+    GifFile = DGifOpenFileName(filename);
+#endif
+    if (GifFile == NULL) {
 	fprintf(stderr, "Can't open GIF file %s\n", filename);
 	return(0);
     }
@@ -507,9 +512,15 @@ write_gif(const char *filename, int width, int height, char *rgb)
 
     ColorMapSize = 1 << ExpNumOfColors;
 
-    if ((OutputColorMap = MakeMapObject(ColorMapSize, NULL)) == NULL ||
+#if GIFLIB_MAJOR >= 5
+    OutputColorMap = GifMakeMapObject(ColorMapSize, NULL);
+#else
+    OutputColorMap = MakeMapObject(ColorMapSize, NULL);
+#endif
+    
+    if (OutputColorMap == NULL ||
 	(OutputBuffer = (GifByteType *) malloc(width * height *
-					    sizeof(GifByteType))) == NULL)
+					       sizeof(GifByteType))) == NULL)
     {
 	fprintf(stderr,"Failed to allocate memory required, aborted.");
 	return(0);
@@ -545,9 +556,13 @@ write_gif(const char *filename, int width, int height, char *rgb)
 
     Ptr = OutputBuffer;
 
+#if GIFLIB_MAJOR >= 5
+    GifFile = EGifOpenFileName(filename, GifTestExistance, NULL);
+#else
+    GifFile = EGifOpenFileName(filename, GifTestExistance);
+#endif
     /* Open stdout for the output file: */
-    if ((GifFile = EGifOpenFileName(filename, GifTestExistance)) == NULL)
-
+    if (GifFile == NULL)
     {
 	QuitGifError(GifFile);
 	return(0);
