@@ -354,6 +354,9 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         planetIterator--;
         const double dist_to_planet = planetIterator->first;
         Planet *current_planet = planetIterator->second.p;
+        const double dist_to_limb = dist_to_planet 
+            - current_planet->Radius() 
+            * sin(atan(current_planet->Radius()/dist_to_planet));
         const double pX = planetIterator->second.X;
         const double pY = planetIterator->second.Y;
         double pR = planetIterator->second.radius;
@@ -461,7 +464,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                     sphericalToPixel(lat, lon, 
                                      radius * currentProperties->Magnify(),
                                      X, Y, Z, current_planet, view, NULL);
-                    if (Z < dist_to_planet) display->setPixel(X, Y, color);
+                    if (Z < dist_to_limb) display->setPixel(X, Y, color);
                 }
             }
                 
@@ -475,7 +478,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
                     sphericalToPixel(lat, lon, 
                                      radius * currentProperties->Magnify(),
                                      X, Y, Z, current_planet, view, NULL);
-                    if (Z < dist_to_planet) display->setPixel(X, Y, color);
+                    if (Z < dist_to_limb) display->setPixel(X, Y, color);
                 }
             }
         }
@@ -500,7 +503,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         {
             multimap<double, Annotation *>::iterator annotationIterator = annotationMap.begin();
             while (annotationIterator != annotationMap.end() 
-                   && annotationIterator->first < dist_to_planet)
+                   && annotationIterator->first < dist_to_limb)
             {
                 (annotationIterator->second)->Draw(display);
                 annotationIterator++;
