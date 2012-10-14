@@ -27,22 +27,12 @@ sphericalToPixel(const double lat, const double lon, const double rad,
             planet->PlanetographicToXYZ(X, Y, Z, lat, lon, rad);
         }           
 
-        Options *options = Options::getInstance();
-
-        // check if point is behind the limb
-        bool isVisible = true;
-        double oX, oY, oZ;
-        options->getOrigin(oX, oY, oZ);
-        double tX, tY, tZ;
-        planet->getPosition(tX, tY, tZ);
-        double cosAngle = ndot(tX-X, tY-Y, tZ-Z, oX-X, oY-Y, oZ-Z);
-        if (cosAngle > 0) isVisible = false;
-
         view->XYZToPixel(X, Y, Z, X, Y, Z);
+        Options *options = Options::getInstance();
         X += options->CenterX();
         Y += options->CenterY();
 
-        returnVal = (isVisible && Z > 0);
+        returnVal = (Z > 0);
     }
     else if (projection != NULL)
     {
