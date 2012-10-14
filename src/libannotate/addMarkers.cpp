@@ -317,19 +317,6 @@ readMarkerFile(const char *line, Planet *planet, const double pR,
 
         markerVisible = sphericalToPixel(lat, lon, radius * magnify, 
                                          X, Y, Z, planet, view, projection);
-
-        // don't draw markers on the far side of the planet
-        if (planet != NULL && view != NULL)
-        {
-            double mX, mY, mZ;
-            planet->PlanetographicToXYZ(mX, mY, mZ, lat, lon, radius * magnify);
-            double oX, oY, oZ;
-            options->getOrigin(oX, oY, oZ);
-            double tX, tY, tZ;
-            planet->getPosition(tX, tY, tZ);
-            double cosAngle = ndot(tX-mX, tY-mY, tZ-mZ, oX-mX, oY-mY, oZ-mZ);
-            if (cosAngle > 0) markerVisible = false;
-        } 
     }
 
     if (pixelCoords || markerVisible)
