@@ -355,8 +355,7 @@ drawMultipleBodies(DisplayBase *display, Planet *target,
         const double dist_to_planet = planetIterator->first;
         Planet *current_planet = planetIterator->second.p;
         const double dist_to_limb = dist_to_planet 
-            - current_planet->Radius() 
-            * sin(atan(current_planet->Radius()/dist_to_planet));
+            - current_planet->Radius()*current_planet->Radius()/dist_to_planet;
         const double pX = planetIterator->second.X;
         const double pY = planetIterator->second.Y;
         double pR = planetIterator->second.radius;
