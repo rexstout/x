@@ -849,7 +849,7 @@ Planet::~Planet()
 double
 Planet::Radius(const double lat) const
 {
-    double returnValue = radiusEq_;
+    double returnValue = 1;
     if (index_ == JUPITER || index_ == SATURN)
     {
         double tmpLat = lat;
