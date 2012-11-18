@@ -274,19 +274,22 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
             targetPlanet->calcHeliocentricEquatorial();
         }
 
-        targetPlanet->getPosition(tX, tY, tZ);
-        const double deltX = tX - oX;
-        const double deltY = tY - oY;
-        const double deltZ = tZ - oZ;
-        targetDist = AU_to_km * sqrt(deltX*deltX 
-                                     + deltY*deltY + deltZ*deltZ);
-
         double obsLat, obsLon;
         targetPlanet->XYZToPlanetographic(oX, oY, oZ, obsLat, obsLon);
 
         char obsString[MAX_LINE_LENGTH];
         double obsLatDeg = obsLat / deg_to_rad;
         double obsLonDeg = obsLon / deg_to_rad;
+
+        targetPlanet->getPosition(tX, tY, tZ);
+        const double deltX = tX - oX;
+        const double deltY = tY - oY;
+        const double deltZ = tZ - oZ;
+        targetDist = sqrt(deltX*deltX + deltY*deltY + deltZ*deltZ);
+        if (options->LabelAltitude())
+            targetDist -= targetPlanet->Radius(obsLat);
+
+        targetDist *= AU_to_km;
 
         if (target == EARTH || target == MOON)
         {
@@ -357,22 +360,23 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         }
         
         char distString[MAX_LINE_LENGTH];
+        string distLabel = (options->LabelAltitude() ? "altitude" : "distance");
         if (targetDist < 1e6)
         {
-            snprintf(distString, MAX_LINE_LENGTH, "dist %.0f km", 
-                     targetDist);
+            snprintf(distString, MAX_LINE_LENGTH, "%s %.0f km", 
+                     distLabel.c_str(), targetDist);
         }
         else if (targetDist < 1e9)
         {
             targetDist /= 1e6;
-            snprintf(distString, MAX_LINE_LENGTH, "dist %.2f million km", 
-                     targetDist);
+            snprintf(distString, MAX_LINE_LENGTH, "%s %.2f million km", 
+                     distLabel.c_str(), targetDist);
         }
         else
         {
             targetDist /= 1e9;
-            snprintf(distString, MAX_LINE_LENGTH, "dist %.2f billion km", 
-                     targetDist);
+            snprintf(distString, MAX_LINE_LENGTH, "%s %.2f billion km", 
+                     distLabel.c_str(), targetDist);
         }
 
         labelLines.push_back(fovCString);

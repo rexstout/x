@@ -61,6 +61,7 @@ class Options
     int JPEGQuality() const { return(quality_); };
     double JulianDay() const { return(julianDay_); };
 
+    bool LabelAltitude() const      { return(labelAltitude_); };
     body LabelBody() const          { return(labelBody_); };
     int LabelMask() const { return(labelMask_); };
     int LabelX() const { return(labelX_); };
@@ -219,6 +220,7 @@ class Options
     int labelMask_;
     int labelX_;
     int labelY_;
+    bool labelAltitude_;  // display altitude instead of distance from center
     body labelBody_;      // print this body's info in the label
     std::string labelString_;
     double latitude_;
