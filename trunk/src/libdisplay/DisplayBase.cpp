@@ -287,8 +287,7 @@ DisplayBase::drawLabel(PlanetProperties *planetProperties[])
         const double deltZ = tZ - oZ;
         targetDist = sqrt(deltX*deltX + deltY*deltY + deltZ*deltZ);
         if (options->LabelAltitude())
-            targetDist -= targetPlanet->Radius(obsLat);
-
+            targetDist -= targetPlanet->Radius()*targetPlanet->Radius(obsLat);
         targetDist *= AU_to_km;
 
         if (target == EARTH || target == MOON)
