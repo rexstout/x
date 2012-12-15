@@ -95,9 +95,6 @@ DisplayMSWin::renderImage(PlanetProperties *planetProperties[])
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, 
                          (char *) outputFilename.c_str(), 
                          SPIF_UPDATEINIFILE);
-
-    if (!options->SaveDesktopFile())
-        unlinkFile(outputFilename.c_str());
 }
 
 string
@@ -109,7 +106,7 @@ DisplayMSWin::TmpDir()
     if (returnstring.empty())
     {
         char tmpdir[MAX_PATH];
-        GetWindowsDirectory(tmpdir, MAX_PATH);
+        GetTempPath(MAX_PATH, tmpdir);
         returnstring.assign(tmpdir);
     }
     return(returnstring);
