@@ -1,0 +1,87 @@
+#!/bin/bash 
+
+version=1.3.0
+
+windows=$(pwd)
+root=${windows}/..
+zipdir=${windows}/zip/xplanet-${version}
+rm -fr zip
+
+mkdir -p $zipdir 
+
+cd ${root}
+cp -p ChangeLog COPYING README windows/xplanet.bat ${zipdir}/
+
+cd $zipdir/
+
+rsync -a --exclude .svn ${root}/xplanet .
+
+for FILE in $(find . -name README); do
+    mv $FILE $(dirname $FILE)/readme.txt
+done
+
+mv xplanet/markers/earth /tmp/
+${windows}/updateTZ.py /tmp/earth > xplanet/markers/earth 
+
+cp -p ${root}/src/xplanet.exe .
+for file in $(cygcheck.exe ./xplanet.exe  | grep cygwin | grep dll); do
+    cp -p $file .
+done
+
+zip -r ../xplanet-${version}.zip .
+
+exit
+
+mkdir xplanet
+mkdir xplanet/xplanet
+foreach dir (arcs config ephemeris fonts images markers origin satellites spice stars)
+  mkdir xplanet/xplanet/$dir
+end
+
+set text_files="COPYING ChangeLog NEWS README xplanet/rgb.txt xplanet/arcs/README xplanet/arcs/constellations xplanet/config/README xplanet/config/default xplanet/config/earth_markers xplanet/config/moon_orbit xplanet/config/overlay_clouds xplanet/ephemeris/README xplanet/fonts/README xplanet/images/README xplanet/markers/README xplanet/markers/brightStars xplanet/markers/earth xplanet/markers/mars xplanet/markers/moon xplanet/origin/README xplanet/origin/cassini xplanet/origin/galileo xplanet/satellites/README xplanet/satellites/iss xplanet/satellites/iss.tle xplanet/spice/README xplanet/spice/asteroids xplanet/spice/asteroids.krn xplanet/spice/cassini xplanet/spice/cassini.krn xplanet/spice/mgs xplanet/spice/mgs.krn xplanet/spice/voyager xplanet/spice/voyager.krn xplanet/stars/BSC"
+
+foreach file ($text_files)
+        cp ../$file xplanet/$file
+	unix2dos xplanet/$file
+end
+
+foreach file (`find . -name README`)
+  mv $file $file:h/readme.txt
+end
+
+mv xplanet/COPYING xplanet/copying.txt
+mv xplanet/ChangeLog xplanet/ChangeLog.txt
+mv xplanet/NEWS xplanet/readme-1st.txt
+
+mv xplanet/xplanet/markers/earth tmp-markers
+posix.pl tmp-markers > xplanet/xplanet/markers/earth
+rm tmp-markers 
+
+#sed -e 's/á/a/g' < tmp-markers > tmp-markers2
+#sed -e 's/ã/a/g' < tmp-markers2 >  tmp-markers3
+#rm tmp-markers tmp-markers2 tmp-markers3
+
+cp ../xplanet/fonts/FreeMonoBold.ttf xplanet/xplanet/fonts
+cp ../xplanet/images/earth.jpg xplanet/xplanet/images
+cp ../xplanet/images/hubble.png xplanet/xplanet/images
+cp ../xplanet/images/iss.png xplanet/xplanet/images
+cp ../xplanet/images/mgs.png xplanet/xplanet/images
+cp ../xplanet/images/night.jpg xplanet/xplanet/images
+cp ../xplanet/images/odyssey.png xplanet/xplanet/images
+cp ../xplanet/images/shuttle.png xplanet/xplanet/images
+cp ../xplanet/images/smile.png xplanet/xplanet/images
+cp ../xplanet/images/sublunar.png xplanet/xplanet/images
+cp ../xplanet/images/subsolar.png xplanet/xplanet/images
+
+cp cygwin1.dll xplanet
+cp windows.txt xplanet
+unix2dos xplanet/windows.txt
+cp xplanet.bat xplanet
+cp sh.exe xplanet
+cp xplanet.exe xplanet
+
+mv xplanet xplanet-${version}
+
+zip -9 -r xplanet-${version}.zip xplanet-${version}
+
+rm -fr xplanet-${version}
