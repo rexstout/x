@@ -348,6 +348,17 @@ toJulian(int year, int month, int day, int hour, int min, int sec)
 }
 
 double
+deltaETpre1838(const double jd)
+{
+    // From McCarthy & Babcock (1986)
+    const double j1800 = 2378496.5;
+    const double t = (jd - j1800)/36525;
+    const double delT = 5.156 + 13.3066 * (t - 0.19) * (t - 0.19);
+
+    return(delT);
+}
+
+double
 deltaETpre1972(const double jd)
 {
     // Valid from 1825 to 2000, Montenbruck & Pfelger (2000), p 188
@@ -436,21 +447,32 @@ deltaETpost1972(const double jd)
 double 
 delT(const double jd)
 {
-/*
-    // From McCarthy & Babcock (1986)
-    const double j1800 = 2378496.5;
-    const double t = (jd - j1800)/36525;
-    const double delT = 5.156 + 13.3066 * (t - 0.19) * (t - 0.19);
-*/
     double delT;
-    if (jd < toJulian(1972, 1, 1, 0, 0, 0))
+    if (jd < toJulian(1838, 1, 1, 0, 0, 0))
     {
-        delT = deltaETpre1972(jd);
+        delT = deltaETpre1838(jd);
     }
     else
     {
-        delT = deltaETpost1972(jd);
+        if (jd < toJulian(1972, 1, 1, 0, 0, 0))
+        {
+            delT = deltaETpre1972(jd);
+        }
+        else
+        {
+            delT = deltaETpost1972(jd);
+        }
     }
+
+/* 
+    int year, month, day, hour, min;
+    double sec;
+    fromJulian(jd, year, month, day, hour, min, sec);
+    double thisYear = year + (month-1)/12.;
+    
+    printf("%.1f %f %f %f %f\n", thisYear, deltaETpre1838(jd), 
+           deltaETpre1972(jd), deltaETpost1972(jd), delT);
+*/    
     return delT;
 }
 
