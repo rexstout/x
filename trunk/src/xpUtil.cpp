@@ -347,17 +347,9 @@ toJulian(int year, int month, int day, int hour, int min, int sec)
     return(jd);
 }
 
-// find the difference between universal and ephemeris time 
-// (delT = ET - UT)
-double 
-delT(const double jd)
+double
+deltaETpre1972(const double jd)
 {
-#if 0
-    // From McCarthy & Babcock (1986)
-    const double j1800 = 2378496.5;
-    const double t = (jd - j1800)/36525;
-    const double delT = 5.156 + 13.3066 * (t - 0.19) * (t - 0.19);
-#else
     // Valid from 1825 to 2000, Montenbruck & Pfelger (2000), p 188
     const double T = (jd - 2451545)/36525;
     const int i = (int) floor(T/0.25);
@@ -389,9 +381,77 @@ delT(const double jd)
     const double delT = c[ii][0] + t * (c[ii][1] 
                                         + t * (c[ii][2] 
                                                + t * c[ii][3]));
-#endif
+    return delT;
+}
 
-    return(delT);
+double
+deltaETpost1972(const double jd)
+{
+    // based on JPL's leap seconds kernel file
+    const double delta_t_a = 32.184;
+    const double k = 1.657e-3;
+    const double eb = 1.671e-2;
+    const double m0 = 6.239996;
+    const double m1 = 1.99096871e-7;
+
+    // leap seconds
+    int delta_at = 9;
+    if (jd >= toJulian(1972, 1, 1, 0, 0, 0)) delta_at++; // 10
+    if (jd >= toJulian(1972, 7, 1, 0, 0, 0)) delta_at++; // 11
+    if (jd >= toJulian(1973, 1, 1, 0, 0, 0)) delta_at++; // 12
+    if (jd >= toJulian(1974, 1, 1, 0, 0, 0)) delta_at++; // 13
+    if (jd >= toJulian(1975, 1, 1, 0, 0, 0)) delta_at++; // 14
+    if (jd >= toJulian(1976, 1, 1, 0, 0, 0)) delta_at++; // 15
+    if (jd >= toJulian(1977, 1, 1, 0, 0, 0)) delta_at++; // 16
+    if (jd >= toJulian(1978, 1, 1, 0, 0, 0)) delta_at++; // 17
+    if (jd >= toJulian(1979, 1, 1, 0, 0, 0)) delta_at++; // 18
+    if (jd >= toJulian(1980, 1, 1, 0, 0, 0)) delta_at++; // 19
+    if (jd >= toJulian(1981, 7, 1, 0, 0, 0)) delta_at++; // 20
+    if (jd >= toJulian(1982, 7, 1, 0, 0, 0)) delta_at++; // 21
+    if (jd >= toJulian(1983, 7, 1, 0, 0, 0)) delta_at++; // 22
+    if (jd >= toJulian(1985, 7, 1, 0, 0, 0)) delta_at++; // 23
+    if (jd >= toJulian(1988, 1, 1, 0, 0, 0)) delta_at++; // 24
+    if (jd >= toJulian(1990, 1, 1, 0, 0, 0)) delta_at++; // 25
+    if (jd >= toJulian(1991, 1, 1, 0, 0, 0)) delta_at++; // 26
+    if (jd >= toJulian(1992, 7, 1, 0, 0, 0)) delta_at++; // 27
+    if (jd >= toJulian(1993, 7, 1, 0, 0, 0)) delta_at++; // 28
+    if (jd >= toJulian(1994, 7, 1, 0, 0, 0)) delta_at++; // 29
+    if (jd >= toJulian(1996, 1, 1, 0, 0, 0)) delta_at++; // 30
+    if (jd >= toJulian(1997, 7, 1, 0, 0, 0)) delta_at++; // 31
+    if (jd >= toJulian(1999, 1, 1, 0, 0, 0)) delta_at++; // 32
+    if (jd >= toJulian(2006, 1, 1, 0, 0, 0)) delta_at++; // 33
+    if (jd >= toJulian(2009, 1, 1, 0, 0, 0)) delta_at++; // 34
+    if (jd >= toJulian(2012, 1, 1, 0, 0, 0)) delta_at++; // 35
+
+    double J2000 = toJulian(2000, 1, 1, 12, 0, 0);
+    double m = m0 + m1 * (jd - J2000);
+    double e = m + eb * sin(m);
+
+    const double delT = delta_t_a + k * sin(e) + delta_at;
+    return delT;
+}
+
+// find the difference between universal and ephemeris time 
+// (delT = ET - UT)
+double 
+delT(const double jd)
+{
+/*
+    // From McCarthy & Babcock (1986)
+    const double j1800 = 2378496.5;
+    const double t = (jd - j1800)/36525;
+    const double delT = 5.156 + 13.3066 * (t - 0.19) * (t - 0.19);
+*/
+    double delT;
+    if (jd < toJulian(1972, 1, 1, 0, 0, 0))
+    {
+        delT = deltaETpre1972(jd);
+    }
+    else
+    {
+        delT = deltaETpost1972(jd);
+    }
+    return delT;
 }
 
 void 
