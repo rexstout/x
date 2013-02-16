@@ -434,9 +434,9 @@ deltaETpost1972(const double jd)
     if (jd >= toJulian(2009, 1, 1, 0, 0, 0)) delta_at++; // 34
     if (jd >= toJulian(2012, 1, 1, 0, 0, 0)) delta_at++; // 35
 
-    double J2000 = toJulian(2000, 1, 1, 12, 0, 0);
-    double m = m0 + m1 * (jd - J2000);
-    double e = m + eb * sin(m);
+    const double J2000 = toJulian(2000, 1, 1, 12, 0, 0);
+    const double m = m0 + m1 * (jd - J2000) * 86400;
+    const double e = m + eb * sin(m);
 
     const double delT = delta_t_a + k * sin(e) + delta_at;
     return delT;
