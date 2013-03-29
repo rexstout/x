@@ -21,8 +21,8 @@ using namespace std;
 
 DisplayMSWin::DisplayMSWin(const int tr) : DisplayBase(tr)
 {
-    fullWidth_ = GetSystemMetrics(SM_CXSCREEN);
-    fullHeight_ = GetSystemMetrics(SM_CYSCREEN);
+    fullWidth_ = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    fullHeight_ = GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
     Options *options = Options::getInstance();
     switch (options->DisplayMode())
