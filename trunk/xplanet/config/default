@@ -2,14 +2,16 @@
 # body.  It's best to leave this file alone and modify a copy. Use the
 # -config option to tell xplanet to read your copy.
 
-[default]                       # Values in this section apply to all
-				# bodies unless overridden below.   
+[default]
+
+# Values in the [default] section apply to all bodies unless
+# overridden below.  DON'T use planet-specific parameters, like "map"
+# here!
 
 arc_color=white
 #arc_file=
 arc_thickness=1
 
-#bump_map=
 bump_scale=1
 
 cloud_gamma=1
@@ -32,8 +34,6 @@ grid=false
 grid1=6
 grid2=15
 
-#image=
-
 magnify=1                       # draw the body as if its radius were
 				# magnified by this factor 
 
@@ -49,8 +49,6 @@ min_radius_for_label=.01        # don't draw a label if the body's
 
 min_radius_for_markers=40       # don't draw markers if the body's
 				# radius in pixels is less than this  
-
-#night_map=
 
 orbit={-.5,.5,2}                # extent of orbit to draw, 
 				# {start, end, delta}, where 
